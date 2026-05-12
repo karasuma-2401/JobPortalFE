@@ -17,11 +17,16 @@ import FoundingInfo from "./pages/Employer/AccountSetup/FoundingInfo";
 import SocialLink from "./pages/Employer/AccountSetup/SocialLinks";
 import Contact from "./pages/Employer/AccountSetup/Contact";
 import SetupSuccess from "./pages/Employer/AccountSetup/SetupSuccess";
-
+import { Navigate } from "react-router-dom";
+import CandidateLayout from "./layouts/CandidateLayout";
+import SettingsPage from "./components/dashboard/Settings";
 const router = createBrowserRouter([
   {
     element: <MainLayout />,
-    children: [{ path: "/home", element: <Home /> }],
+    children: [
+      { path: "/", element: <Navigate to="/home" /> }, 
+      { path: "/home", element: <Home /> },
+    ],
   },
   {
     element: <AuthLayout />,
@@ -49,6 +54,20 @@ const router = createBrowserRouter([
   },
   { path: "/verify-email", element: <VerifyEmail /> },
   { path: "/reset-password", element: <ResetPassword /> },
+  {
+    path: "/candidate",
+    element: <CandidateLayout />,
+    children: [
+      { path: "settings", element: <SettingsPage /> },
+    ],
+  },
+  {
+    element: <MainLayout />,
+    children: [
+      { path: "/", element: <Navigate to="/candidate/settings" /> }, 
+      { path: "/home", element: <Home /> },
+    ],
+  },
 ]);
 
 export default function App() {

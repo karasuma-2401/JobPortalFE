@@ -4,23 +4,24 @@ import {
   ArrowRight,
   Plus,
   X,
-  Facebook,
-  Twitter,
-  Instagram,
-  Youtube,
-  Linkedin,
 } from "lucide-react";
+import { FaFacebook,
+         FaTwitter,
+         FaInstagram,
+         FaYoutube,
+         FaLinkedin
+ } from "react-icons/fa"
 
 import ComboBox, { type OptionType } from "../../../components/ui/ComboBox";
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 
 const socialNetworks: OptionType[] = [
-  { label: "Facebook", icon: <Facebook />, value: "facebook" },
-  { label: "Twitter", icon: <Twitter />, value: "twitter" },
-  { label: "Instagram", icon: <Instagram />, value: "instagram" },
-  { label: "Youtube", icon: <Youtube />, value: "youtube" },
-  { label: "Linked In", icon: <Linkedin />, value: "linkedin" },
+  { label: "Facebook", icon: <FaFacebook />, value: "facebook" },
+  { label: "Twitter", icon: <FaTwitter />, value: "twitter" },
+  { label: "Instagram", icon: <FaInstagram />, value: "instagram" },
+  { label: "Youtube", icon: <FaYoutube />, value: "youtube" },
+  { label: "Linked In", icon: <FaLinkedin />, value: "linkedin" },
 ];
 
 interface SocialLinkItem {
