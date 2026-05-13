@@ -90,26 +90,23 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      {/* PHẦN DƯỚI: CV Manager - Nút thêm mới nằm ngang đồng bộ */}
+      {/* PHẦN DƯỚI: CV Manager */}
       <div className="mt-16 pt-10 border-t border-gray-100 text-left">
         <h3 className="text-lg font-bold mb-8 text-gray-900">Your Cv/Resume</h3>
         
-        {/* items-stretch bắt các con trong hàng cao bằng nhau */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
           
           <ResumeCard resume={{ name: 'Professional Resume', size: '3.5 MB' }} />
           <ResumeCard resume={{ name: 'Product Designer', size: '4.7 MB' }} />
           <ResumeCard resume={{ name: 'Visual Designer', size: '1.3 MB' }} />
           
-          {/* NÚT THÊM MỚI DẠNG NGANG (Y hệt ResumeCard) */}
+          {/* NÚT THÊM MỚI */}
           <button className="flex items-center justify-start p-5 border-2 border-dashed border-primary-100 rounded-lg bg-bg-white hover:bg-primary-50 transition-all h-full group outline-none">
             <div className="flex items-center gap-4">
-              {/* Icon Plus hình tròn */}
               <div className="p-3 bg-primary-100 rounded-full text-primary-500 group-hover:scale-110 transition-transform">
                 <Plus className="w-6 h-6" />
               </div>
               
-              {/* Text hướng dẫn căn trái */}
               <div className="flex flex-col text-left">
                 <p className="text-sm font-bold text-primary-500">Add Cv/Resume</p>
                 <p className="text-[11px] text-gray-400 mt-1">Browse file or drop here. only pdf</p>
