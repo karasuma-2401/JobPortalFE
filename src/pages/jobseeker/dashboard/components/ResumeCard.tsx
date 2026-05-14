@@ -1,23 +1,24 @@
-import { useState, useEffect, useRef } from 'react';
-import { FileText, MoreVertical, Trash2, Edit3 } from 'lucide-react';
+import { useState, useEffect, useRef } from "react";
+import { FileText, MoreVertical, Trash2, Edit3 } from "lucide-react";
 
 interface ResumeCardProps {
-  resume: { name: string; size: string };
-  onDelete?: () => void;
+  resume: { id: string; name: string; size: string };
+  onDelete?: (id: string) => void;
 }
 
-export const ResumeCard = ({ resume, onDelete }: ResumeCardProps) => {
+export default function ResumeCard({ resume, onDelete }: ResumeCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Auto close menu when clicking outside component
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -33,34 +34,38 @@ export const ResumeCard = ({ resume, onDelete }: ResumeCardProps) => {
           <p className="text-xs text-gray-500 mt-1">{resume.size}</p>
         </div>
       </div>
-      
-      {/* Container của nút ba chấm và menu */}
+
       <div className="relative shrink-0 ml-2" ref={menuRef}>
-        <button 
+        <button
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
           className={`p-1.5 rounded-full transition-colors ${
-            isOpen ? 'bg-primary-50 text-primary-500' : 'hover:bg-gray-50 text-gray-400'
+            isOpen ? "bg-primary-50 text-primary-500" : "hover:bg-gray-50 text-gray-400"
           }`}
         >
-          <MoreVertical className="w-5 h-5" />
+          <MoreVertical size={20} />
         </button>
-        
-        {/* Dropdown Menu */}
+
         {isOpen && (
-          <div className="absolute right-0 w-40 bg-bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 rounded-lg py-1.5 z-30 mt-2 animate-in fade-in zoom-in duration-150">
-            <button 
+          <div className="absolute right-0 w-40 bg-bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 rounded-lg py-1.5 z-30 mt-2">
+            <button
+              type="button"
               className="flex items-center gap-2 px-4 py-2.5 text-sm w-full hover:bg-gray-50 text-gray-700 transition-colors"
-              onClick={() => { /* Xử lý edit */ setIsOpen(false); }}
+              onClick={() => setIsOpen(false)}
             >
-              <Edit3 className="w-4 h-4 text-primary-500" />
+              <Edit3 size={16} className="text-primary-500" />
               <span>Edit Resume</span>
             </button>
-            <div className="h-[1px] bg-gray-50 my-1" />
-            <button 
+            <div className="h-px bg-gray-100 my-1" />
+            <button
+              type="button"
               className="flex items-center gap-2 px-4 py-2.5 text-sm w-full hover:bg-danger-50 text-danger-500 transition-colors"
-              onClick={() => { onDelete?.(); setIsOpen(false); }}
+              onClick={() => {
+                if (onDelete) onDelete(resume.id);
+                setIsOpen(false);
+              }}
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 size={16} />
               <span>Delete</span>
             </button>
           </div>
@@ -68,4 +73,4 @@ export const ResumeCard = ({ resume, onDelete }: ResumeCardProps) => {
       </div>
     </div>
   );
-};
+}
