@@ -4,13 +4,13 @@ import { FileText, MoreVertical, Trash2, Edit3 } from "lucide-react";
 interface ResumeCardProps {
   resume: { id: string; name: string; size: string };
   onDelete?: (id: string) => void;
+  onEdit?: () => void;
 }
 
-export default function ResumeCard({ resume, onDelete }: ResumeCardProps) {
+export default function ResumeCard({ resume, onDelete, onEdit }: ResumeCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Auto close menu when clicking outside component
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -51,7 +51,10 @@ export default function ResumeCard({ resume, onDelete }: ResumeCardProps) {
             <button
               type="button"
               className="flex items-center gap-2 px-4 py-2.5 text-sm w-full hover:bg-gray-50 text-gray-700 transition-colors"
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                if (onEdit) onEdit();
+              }}
             >
               <Edit3 size={16} className="text-primary-500" />
               <span>Edit Resume</span>

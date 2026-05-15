@@ -19,7 +19,7 @@ import Contact from "./pages/Employer/AccountSetup/Contact";
 import SetupSuccess from "./pages/Employer/AccountSetup/SetupSuccess";
 import { Navigate } from "react-router-dom";
 import CandidateLayout from "./layouts/CandidateLayout";
-import SettingsPage from "./pages/jobseeker/dashboard/Settings";
+import SettingsPage from "./pages/jobseeker/dashboard/Settings/Settings";
 const router = createBrowserRouter([
   {
     element: <MainLayout />,

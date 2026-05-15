@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Globe, Loader2, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
-import Input from "../../../../components/ui/Input";
-import Button from "../../../../components/ui/Button";
+import Input from "../../../../../components/ui/Input";
+import Button from "../../../../../components/ui/Button";
 
 export default function BasicInfoForm() {
   const [fullName, setFullName] = useState("");
