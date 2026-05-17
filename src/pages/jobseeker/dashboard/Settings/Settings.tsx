@@ -4,6 +4,7 @@ import BasicInfoForm from "./components/BasicInfoForm";
 import ResumeManager from "./components/ResumeManager";
 import ProfileTab from "./components/ProfileTab";
 import SocialLinksTab from "./components/SocialLinksTab";
+import AccountSettingsTab from "./components/AccountSettingsTab";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Personal");
@@ -59,11 +60,9 @@ export default function Settings() {
         {activeTab === "Social Links" && (
           <SocialLinksTab />
       )}
-              {(activeTab === "Social Links") && (
-          <div className="py-20 text-center text-gray-400 border border-dashed border-gray-100 rounded-xl">
-            Content for {activeTab} is coming soon...
-          </div>
-        )}
+        {activeTab === "Account Setting" && (
+          <AccountSettingsTab />
+      )}
       </div>
     </div>
   );
