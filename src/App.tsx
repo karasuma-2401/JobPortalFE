@@ -20,6 +20,7 @@ import Contact from "./pages/employer/AccountSetup/Contact";
 import SetupSuccess from "./pages/employer/AccountSetup/SetupSuccess";
 
 import Overview from "./pages/employer/dashboard/Overview";
+import PostJobPricing from "./pages/employer/dashboard/PostJobPricing";
 
 const router = createBrowserRouter([
   {
@@ -60,7 +61,15 @@ const router = createBrowserRouter([
       },
       {
         path: "post-job",
-        element: <div className="text-2xl font-bold">Trang Đăng Việc Mới</div>,
+        element: <PostJobPricing />,
+      },
+      {
+        path: "checkout",
+        element: (
+          <div className="text-2xl font-bold">
+            Trang Checkout (Đang xây dựng)
+          </div>
+        ),
       },
       {
         path: "my-jobs",
@@ -70,7 +79,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-
   { path: "/verify-email", element: <VerifyEmail /> },
   { path: "/reset-password", element: <ResetPassword /> },
 ]);
