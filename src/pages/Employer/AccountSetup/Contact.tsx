@@ -56,7 +56,7 @@ export default function Contact() {
           <div className="flex flex-col gap-2">
             <label className="font-medium text-sm text-gray-900">Phone</label>
             <div className="flex gap-3">
-              <div className="w-42">
+              <div className="w-45">
                 <ComboBox
                   options={CountryCodes}
                   value={countryCode}
