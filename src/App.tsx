@@ -23,6 +23,7 @@ import Overview from "./pages/employer/dashboard/Overview";
 import PostJobPricing from "./pages/employer/post-job/PostJobPricing";
 import CheckoutPage from "./pages/employer/post-job/Checkout";
 import CreateJobForm from "./pages/employer/post-job/CreateJobForm";
+import MyJobsPage from "./pages/employer/my-jobs/MyJobsPage";
 
 const router = createBrowserRouter([
   {
@@ -71,9 +72,7 @@ const router = createBrowserRouter([
       },
       {
         path: "my-jobs",
-        element: (
-          <div className="text-2xl font-bold">Trang Quản Lý Việc Làm</div>
-        ),
+        element: <MyJobsPage />,
       },
       {
         path: "post-job",

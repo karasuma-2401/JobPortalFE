@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import ApplyJobType from "./components/ApplyJobType";
 import RichTextEditor from "../../../components/ui/RichTextEditor";
+import PostSuccessModal from "./components/PostSuccessModal";
 
 export default function CreateJobForm() {
-  const navigate = useNavigate();
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     tags: "",
@@ -35,8 +35,7 @@ export default function CreateJobForm() {
       toast.error("Job Title is required!");
       return;
     }
-    toast.success("Job posted successfully!");
-    navigate("/employer/dashboard");
+    setIsSuccessModalOpen(true);
   };
 
   return (
@@ -277,6 +276,12 @@ export default function CreateJobForm() {
           </button>
         </div>
       </form>
+
+      <PostSuccessModal
+        isOpen={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        jobTitle={formData.title || "UI/UX Designer"}
+      />
     </div>
   );
 }
