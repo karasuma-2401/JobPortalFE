@@ -20,7 +20,9 @@ import Contact from "./pages/employer/AccountSetup/Contact";
 import SetupSuccess from "./pages/employer/AccountSetup/SetupSuccess";
 
 import Overview from "./pages/employer/dashboard/Overview";
-import PostJobPricing from "./pages/employer/dashboard/PostJobPricing";
+import PostJobPricing from "./pages/employer/post-job/PostJobPricing";
+import CheckoutPage from "./pages/employer/post-job/Checkout";
+import CreateJobForm from "./pages/employer/post-job/CreateJobForm";
 
 const router = createBrowserRouter([
   {
@@ -65,17 +67,20 @@ const router = createBrowserRouter([
       },
       {
         path: "checkout",
-        element: (
-          <div className="text-2xl font-bold">
-            Trang Checkout (Đang xây dựng)
-          </div>
-        ),
+        element: <CheckoutPage />,
       },
       {
         path: "my-jobs",
         element: (
           <div className="text-2xl font-bold">Trang Quản Lý Việc Làm</div>
         ),
+      },
+      {
+        path: "post-job",
+        children: [
+          { index: true, element: <PostJobPricing /> },
+          { path: "create", element: <CreateJobForm /> },
+        ],
       },
     ],
   },

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import PricingCard from "./components/PricingCard";
+import PricingCard from "./components/PricingCard"
 import pricingIllustration from "../../../assets/PricingIllustration.svg";
 
 const pricingPlans = [
