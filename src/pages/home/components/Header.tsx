@@ -4,7 +4,7 @@ import { Search, PhoneCall } from "lucide-react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Button from "../../../components/ui/Button";
 import JobLogo from "../../../assets/JobLogo.svg";
-import ComboBox from "../../../components/ui/ComboBox";
+import ComboBox, { type OptionType } from "../../../components/ui/ComboBox";
 
 const languages = [
   { label: "English", value: "english" },
@@ -22,6 +22,7 @@ const navLinks = [
 export default function Header() {
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
+  const [language, setLanguage] = useState<OptionType>(languages[0]);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious() ?? 0;
@@ -62,7 +63,11 @@ export default function Header() {
             <PhoneCall size={16} />
             <span className="font-medium text-gray-900">+84867070087</span>
           </div>
-          <ComboBox options={languages} placeholder="English" />
+          <ComboBox
+            options={languages}
+            value={language}
+            onChange={setLanguage}
+          />
         </div>
       </div>
 

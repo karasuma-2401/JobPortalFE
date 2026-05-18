@@ -65,7 +65,7 @@ export default function Register() {
         <div className="relative">
           <ComboBox
             options={accountTypes}
-            placeholder="Employers"
+            value={role}
             onChange={(option) => setRole(option)}
           />
         </div>

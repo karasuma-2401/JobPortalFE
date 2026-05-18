@@ -4,7 +4,7 @@ import { Toaster } from "sonner";
 import MainLayout from "./layouts/MainLayout";
 import AuthLayout from "./layouts/AuthLayout";
 import EmployerSetupLayout from "./layouts/EmployerSetupLayout";
-import EmployerLayout from "./layouts/EmployerLayout";
+import EmployerDashboardLayout from "./layouts/EmployerDashboardLayout";
 
 import Home from "./pages/home/Home";
 import Login from "./pages/auth/Login";
@@ -12,11 +12,18 @@ import Register from "./pages/auth/Register";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
-import CompanyInfo from "./pages/Employer/AccountSetup/CompanyInfo";
-import FoundingInfo from "./pages/Employer/AccountSetup/FoundingInfo";
-import SocialLink from "./pages/Employer/AccountSetup/SocialLinks";
-import Contact from "./pages/Employer/AccountSetup/Contact";
-import SetupSuccess from "./pages/Employer/AccountSetup/SetupSuccess";
+
+import CompanyInfo from "./pages/employer/AccountSetup/CompanyInfo";
+import FoundingInfo from "./pages/employer/AccountSetup/FoundingInfo";
+import SocialLink from "./pages/employer/AccountSetup/SocialLinks";
+import Contact from "./pages/employer/AccountSetup/Contact";
+import SetupSuccess from "./pages/employer/AccountSetup/SetupSuccess";
+
+import Overview from "./pages/employer/dashboard/Overview";
+import PostJobPricing from "./pages/employer/post-job/PostJobPricing";
+import CheckoutPage from "./pages/employer/post-job/Checkout";
+import CreateJobForm from "./pages/employer/post-job/CreateJobForm";
+import MyJobsPage from "./pages/employer/my-jobs/MyJobsPage";
 
 const router = createBrowserRouter([
   {
@@ -28,7 +35,6 @@ const router = createBrowserRouter([
     children: [
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
-
       { path: "/forgot-password", element: <ForgotPassword /> },
     ],
   },
@@ -36,6 +42,7 @@ const router = createBrowserRouter([
     path: "/employer/setup",
     element: <EmployerSetupLayout />,
     children: [
+      { index: true, element: <CompanyInfo /> },
       { path: "company", element: <CompanyInfo /> },
       { path: "founding", element: <FoundingInfo /> },
       { path: "social", element: <SocialLink /> },
@@ -44,8 +51,37 @@ const router = createBrowserRouter([
     ],
   },
   {
-    element: <EmployerLayout />,
-    children: [],
+    path: "/employer",
+    element: <EmployerDashboardLayout />,
+    children: [
+      { index: true, element: <Overview /> },
+      { path: "dashboard", element: <Overview /> },
+      {
+        path: "profile",
+        element: (
+          <div className="text-2xl font-bold">Trang Employers Profile</div>
+        ),
+      },
+      {
+        path: "post-job",
+        element: <PostJobPricing />,
+      },
+      {
+        path: "checkout",
+        element: <CheckoutPage />,
+      },
+      {
+        path: "my-jobs",
+        element: <MyJobsPage />,
+      },
+      {
+        path: "post-job",
+        children: [
+          { index: true, element: <PostJobPricing /> },
+          { path: "create", element: <CreateJobForm /> },
+        ],
+      },
+    ],
   },
   { path: "/verify-email", element: <VerifyEmail /> },
   { path: "/reset-password", element: <ResetPassword /> },
@@ -55,7 +91,7 @@ export default function App() {
   return (
     <>
       <Toaster position="bottom-right" richColors />
-      <RouterProvider router={router} />;
+      <RouterProvider router={router} />
     </>
   );
 }

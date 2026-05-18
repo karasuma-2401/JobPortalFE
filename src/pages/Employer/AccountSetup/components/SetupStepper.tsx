@@ -1,7 +1,7 @@
 import { User, Building, Globe, AtSign } from "lucide-react";
 const steps = [
   { path: "company", label: "Company Info", icon: User },
-  { path: "fouding", label: "Fouding Info", icon: Building },
+  { path: "founding", label: "Founding Info", icon: Building },
   { path: "social", label: "Social Media Profile", icon: Globe },
   { path: "contact", label: "Contact", icon: AtSign },
 ];

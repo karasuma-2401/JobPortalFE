@@ -1,8 +1,8 @@
 // src/layouts/EmployerSetupLayout.tsx
 import { Outlet, useLocation } from "react-router-dom";
-import SetupHeader from "../pages/Employer/AccountSetup/components/SetupHeader";
-import SetupStepper from "../pages/Employer/AccountSetup/components/SetupStepper";
-import SetupFooter from "../pages/Employer/AccountSetup/components/SetupFooter";
+import SetupHeader from "../pages/employer/AccountSetup/components/SetupHeader";
+import SetupStepper from "../pages/employer/AccountSetup/components/SetupStepper";
+import SetupFooter from "../pages/employer/AccountSetup/components/SetupFooter";
 
 export default function EmployerSetupLayout() {
   const location = useLocation();
