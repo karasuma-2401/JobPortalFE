@@ -1,22 +1,24 @@
-import { Bookmark, MoreVertical, Mail, Download } from "lucide-react";
+import {
+  Bookmark,
+  MoreVertical,
+  Mail,
+  Download,
+  BookmarkMinus,
+} from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
-
-export interface SavedCandidate {
-  id: string;
-  name: string;
-  role: string;
-  avatar: string | null;
-}
+import type { Candidate } from "../../components/CandidateProfileModal";
 
 interface SavedCandidateItemProps {
-  candidate: SavedCandidate;
+  candidate: Candidate;
   onViewProfile: (id: string) => void;
+  onRemove: (id: string) => void;
 }
 
 export default function SavedCandidateItem({
   candidate,
   onViewProfile,
+  onRemove,
 }: SavedCandidateItemProps) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -51,8 +53,13 @@ export default function SavedCandidateItem({
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors">
-          <Bookmark size={20} fill="currentColor" />
+        <button
+          onClick={() => onRemove(candidate.id)}
+          className="p-2 text-blue-600 hover:bg-red-50 hover:text-red-500 rounded-full transition-colors group/btn"
+          title="Remove from saved"
+        >
+          <Bookmark size={20} className="fill-current group-hover/btn:hidden" />
+          <BookmarkMinus size={20} className="hidden group-hover/btn:block" />
         </button>
 
         <button
