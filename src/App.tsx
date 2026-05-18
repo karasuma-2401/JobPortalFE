@@ -24,6 +24,8 @@ import PostJobPricing from "./pages/employer/post-job/PostJobPricing";
 import CheckoutPage from "./pages/employer/post-job/Checkout";
 import CreateJobForm from "./pages/employer/post-job/CreateJobForm";
 import MyJobsPage from "./pages/employer/my-jobs/MyJobsPage";
+import ApplicationsPage from "./pages/employer/applications/ApplicationsPage";
+import SavedCandidatesPage from "./pages/employer/saved-candidates/SavedCandidatesPage";
 
 const router = createBrowserRouter([
   {
@@ -80,6 +82,14 @@ const router = createBrowserRouter([
           { index: true, element: <PostJobPricing /> },
           { path: "create", element: <CreateJobForm /> },
         ],
+      },
+      {
+        path: "applications",
+        element: <ApplicationsPage />,
+      },
+      {
+        path: "saved-candidates",
+        element: <SavedCandidatesPage />,
       },
     ],
   },
