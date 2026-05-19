@@ -26,6 +26,7 @@ import CreateJobForm from "./pages/employer/post-job/CreateJobForm";
 import MyJobsPage from "./pages/employer/my-jobs/MyJobsPage";
 import ApplicationsPage from "./pages/employer/applications/ApplicationsPage";
 import SavedCandidatesPage from "./pages/employer/saved-candidates/SavedCandidatesPage";
+import PlansBillingPage from "./pages/employer/plans-billing/PlansBillingPage";
 
 const router = createBrowserRouter([
   {
@@ -90,6 +91,10 @@ const router = createBrowserRouter([
       {
         path: "saved-candidates",
         element: <SavedCandidatesPage />,
+      },
+      {
+        path: "plans-billing",
+        element: <PlansBillingPage />,
       },
     ],
   },
