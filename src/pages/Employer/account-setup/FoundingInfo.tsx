@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 
-// Nhúng các mảnh ghép "Lego" vào
 import Input from "../../../components/ui/Input";
 import ComboBox, { type OptionType } from "../../../components/ui/ComboBox";
 import Button from "../../../components/ui/Button";
 import RichTextEditor from "../../../components/ui/RichTextEditor";
 
-// --- Dữ liệu giả lập cho các ô Dropdown (Sau này có thể gọi từ BE lên) ---
 const orgTypes = [
   { label: "Private Company", value: "private" },
   { label: "Public Company", value: "public" },
@@ -27,7 +26,11 @@ const teamSizes = [
   { label: "201 - 500 Employees", value: "201-500" },
 ];
 
-export default function FoundingInfo() {
+interface FoundingInfoProps {
+  mode?: "setup" | "settings";
+}
+
+export default function FoundingInfo({ mode = "setup" }: FoundingInfoProps) {
   const navigate = useNavigate();
   const [orgType, setOrgType] = useState<OptionType | null>(null);
   const [industry, setIndustry] = useState<OptionType | null>(null);
@@ -36,10 +39,13 @@ export default function FoundingInfo() {
   const [website, setWebsite] = useState("");
   const [vision, setVision] = useState("");
 
-  const handleSaveAndNext = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // call api
-    navigate("/employer/setup/social");
+    if (mode === "setup") {
+      navigate("/employer/setup/social");
+    } else {
+      toast.success("Founding information updated successfully!");
+    }
   };
 
   const handlePrevious = () => {
@@ -48,7 +54,7 @@ export default function FoundingInfo() {
 
   return (
     <div className="w-full bg-white animate-in fade-in duration-500">
-      <form onSubmit={handleSaveAndNext} className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="flex flex-col gap-2 relative">
             <label className="text-sm font-medium text-gray-900">
@@ -123,19 +129,27 @@ export default function FoundingInfo() {
           />
         </div>
         <div className="flex items-center gap-4 mt-2">
-          <button
-            type="button"
-            onClick={handlePrevious}
-            className="px-6 py-3 font-semibold rounded-md bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors"
-          >
-            Previous
-          </button>
+          {mode === "setup" && (
+            <button
+              type="button"
+              onClick={handlePrevious}
+              className="px-6 py-3 font-semibold rounded-md bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors"
+            >
+              Previous
+            </button>
+          )}
           <Button
             variant="primary"
             type="submit"
-            className="flex items-center gap-2"
+            className={mode === "setup" ? "flex items-center gap-2" : ""}
           >
-            Save & Next <ArrowRight size={18} />
+            {mode === "setup" ? (
+              <>
+                Save & Next <ArrowRight size={18} />
+              </>
+            ) : (
+              "Save Changes"
+            )}
           </Button>
         </div>
       </form>

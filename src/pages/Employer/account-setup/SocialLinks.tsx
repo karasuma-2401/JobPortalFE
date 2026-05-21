@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import {
   ArrowRight,
   Plus,
@@ -16,27 +17,34 @@ import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 
 const socialNetworks: OptionType[] = [
-  { label: "Facebook", icon: <Facebook />, value: "facebook" },
-  { label: "Twitter", icon: <Twitter />, value: "twitter" },
-  { label: "Instagram", icon: <Instagram />, value: "instagram" },
-  { label: "Youtube", icon: <Youtube />, value: "youtube" },
-  { label: "Linked In", icon: <Linkedin />, value: "linkedin" },
+  { label: "Facebook", icon: <Facebook size={18} />, value: "facebook" },
+  { label: "Twitter", icon: <Twitter size={18} />, value: "twitter" },
+  { label: "Instagram", icon: <Instagram size={18} />, value: "instagram" },
+  { label: "Youtube", icon: <Youtube size={18} />, value: "youtube" },
+  { label: "Linked In", icon: <Linkedin size={18} />, value: "linkedin" },
 ];
 
 interface SocialLinkItem {
-  id: string; //key
+  id: string;
   network: OptionType;
   url: string;
 }
 
-export default function SocialLink() {
+interface SocialLinksProps {
+  mode?: "setup" | "settings";
+}
+
+export default function SocialLinks({ mode = "setup" }: SocialLinksProps) {
   const navigate = useNavigate();
 
   const [links, setLinks] = useState<SocialLinkItem[]>([
-    { id: Date.now.toString(), network: socialNetworks[0], url: "" },
+    {
+      id: new Date().getTime().toString(),
+      network: socialNetworks[0],
+      url: "",
+    },
   ]);
 
-  // handle create a new link
   const handleAddLink = () => {
     setLinks([
       ...links,
@@ -44,14 +52,11 @@ export default function SocialLink() {
     ]);
   };
 
-  // handle remove link
   const handleRemoveLink = (idToRemove: string) => {
-    // can not remove when only exists a row
     if (links.length === 1) return;
     setLinks(links.filter((link) => link.id !== idToRemove));
   };
 
-  // handle update social link
   const handleUpdateLink = (
     id: string,
     field: "network" | "url",
@@ -64,10 +69,13 @@ export default function SocialLink() {
     );
   };
 
-  const handleSaveAndNext = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // call api here
-    navigate("/employer/setup/contact");
+    if (mode === "setup") {
+      navigate("/employer/setup/contact");
+    } else {
+      toast.success("Social links updated successfully!");
+    }
   };
 
   const handlePrevious = () => {
@@ -76,7 +84,7 @@ export default function SocialLink() {
 
   return (
     <div className="w-full bg-white animate-in fade-in duration-500">
-      <form onSubmit={handleSaveAndNext} className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div className="flex flex-col gap-4">
           {links.map((link, index) => (
             <div key={link.id} className="flex flex-col gap-2">
@@ -110,7 +118,7 @@ export default function SocialLink() {
                   onClick={() => handleRemoveLink(link.id)}
                   disabled={links.length === 1}
                   className={`font-extrabold w-10 h-10 p-3 rounded-full border border-gray-200 transition-colors flex items-center justify-center
-                    ${links.length === 1 ? "bg-gray-50 text-gray-300 cursor-not-allowed" : "bg-gray-50 text-gray-900 hover:bg-danger-50 hover:text-danger-500 hover:border-danger-200"}`}
+                    ${links.length === 1 ? "bg-gray-50 text-gray-300 cursor-not-allowed" : "bg-gray-50 text-gray-900 hover:bg-red-50 hover:text-red-500 hover:border-red-200"}`}
                 >
                   <X size={20} />
                 </button>
@@ -126,19 +134,27 @@ export default function SocialLink() {
           <Plus size={18} /> Add New Social Link
         </button>
         <div className="flex items-center gap-4 mt-6">
-          <button
-            type="button"
-            onClick={handlePrevious}
-            className="px-6 py-3 font-semibold rounded-md bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors"
-          >
-            Previous
-          </button>
+          {mode === "setup" && (
+            <button
+              type="button"
+              onClick={handlePrevious}
+              className="px-6 py-3 font-semibold rounded-md bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors"
+            >
+              Previous
+            </button>
+          )}
           <Button
             variant="primary"
             type="submit"
-            className="flex items-center gap-2"
+            className={mode === "setup" ? "flex items-center gap-2" : ""}
           >
-            Save & Next <ArrowRight size={18} />
+            {mode === "setup" ? (
+              <>
+                Save & Next <ArrowRight size={18} />
+              </>
+            ) : (
+              "Save Changes"
+            )}
           </Button>
         </div>
       </form>

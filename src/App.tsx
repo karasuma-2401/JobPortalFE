@@ -13,11 +13,11 @@ import VerifyEmail from "./pages/auth/VerifyEmail";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 
-import CompanyInfo from "./pages/employer/AccountSetup/CompanyInfo";
-import FoundingInfo from "./pages/employer/AccountSetup/FoundingInfo";
-import SocialLink from "./pages/employer/AccountSetup/SocialLinks";
-import Contact from "./pages/employer/AccountSetup/Contact";
-import SetupSuccess from "./pages/employer/AccountSetup/SetupSuccess";
+import CompanyInfo from "./pages/employer/account-setup/CompanyInfo";
+import FoundingInfo from "./pages/employer/account-setup/FoundingInfo";
+import SocialLink from "./pages/employer/account-setup/SocialLinks";
+import Contact from "./pages/employer/account-setup/Contact";
+import SetupSuccess from "./pages/employer/account-setup/SetupSuccess";
 
 import Overview from "./pages/employer/dashboard/Overview";
 import PostJobPricing from "./pages/employer/post-job/PostJobPricing";
@@ -26,6 +26,8 @@ import CreateJobForm from "./pages/employer/post-job/CreateJobForm";
 import MyJobsPage from "./pages/employer/my-jobs/MyJobsPage";
 import ApplicationsPage from "./pages/employer/applications/ApplicationsPage";
 import SavedCandidatesPage from "./pages/employer/saved-candidates/SavedCandidatesPage";
+import PlansBillingPage from "./pages/employer/plans-billing/PlansBillingPage";
+import SettingsPage from "./pages/employer/settings/SettingsPage";
 
 const router = createBrowserRouter([
   {
@@ -90,6 +92,14 @@ const router = createBrowserRouter([
       {
         path: "saved-candidates",
         element: <SavedCandidatesPage />,
+      },
+      {
+        path: "plans-billing",
+        element: <PlansBillingPage />,
+      },
+      {
+        path: "settings",
+        element: <SettingsPage />,
       },
     ],
   },

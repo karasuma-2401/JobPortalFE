@@ -21,7 +21,7 @@ const navItems = [
     path: "/employer/saved-candidates",
     icon: Bookmark,
   },
-  { name: "Plans & Billing", path: "/employer/billing", icon: CreditCard },
+  { name: "Plans & Billing", path: "/employer/plans-billing", icon: CreditCard },
   { name: "All Companies", path: "/employer/companies", icon: Building },
   { name: "Settings", path: "/employer/settings", icon: Settings },
 ];
