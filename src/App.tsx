@@ -28,6 +28,7 @@ import ApplicationsPage from "./pages/employer/applications/ApplicationsPage";
 import SavedCandidatesPage from "./pages/employer/saved-candidates/SavedCandidatesPage";
 import PlansBillingPage from "./pages/employer/plans-billing/PlansBillingPage";
 import SettingsPage from "./pages/employer/settings/SettingsPage";
+import EmployerProfilePage from "./pages/employer/profile/EmployerProfilePage";
 
 const router = createBrowserRouter([
   {
@@ -60,12 +61,6 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Overview /> },
       { path: "dashboard", element: <Overview /> },
-      {
-        path: "profile",
-        element: (
-          <div className="text-2xl font-bold">Trang Employers Profile</div>
-        ),
-      },
       {
         path: "post-job",
         element: <PostJobPricing />,
@@ -100,6 +95,10 @@ const router = createBrowserRouter([
       {
         path: "settings",
         element: <SettingsPage />,
+      },
+      {
+        path: "profile",
+        element: <EmployerProfilePage />,
       },
     ],
   },

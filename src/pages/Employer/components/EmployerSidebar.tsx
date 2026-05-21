@@ -21,7 +21,11 @@ const navItems = [
     path: "/employer/saved-candidates",
     icon: Bookmark,
   },
-  { name: "Plans & Billing", path: "/employer/plans-billing", icon: CreditCard },
+  {
+    name: "Plans & Billing",
+    path: "/employer/plans-billing",
+    icon: CreditCard,
+  },
   { name: "All Companies", path: "/employer/companies", icon: Building },
   { name: "Settings", path: "/employer/settings", icon: Settings },
 ];
@@ -29,7 +33,6 @@ const navItems = [
 export default function EmployerSidebar() {
   return (
     <aside className="w-64 h-screen bg-white border-r border-gray-200 flex-col hidden md:flex">
-      {/* Tiêu đề Sidebar */}
       <div className="p-6">
         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
           Employers Dashboard
