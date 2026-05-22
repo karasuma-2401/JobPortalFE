@@ -16,7 +16,7 @@ export default function DashboardSidebar() {
     { path: "/candidate/overview", label: "Overview", icon: <LayoutDashboard size={22} /> },
     { path: "/candidate/applied", label: "Applied Jobs", icon: <Briefcase size={22} /> },
     { path: "/candidate/favorites", label: "Favorite Jobs", icon: <Bookmark size={22} /> },
-    { path: "/candidate/alerts", label: "Job Alert", icon: <Bell size={22} />, badge: "09" },
+    { path: "/candidate/jobalerts", label: "Job Alert", icon: <Bell size={22} />, badge: "09" },
     { path: "/candidate/settings", label: "Settings", icon: <Settings size={22} /> },
   ];
 

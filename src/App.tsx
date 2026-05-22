@@ -20,6 +20,7 @@ import SetupSuccess from "./pages/Employer/AccountSetup/SetupSuccess";
 import { Navigate } from "react-router-dom";
 import CandidateLayout from "./layouts/CandidateLayout";
 import SettingsPage from "./pages/jobseeker/dashboard/Settings/Settings";
+import JobAlertPage from "./pages/jobseeker/dashboard/JobAlert/JobAlert";
 const router = createBrowserRouter([
   {
     element: <MainLayout />,
@@ -59,6 +60,7 @@ const router = createBrowserRouter([
     element: <CandidateLayout />,
     children: [
       { path: "settings", element: <SettingsPage /> },
+      { path: "jobalerts", element: <JobAlertPage /> },
     ],
   },
   {
