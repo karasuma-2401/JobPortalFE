@@ -1,21 +1,38 @@
 import { useState } from "react";
 import { Pencil } from "lucide-react";
-import JobAlertItem, { type JobAlertItemProps } from "./components/JobAlertItem";
+import JobAlertItem, { type JobAlertItemProps } from "./JobAlertItem";
 import DashboardPagination from "../../../../components/ui/DashboardPagination";
 
 export default function JobAlertPage() {
   const [currentPage, setCurrentPage] = useState(1); 
   const [totalPages] = useState(12);   
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
     console.log(`Gọi API lấy data cho trang: ${pageNumber}`);
   };
 
-  const mockJobs: JobAlertItemProps[] = [
-    { id: "1", logo: "https://logo.clearbit.com/google.com", role: `Technical Support (Trang ${currentPage})`, type: "Full Time", location: "Idaho, USA", salary: "$15K-$20K", daysRemaining: "4 Days Remaining" },
-    { id: "2", logo: "https://logo.clearbit.com/youtube.com", role: "UI/UX Designer", type: "Full Time", location: "Minnesota, USA", salary: "$10K-$15K", daysRemaining: "4 Days Remaining" },
-  ];
+  const mockJobs: Omit<JobAlertItemProps, "isSelected" | "onSelect">[] = [
+  { 
+    id: "1", 
+    logo: "https://logo.clearbit.com/google.com", 
+    role: "Technical Support Specialist", 
+    type: "Full Time", 
+    location: "Idaho, USA", 
+    salary: "$15K-$20K", 
+    daysRemaining: "Job Expire" 
+  },
+  { 
+    id: "2", 
+    logo: "https://logo.clearbit.com/youtube.com", 
+    role: "UI/UX Designer", 
+    type: "Full Time", 
+    location: "Minnesota, USA", 
+    salary: "$10K-$15K", 
+    daysRemaining: "4 Days Remaining" 
+  },
+];
 
   return (
     <div className="space-y-8 text-left animate-fade-in">
@@ -32,7 +49,12 @@ export default function JobAlertPage() {
 
       <div className="flex flex-col gap-5">
         {mockJobs.map((job) => (
-          <JobAlertItem key={job.id} {...job} />
+          <JobAlertItem 
+            key={job.id} 
+            {...job} 
+            isSelected={selectedJobId === job.id}
+            onSelect={() => setSelectedJobId(job.id === selectedJobId ? null : job.id)}
+          />
         ))}
       </div>
 

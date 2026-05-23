@@ -2,7 +2,6 @@ import { useState } from "react";
 import FavoriteJobItem from "./FavoriteJobItem";
 import DashboardPagination from "../../../../components/ui/DashboardPagination";
 
-// Định nghĩa kiểu dữ liệu sạch cho mock data (không chứa trạng thái UI)
 interface RawFavoriteJob {
   id: string;
   logo: string;
@@ -54,7 +53,6 @@ export default function FavoriteJobsPage() {
         ))}
       </div>
 
-      {/* Phân trang */}
       <DashboardPagination
         currentPage={currentPage}
         totalPages={totalPages}
