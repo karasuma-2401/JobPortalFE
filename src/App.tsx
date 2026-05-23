@@ -22,6 +22,7 @@ import CandidateLayout from "./layouts/CandidateLayout";
 import SettingsPage from "./pages/jobseeker/dashboard/Settings/Settings";
 import JobAlertPage from "./pages/jobseeker/dashboard/JobAlert/JobAlert";
 import FavoriteJobsPage from "./pages/jobseeker/dashboard/FavoriteJob/FavoriteJobs";
+import AppliedJobsPage from "./pages/jobseeker/dashboard/AppliedJob/AppliedJobs";
 const router = createBrowserRouter([
   {
     element: <MainLayout />,
@@ -63,6 +64,7 @@ const router = createBrowserRouter([
       { path: "settings", element: <SettingsPage /> },
       { path: "jobalerts", element: <JobAlertPage /> },
       { path: "favorites", element: <FavoriteJobsPage /> },
+      { path: "applied", element: <AppliedJobsPage /> },
     ],
   },
   {
