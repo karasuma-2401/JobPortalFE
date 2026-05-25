@@ -18,12 +18,13 @@ import SocialLink from "./pages/Employer/AccountSetup/SocialLinks";
 import Contact from "./pages/Employer/AccountSetup/Contact";
 import SetupSuccess from "./pages/Employer/AccountSetup/SetupSuccess";
 import { Navigate } from "react-router-dom";
-import CandidateLayout from "./layouts/CandidateLayout";
+import CandidateLayout from "./layouts/CandidateDashBoardLayout";
 import SettingsPage from "./pages/jobseeker/dashboard/Settings/Settings";
 import JobAlertPage from "./pages/jobseeker/dashboard/JobAlert/JobAlert";
 import FavoriteJobsPage from "./pages/jobseeker/dashboard/FavoriteJob/FavoriteJobs";
 import AppliedJobsPage from "./pages/jobseeker/dashboard/AppliedJob/AppliedJobs";
 import OverviewPage from "./pages/jobseeker/dashboard/Overview/Overview";
+import CandidateFullLayout from "./layouts/CandidateFullLayout";
 const router = createBrowserRouter([
   {
     element: <MainLayout />,
@@ -59,6 +60,12 @@ const router = createBrowserRouter([
   { path: "/verify-email", element: <VerifyEmail /> },
   { path: "/reset-password", element: <ResetPassword /> },
   {
+    element: <CandidateFullLayout />,
+    children: [
+      { path: "/job-alerts", element: <JobAlertPage /> }, 
+    ],
+  },
+  {
     path: "/candidate",
     element: <CandidateLayout />,
     children: [
@@ -73,6 +80,7 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { path: "/", element: <Navigate to="/candidate/settings" /> }, 
+      { path: "/job-alerts", element: <JobAlertPage /> },
       { path: "/home", element: <Home /> },
     ],
   },

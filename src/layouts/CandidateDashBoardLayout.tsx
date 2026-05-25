@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import DashboardTopbar from "../components/ui/DashboardTopbar";
+import DashboardTopbar from "../components/ui/CandidateTopbar";
 import DashboardSidebar from "../components/ui/DashboardSidebar";
 
 export default function CandidateLayout() {
