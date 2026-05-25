@@ -1,42 +1,53 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 
 import ImageUpload from "../../../components/ui/ImageUpload";
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 import RichTextEditor from "../../../components/ui/RichTextEditor";
 
-export default function CompanyInfo() {
+interface CompanyInfoProps {
+  mode?: "setup" | "settings";
+}
+
+export default function CompanyInfo({ mode = "setup" }: CompanyInfoProps) {
   const navigate = useNavigate();
 
   const [companyName, setCompanyName] = useState("");
   const [aboutUs, setAboutUs] = useState("");
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [bannerFile, setBannerfile] = useState<File | null>(null);
 
-  const [logoFile, setLogoFile] = useState<File | null> (null);
-  const [bannerFile, setBannerfile] = useState<File | null> (null);
-
-
-  const handleSaveAndNext = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // await employerService.saveCompanyInfo({ companyName, aboutUs, logo, banner });
-    console.log ("Data submit: ", {
-      companyName, 
-      aboutUs, 
+    const formData = {
+      companyName,
+      aboutUs,
       logoFile,
-      bannerFile
-    })
-    navigate("/employer/setup/founding");
+      bannerFile,
+    };
+
+    console.log("Form Data Prepared:", formData);
+
+    if (mode === "setup") {
+      navigate("/employer/setup/founding");
+    } else {
+      toast.success("Company information updated successfully!");
+    }
   };
 
   return (
     <div className="w-full bg-white animate-in fade-in duration-500">
-      <h2 className="text-lg font-bold text-gray-900 mb-6">
-        Logo & Banner Image
-      </h2>
+      {mode === "setup" && (
+        <h2 className="text-lg font-bold text-gray-900 mb-6">
+          Logo & Banner Image
+        </h2>
+      )}
 
-      <form onSubmit={handleSaveAndNext} className="flex flex-col gap-8">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-8">
         <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1">
             <span className="block text-sm font-medium text-gray-900 mb-2">
@@ -87,9 +98,15 @@ export default function CompanyInfo() {
           <Button
             variant="primary"
             type="submit"
-            className="flex items-center gap-2"
+            className={mode === "setup" ? "flex items-center gap-2" : ""}
           >
-            Save & Next <ArrowRight size={18} />
+            {mode === "setup" ? (
+              <>
+                Save & Next <ArrowRight size={18} />
+              </>
+            ) : (
+              "Save Changes"
+            )}
           </Button>
         </div>
       </form>

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { toast } from "sonner";
 import { ArrowRight, Mail } from "lucide-react";
+
 import ComboBox, { type OptionType } from "../../../components/ui/ComboBox";
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
@@ -15,7 +16,11 @@ const CountryCodes = [
   { label: "+1 (US)", value: "+1", icon: <span className="text-sm">US</span> },
 ];
 
-export default function Contact() {
+interface ContactProps {
+  mode?: "setup" | "settings";
+}
+
+export default function Contact({ mode = "setup" }: ContactProps) {
   const navigate = useNavigate();
 
   const [mapLocation, setMapLocation] = useState("");
@@ -23,24 +28,22 @@ export default function Contact() {
   const [email, setEmail] = useState("");
   const [countryCode, setCountryCode] = useState<OptionType>(CountryCodes[0]);
 
-  const handleFinishAndNext = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const fullPhone = countryCode ? `${countryCode.value} ${phone}` : phone;
-
-    // lock for a while to see the data
-    console.log("Data submit: ", { mapLocation, phone: fullPhone, email });
-    // await employyerService.saveContact({mapLocation, phone, email});
-    console.log("Data submit: ", { mapLocation, phone: fullPhone, email });
-    navigate("/employer/setup/success");
+    if (mode === "setup") {
+      navigate("/employer/setup/success");
+    } else {
+      toast.success("Contact information updated successfully!");
+    }
   };
+
   const handlePrevious = () => {
     navigate("/employer/setup/social");
   };
 
   return (
     <div className="w-full bg-white animate-in fade-in duration-500">
-      <form onSubmit={handleFinishAndNext} className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <label className="font-medium text-sm text-gray-900">
@@ -56,7 +59,7 @@ export default function Contact() {
           <div className="flex flex-col gap-2">
             <label className="font-medium text-sm text-gray-900">Phone</label>
             <div className="flex gap-3">
-              <div className="w-42">
+              <div className="w-45">
                 <ComboBox
                   options={CountryCodes}
                   value={countryCode}
@@ -77,8 +80,8 @@ export default function Contact() {
           <div className="flex flex-col gap-2">
             <label className="font-medium text-sm text-gray-900">Email</label>
             <div className="flex gap-3">
-              <div className="w-12 flex items-center justify-left">
-                <Mail size={40} className="text-primary-500" />
+              <div className="w-12 flex items-center justify-center border border-gray-200 rounded-md">
+                <Mail size={20} className="text-gray-400" />
               </div>
               <Input
                 type="email"
@@ -90,20 +93,28 @@ export default function Contact() {
           </div>
         </div>
         <div className="flex items-center gap-4 mt-6">
-          <button
-            type="button"
-            onClick={handlePrevious}
-            className="px-6 py-3 font-semibold rounded-md bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors"
-          >
-            Previous
-          </button>
+          {mode === "setup" && (
+            <button
+              type="button"
+              onClick={handlePrevious}
+              className="px-6 py-3 font-semibold rounded-md bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors"
+            >
+              Previous
+            </button>
+          )}
           <Button
             variant="primary"
             type="submit"
-            className="flex items-center gap-2"
+            className={mode === "setup" ? "flex items-center gap-2" : ""}
           >
-            Finish Editings
-            <ArrowRight size={18} />
+            {mode === "setup" ? (
+              <>
+                Finish Editings
+                <ArrowRight size={18} />
+              </>
+            ) : (
+              "Save Changes"
+            )}
           </Button>
         </div>
       </form>

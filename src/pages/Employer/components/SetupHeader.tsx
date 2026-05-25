@@ -1,4 +1,4 @@
-import JobLogo from "../../../../assets/JobLogo.svg";
+import JobLogo from "../../../assets/JobLogo.svg";
 interface SetupHeaderProps {
   progress: number;
   isSuccessPage: boolean;

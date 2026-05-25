@@ -38,7 +38,7 @@ export default function ComboBox({
   return (
     <div ref={wrapperRef} className="relative w-full">
       <div
-        className="flex items-center justify-between w-full px-4 py-3 text-sm bg-white border border-gray-200 rounded-md cursor-pointer hover:border-primary-500 transition-colors"
+        className="flex items-center justify-between gap-2 w-full px-4 py-3 text-sm bg-white border border-gray-200 rounded-md cursor-pointer hover:border-primary-500 transition-colors"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span
@@ -53,7 +53,7 @@ export default function ComboBox({
       </div>
 
       {isOpen && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto animate-in fade-in zoom-in-95">
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto animate-in fade-in zoom-in-95">
           {options.map((option) => (
             <div
               key={option.value}
