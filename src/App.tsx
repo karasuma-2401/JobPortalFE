@@ -29,6 +29,8 @@ import SavedCandidatesPage from "./pages/employer/saved-candidates/SavedCandidat
 import PlansBillingPage from "./pages/employer/plans-billing/PlansBillingPage";
 import SettingsPage from "./pages/employer/settings/SettingsPage";
 import EmployerProfilePage from "./pages/employer/profile/EmployerProfilePage";
+import AdminLayout from "./layouts/AdminLayout";
+import PaymentManagementPage from "./pages/admin/payments/PaymentMangementPage";
 
 const router = createBrowserRouter([
   {
@@ -104,6 +106,15 @@ const router = createBrowserRouter([
   },
   { path: "/verify-email", element: <VerifyEmail /> },
   { path: "/reset-password", element: <ResetPassword /> },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      { index: true, element: <div>Admin Dashboard</div> },
+      { path: "dashboard", element: <div>Admin Dashboard</div> },
+      { path: "payments", element: <PaymentManagementPage /> },
+    ],
+  },
 ]);
 
 export default function App() {
