@@ -31,6 +31,8 @@ import SettingsPage from "./pages/employer/settings/SettingsPage";
 import EmployerProfilePage from "./pages/employer/profile/EmployerProfilePage";
 import AdminLayout from "./layouts/AdminLayout";
 import PaymentManagementPage from "./pages/admin/payments/PaymentMangementPage";
+import EmployerApprovalPage from "./pages/admin/employer-approvals/EmployerApprovalPage";
+import EmployerReviewPage from "./pages/admin/employer-approvals/EmployerReviewPage";
 
 const router = createBrowserRouter([
   {
@@ -113,6 +115,8 @@ const router = createBrowserRouter([
       { index: true, element: <div>Admin Dashboard</div> },
       { path: "dashboard", element: <div>Admin Dashboard</div> },
       { path: "payments", element: <PaymentManagementPage /> },
+      { path: "employer-approvals", element: <EmployerApprovalPage /> },
+      { path: "employer-approvals/:id", element: <EmployerReviewPage /> },
     ],
   },
 ]);
