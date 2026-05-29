@@ -35,6 +35,7 @@ import EmployerApprovalPage from "./pages/admin/employer-approvals/EmployerAppro
 import EmployerReviewPage from "./pages/admin/employer-approvals/EmployerReviewPage";
 import UserManagementPage from "./pages/admin/users/UserManagementPage";
 import AuditLogPage from "./pages/admin/audit-logs/AuditLogPage";
+import IndustryManagementPage from "./pages/admin/industry/IndustryManagementPage";
 
 const router = createBrowserRouter([
   {
@@ -121,6 +122,7 @@ const router = createBrowserRouter([
       { path: "employer-approvals/:id", element: <EmployerReviewPage /> },
       { path: "users", element: <UserManagementPage /> },
       { path: "audit-logs", element: <AuditLogPage /> },
+      { path: "industries", element: <IndustryManagementPage /> },
     ],
   },
 ]);
