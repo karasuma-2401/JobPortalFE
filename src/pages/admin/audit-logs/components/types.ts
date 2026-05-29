@@ -1,4 +1,4 @@
-export type ActionType = "Create" | "Update" | "Delete" | " Login" | "Approve" | "Reject"
+export type ActionType = "Create" | "Update" | "Delete" | "Login" | "Approve" | "Reject"
 export type EntityType = "User" | "EmployerProfile" | "JobPost" | "Payment" | "System"
 
 export interface AuditLog {

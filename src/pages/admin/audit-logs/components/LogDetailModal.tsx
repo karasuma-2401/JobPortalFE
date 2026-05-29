@@ -26,7 +26,7 @@ export default function LogDetailModal({
   };
 
   return (
-    <div className="fixed inset-0 z-100 items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={onClose}
@@ -61,8 +61,15 @@ export default function LogDetailModal({
                 Actor
               </p>
               <p className="text-sm font-semibold text-gray-900">{log.email}</p>
-              <p className="text-xs text-gray-500">{log.userId}</p>
+              <p className="text-xs text-gray-500">ID: {log.userId}</p>
             </div>
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
+              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">
+                Action
+              </p>
+              <p className="text-sm font-bold text-blue-600">{log.action}</p>
+            </div>
+
             <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">
                 Target Entity
@@ -70,7 +77,7 @@ export default function LogDetailModal({
               <p className="text-sm font-semibold text-gray-900">
                 {log.entityType}
               </p>
-              <p className="text-xs text-gray-500">{log.entityId}</p>
+              <p className="text-xs font-mono text-gray-500">{log.entityId}</p>
             </div>
           </div>
           <div>
