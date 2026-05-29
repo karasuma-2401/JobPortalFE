@@ -34,6 +34,7 @@ import PaymentManagementPage from "./pages/admin/payments/PaymentMangementPage";
 import EmployerApprovalPage from "./pages/admin/employer-approvals/EmployerApprovalPage";
 import EmployerReviewPage from "./pages/admin/employer-approvals/EmployerReviewPage";
 import UserManagementPage from "./pages/admin/users/UserManagementPage";
+import AuditLogPage from "./pages/admin/audit-logs/AuditLogPage";
 
 const router = createBrowserRouter([
   {
@@ -119,6 +120,7 @@ const router = createBrowserRouter([
       { path: "employer-approvals", element: <EmployerApprovalPage /> },
       { path: "employer-approvals/:id", element: <EmployerReviewPage /> },
       { path: "users", element: <UserManagementPage /> },
+      { path: "audit-logs", element: <AuditLogPage /> },
     ],
   },
 ]);
