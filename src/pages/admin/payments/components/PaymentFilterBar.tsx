@@ -1,5 +1,6 @@
 import { Search, Filter } from "lucide-react";
 import { type PaymentStatus } from "./StatusBadge";
+import CustomDropdown from "../../../../components/ui/DropDown";
 
 interface PaymentFilterBarProps {
   searchQuery: string;
@@ -14,6 +15,13 @@ export default function PaymentFilterBar({
   statusFilter,
   onStatusChange,
 }: PaymentFilterBarProps) {
+  const statusOption = [
+    { label: "All", value: "All" },
+    { label: "Completed", value: "Completed" },
+    { label: "Pending", value: "Pending" },
+    { label: "Failed", value: "Failed" },
+    { label: "Canceled", value: "Canceled" },
+  ];
   return (
     <div className="p-5 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 bg-gray-50/50">
       <div className="relative w-full sm:max-w-md">
@@ -31,22 +39,12 @@ export default function PaymentFilterBar({
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-3 py-2">
-          <Filter size={16} className="text-gray-400" />
-          <select
-            value={statusFilter}
-            onChange={(e) =>
-              onStatusChange(e.target.value as PaymentStatus | "All")
-            }
-            className="bg-transparent text-sm text-gray-700 outline-none cursor-pointer"
-          >
-            <option value="All">All Status</option>
-            <option value="Completed">Completed</option>
-            <option value="Pending">Pending</option>
-            <option value="Failed">Failed</option>
-            <option value="Canceled">Canceled</option>
-          </select>
-        </div>
+        <CustomDropdown
+          icon={Filter}
+          value={statusFilter}
+          options={statusOption}
+          onChange={(val) => onStatusChange(val as PaymentStatus | "All")}
+        />
       </div>
     </div>
   );
