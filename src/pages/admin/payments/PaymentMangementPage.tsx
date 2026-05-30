@@ -6,8 +6,8 @@ import PaymentDetailDrawer, {
 } from "./components/PaymentDetailDrawer";
 import PaymentFilterBar from "./components/PaymentFilterBar";
 import PaymentTable from "./components/PaymentTable";
-import PaymentPagination from "./components/PaymentPagination";
 import ConfirmModal from "../../../components/ui/ConfirmModal";
+import TablePagination from "../../../components/ui/TablePagination";
 
 const MOCK_PAYMENTS: Payment[] = [
   {
@@ -171,7 +171,7 @@ export default function PaymentManagementPage() {
           onUpdateStatus={handleUpdateStatus}
         />
 
-        <PaymentPagination
+        <TablePagination
           currentPage={currentPage}
           totalPages={totalPages}
           itemsPerPage={itemsPerPage}
