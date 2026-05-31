@@ -13,9 +13,9 @@ export default function DashboardPage() {
           Welcome back, Super Admin! Here's what's happening today.
         </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         <StatCard
-          title="Total Revenue"
+          title="Revenue"
           value="$124,500"
           icon={<DollarSign size={24} />}
           trend={{ value: 12.5, isPositive: true }}
@@ -23,7 +23,7 @@ export default function DashboardPage() {
           iconColor="text-blue-600"
         />
         <StatCard
-          title="Total Users"
+          title="Users"
           value="8,234"
           icon={<Users size={24} />}
           trend={{ value: 5.2, isPositive: true }}
