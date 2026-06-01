@@ -21,6 +21,7 @@ import { Navigate } from "react-router-dom";
 import CandidateLayout from "./layouts/CandidateDashBoardLayout";
 import SettingsPage from "./pages/jobseeker/dashboard/Settings/Settings";
 import JobAlertPage from "./pages/jobseeker/dashboard/JobAlert/JobAlert";
+import FindJobPage from "./pages/jobseeker/FindJob/FindJobPage";
 import FavoriteJobsPage from "./pages/jobseeker/dashboard/FavoriteJob/FavoriteJobs";
 import AppliedJobsPage from "./pages/jobseeker/dashboard/AppliedJob/AppliedJobs";
 import OverviewPage from "./pages/jobseeker/dashboard/Overview/Overview";
@@ -63,6 +64,7 @@ const router = createBrowserRouter([
     element: <CandidateFullLayout />,
     children: [
       { path: "/job-alerts", element: <JobAlertPage /> }, 
+      { path: "/find-job", element: <FindJobPage/> },
     ],
   },
   {
