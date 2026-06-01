@@ -29,6 +29,14 @@ import SavedCandidatesPage from "./pages/employer/saved-candidates/SavedCandidat
 import PlansBillingPage from "./pages/employer/plans-billing/PlansBillingPage";
 import SettingsPage from "./pages/employer/settings/SettingsPage";
 import EmployerProfilePage from "./pages/employer/profile/EmployerProfilePage";
+import AdminLayout from "./layouts/AdminLayout";
+import PaymentManagementPage from "./pages/admin/payments/PaymentManagementPage";
+import EmployerApprovalPage from "./pages/admin/employer-approvals/EmployerApprovalPage";
+import EmployerReviewPage from "./pages/admin/employer-approvals/EmployerReviewPage";
+import UserManagementPage from "./pages/admin/users/UserManagementPage";
+import AuditLogPage from "./pages/admin/audit-logs/AuditLogPage";
+import IndustryManagementPage from "./pages/admin/industry/IndustryManagementPage";
+import DashboardPage from "./pages/admin/dashboard/DashboardPage";
 
 const router = createBrowserRouter([
   {
@@ -104,6 +112,20 @@ const router = createBrowserRouter([
   },
   { path: "/verify-email", element: <VerifyEmail /> },
   { path: "/reset-password", element: <ResetPassword /> },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      { index: true, element: <div>Admin Dashboard</div> },
+      { path: "dashboard", element: <DashboardPage/> },
+      { path: "payments", element: <PaymentManagementPage /> },
+      { path: "employer-approvals", element: <EmployerApprovalPage /> },
+      { path: "employer-approvals/:id", element: <EmployerReviewPage /> },
+      { path: "users", element: <UserManagementPage /> },
+      { path: "audit-logs", element: <AuditLogPage /> },
+      { path: "industries", element: <IndustryManagementPage /> },
+    ],
+  },
 ]);
 
 export default function App() {
