@@ -1,4 +1,3 @@
-// Bổ sung thêm Navigate vào dòng import
 import {
   createBrowserRouter,
   RouterProvider,
@@ -43,6 +42,7 @@ import UserManagementPage from "./pages/admin/users/UserManagementPage";
 import AuditLogPage from "./pages/admin/audit-logs/AuditLogPage";
 import IndustryManagementPage from "./pages/admin/industry/IndustryManagementPage";
 import DashboardPage from "./pages/admin/dashboard/DashboardPage";
+import { NotificationProvider } from "./contexts/NotificationProvider";
 
 const router = createBrowserRouter([
   {
@@ -134,7 +134,9 @@ export default function App() {
   return (
     <>
       <Toaster position="bottom-right" richColors />
-      <RouterProvider router={router} />
+      <NotificationProvider>
+        <RouterProvider router={router} />
+      </NotificationProvider>
     </>
   );
 }
