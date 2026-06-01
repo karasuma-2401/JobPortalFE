@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Bell, Phone, Briefcase, User, Settings, LogOut } from "lucide-react";
+import { Phone, Briefcase, User, Settings, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import sulkyunggu from "../../../assets/sulkyunggu.jpg";
 import ComboBox, { type OptionType } from "../../../components/ui/ComboBox";
+import NotificationBell from "../../../components/ui/NotificationBell";
 
 const navLinks = [
   { name: "Home", path: "/home" },
@@ -37,10 +38,6 @@ export default function EmployerHeader() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const handleNotification = () => {
-    toast.info("No new notifications at the moment.");
-  };
 
   const handleLogout = () => {
     toast.success("Logged out successfully!");
@@ -93,13 +90,7 @@ export default function EmployerHeader() {
         </div>
 
         <div className="flex items-center gap-5">
-          <button
-            onClick={handleNotification}
-            className="relative text-gray-500 hover:text-primary-600 transition-colors"
-          >
-            <Bell size={24} />
-            <span className="absolute top-0 right-0 w-2 h-2 bg-danger-500 rounded-full border border-white"></span>
-          </button>
+          <NotificationBell />
 
           <Link
             to="/employer/post-job"

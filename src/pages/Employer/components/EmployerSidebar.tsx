@@ -6,7 +6,6 @@ import {
   Briefcase,
   Bookmark,
   CreditCard,
-  Building,
   Settings,
   LogOut,
 } from "lucide-react";
@@ -26,7 +25,6 @@ const navItems = [
     path: "/employer/plans-billing",
     icon: CreditCard,
   },
-  { name: "All Companies", path: "/employer/companies", icon: Building },
   { name: "Settings", path: "/employer/settings", icon: Settings },
 ];
 

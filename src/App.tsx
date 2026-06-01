@@ -1,4 +1,8 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from "react-router-dom";
 import { Toaster } from "sonner";
 
 import MainLayout from "./layouts/MainLayout";
@@ -29,6 +33,7 @@ import SavedCandidatesPage from "./pages/employer/saved-candidates/SavedCandidat
 import PlansBillingPage from "./pages/employer/plans-billing/PlansBillingPage";
 import SettingsPage from "./pages/employer/settings/SettingsPage";
 import EmployerProfilePage from "./pages/employer/profile/EmployerProfilePage";
+
 import AdminLayout from "./layouts/AdminLayout";
 import PaymentManagementPage from "./pages/admin/payments/PaymentManagementPage";
 import EmployerApprovalPage from "./pages/admin/employer-approvals/EmployerApprovalPage";
@@ -37,6 +42,7 @@ import UserManagementPage from "./pages/admin/users/UserManagementPage";
 import AuditLogPage from "./pages/admin/audit-logs/AuditLogPage";
 import IndustryManagementPage from "./pages/admin/industry/IndustryManagementPage";
 import DashboardPage from "./pages/admin/dashboard/DashboardPage";
+import { NotificationProvider } from "./contexts/NotificationProvider";
 
 const router = createBrowserRouter([
   {
@@ -67,12 +73,8 @@ const router = createBrowserRouter([
     path: "/employer",
     element: <EmployerDashboardLayout />,
     children: [
-      { index: true, element: <Overview /> },
+      { index: true, element: <Navigate to="dashboard" replace /> },
       { path: "dashboard", element: <Overview /> },
-      {
-        path: "post-job",
-        element: <PostJobPricing />,
-      },
       {
         path: "checkout",
         element: <CheckoutPage />,
@@ -116,8 +118,8 @@ const router = createBrowserRouter([
     path: "/admin",
     element: <AdminLayout />,
     children: [
-      { index: true, element: <div>Admin Dashboard</div> },
-      { path: "dashboard", element: <DashboardPage/> },
+      { index: true, element: <Navigate to="dashboard" replace /> },
+      { path: "dashboard", element: <DashboardPage /> },
       { path: "payments", element: <PaymentManagementPage /> },
       { path: "employer-approvals", element: <EmployerApprovalPage /> },
       { path: "employer-approvals/:id", element: <EmployerReviewPage /> },
@@ -132,7 +134,9 @@ export default function App() {
   return (
     <>
       <Toaster position="bottom-right" richColors />
-      <RouterProvider router={router} />
+      <NotificationProvider>
+        <RouterProvider router={router} />
+      </NotificationProvider>
     </>
   );
 }
