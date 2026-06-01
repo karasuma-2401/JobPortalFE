@@ -31,7 +31,7 @@ import MyJobsPage from "./pages/employer/my-jobs/MyJobsPage";
 import ApplicationsPage from "./pages/employer/applications/ApplicationsPage";
 import SavedCandidatesPage from "./pages/employer/saved-candidates/SavedCandidatesPage";
 import PlansBillingPage from "./pages/employer/plans-billing/PlansBillingPage";
-import SettingsPage from "./pages/employer/settings/SettingsPage";
+import EmployerSettingsPage from "./pages/employer/settings/SettingsPage";
 import EmployerProfilePage from "./pages/employer/profile/EmployerProfilePage";
 
 import AdminLayout from "./layouts/AdminLayout";
@@ -44,10 +44,22 @@ import IndustryManagementPage from "./pages/admin/industry/IndustryManagementPag
 import DashboardPage from "./pages/admin/dashboard/DashboardPage";
 import { NotificationProvider } from "./contexts/NotificationProvider";
 
+import CandidateLayout from "./layouts/CandidateDashBoardLayout";
+import SettingsPage from "./pages/jobseeker/dashboard/Settings/Settings";
+import JobAlertPage from "./pages/jobseeker/dashboard/JobAlert/JobAlert";
+import FindJobPage from "./pages/jobseeker/FindJob/FindJobPage";
+import FavoriteJobsPage from "./pages/jobseeker/dashboard/FavoriteJob/FavoriteJobs";
+import AppliedJobsPage from "./pages/jobseeker/dashboard/AppliedJob/AppliedJobs";
+import OverviewPage from "./pages/jobseeker/dashboard/Overview/Overview";
+import CandidateFullLayout from "./layouts/CandidateFullLayout";
 const router = createBrowserRouter([
   {
     element: <MainLayout />,
-    children: [{ path: "/home", element: <Home /> }],
+    children: [
+      { path: "/", element: <Navigate to="/candidate/settings" /> },
+      { path: "/job-alerts", element: <JobAlertPage /> },
+      { path: "/home", element: <Home /> },
+    ],
   },
   {
     element: <AuthLayout />,
@@ -104,7 +116,7 @@ const router = createBrowserRouter([
       },
       {
         path: "settings",
-        element: <SettingsPage />,
+        element: <EmployerSettingsPage />,
       },
       {
         path: "profile",
@@ -126,6 +138,25 @@ const router = createBrowserRouter([
       { path: "users", element: <UserManagementPage /> },
       { path: "audit-logs", element: <AuditLogPage /> },
       { path: "industries", element: <IndustryManagementPage /> },
+    ],
+  },
+
+  {
+    element: <CandidateFullLayout />,
+    children: [
+      { path: "/job-alerts", element: <JobAlertPage /> },
+      { path: "/find-job", element: <FindJobPage /> },
+    ],
+  },
+  {
+    path: "/candidate",
+    element: <CandidateLayout />,
+    children: [
+      { path: "settings", element: <SettingsPage /> },
+      { path: "jobalerts", element: <JobAlertPage /> },
+      { path: "favorites", element: <FavoriteJobsPage /> },
+      { path: "applied", element: <AppliedJobsPage /> },
+      { path: "overview", element: <OverviewPage /> },
     ],
   },
 ]);
