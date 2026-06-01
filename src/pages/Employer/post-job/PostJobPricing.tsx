@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import PricingCard from "./components/PricingCard"
-import pricingIllustration from "../../../assets/PricingIllustration.svg";
+import PricingCard from "./components/PricingCard";
+import PricingIllustration from "../../../assets/PricingIllustration.svg";
 
 const pricingPlans = [
   {
@@ -76,7 +76,7 @@ export default function PostJobPricing() {
         </div>
         <div className="w-full max-w-sm hidden lg:flex justify-end">
           <img
-            src={pricingIllustration}
+            src={PricingIllustration}
             alt="Pricing Illustration"
             className="w-full h-auto object-contain max-w-[320px]"
             onError={(e) => {
