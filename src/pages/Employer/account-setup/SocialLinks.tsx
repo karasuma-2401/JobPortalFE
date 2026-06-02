@@ -9,11 +9,31 @@ import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 
 const socialNetworks: OptionType[] = [
-  { label: "Facebook", icon: <Facebook size={18} />, value: "facebook" },
-  { label: "Twitter", icon: <Twitter size={18} />, value: "twitter" },
-  { label: "Instagram", icon: <Instagram size={18} />, value: "instagram" },
-  { label: "Youtube", icon: <Youtube size={18} />, value: "youtube" },
-  { label: "Linked In", icon: <Linkedin size={18} />, value: "linkedin" },
+  {
+    label: "Facebook",
+    icon: <Facebook className="text-blue-600" />,
+    value: "facebook",
+  },
+  {
+    label: "Twitter",
+    icon: <Twitter className="text-sky-500" />,
+    value: "twitter",
+  },
+  {
+    label: "Instagram",
+    icon: <Instagram className="text-pink-600" />,
+    value: "instagram",
+  },
+  {
+    label: "Youtube",
+    icon: <Youtube className="text-red-600" />,
+    value: "youtube",
+  },
+  {
+    label: "LinkedIn",
+    icon: <Linkedin className="text-blue-700" />,
+    value: "linkedin",
+  },
 ];
 
 interface SocialLinkItem {

@@ -29,3 +29,10 @@
 .react-datepicker-popper {
   @apply z-100 !important;
 }
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container {
+  width: 100%;
+}

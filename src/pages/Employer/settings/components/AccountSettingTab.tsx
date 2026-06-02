@@ -128,7 +128,7 @@ export default function AccountSettingTab() {
           Delete Your Company
         </h3>
         <p className="text-sm text-gray-500 mb-6 max-w-3xl leading-relaxed">
-          If you delete your Jobpilot account, you will no longer be able to get
+          If you delete your Job pilot account, you will no longer be able to get
           information about the matched jobs, following employers, and job
           alert, shortlisted jobs and more. You will be abandoned from all the
           services of Jobpilot.com.

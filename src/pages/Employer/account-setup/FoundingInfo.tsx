@@ -7,6 +7,7 @@ import Input from "../../../components/ui/Input";
 import ComboBox, { type OptionType } from "../../../components/ui/ComboBox";
 import Button from "../../../components/ui/Button";
 import RichTextEditor from "../../../components/ui/RichTextEditor";
+import CustomDatePicker from "../../../components/ui/DatePicker";
 
 const orgTypes = [
   { label: "Private Company", value: "private" },
@@ -31,6 +32,14 @@ interface FoundingInfoProps {
 }
 
 export default function FoundingInfo({ mode = "setup" }: FoundingInfoProps) {
+  const parseDate = (dStr: string) => (dStr ? new Date(dStr) : null);
+  const formatDate = (date: Date | null) => {
+    if (!date) return "";
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
   const navigate = useNavigate();
   const [orgType, setOrgType] = useState<OptionType | null>(null);
   const [industry, setIndustry] = useState<OptionType | null>(null);
@@ -95,13 +104,12 @@ export default function FoundingInfo({ mode = "setup" }: FoundingInfoProps) {
             <label className="text-sm font-medium text-gray-900">
               Year of Establishment
             </label>
-            <Input
-              type="date"
+            <CustomDatePicker
               placeholder="dd/mm/yyyy"
-              value={establishedYear}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setEstablishedYear(e.target.value)
-              }
+              onChange={(date) => {
+                setEstablishedYear(formatDate(date));
+              }}
+              selected={parseDate(establishedYear)}
             />
           </div>
           <div className="flex flex-col gap-2">

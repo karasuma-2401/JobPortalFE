@@ -7,6 +7,7 @@ import {
   ArrowUpCircle,
   Eye,
   XSquare,
+  Users, // Import thêm icon Users ở đây
 } from "lucide-react";
 import Button from "../../../../components/ui/Button";
 
@@ -90,12 +91,13 @@ export default function RecentJobsTable({
                 </td>
 
                 <td className="px-6 py-4">
+                  {/* Bọc Border, Background và chỉnh bo góc cho Status Badge */}
                   {job.status === "Active" ? (
-                    <span className="flex items-center gap-1.5 text-sm font-medium text-success-600">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md border bg-success-50 border-success-200 text-sm font-medium text-success-700">
                       <CheckCircle2 size={16} /> {job.status}
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1.5 text-sm font-medium text-danger-500">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md border bg-danger-50 border-danger-200 text-sm font-medium text-danger-700">
                       <XCircle size={16} /> {job.status}
                     </span>
                   )}
@@ -103,8 +105,9 @@ export default function RecentJobsTable({
 
                 <td className="px-6 py-4">
                   <span className="flex items-center gap-2 text-sm font-medium text-gray-600">
-                    <span className="text-gray-400">👥</span> {job.applications}{" "}
-                    Applications
+                    {/* Thay thế emoji bằng icon Users */}
+                    <Users size={18} className="text-gray-400" />{" "}
+                    {job.applications} Applications
                   </span>
                 </td>
 

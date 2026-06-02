@@ -30,7 +30,7 @@ export default function SettingsPage() {
     <div className="w-full mx-auto animate-in fade-in duration-500 pb-16">
       <h1 className="text-xl font-bold text-gray-900 mb-6">Settings</h1>
 
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-visible">
         <div className="border-b border-gray-200 px-6">
           <div className="flex overflow-x-auto scrollbar-hide">
             <button

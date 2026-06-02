@@ -12,7 +12,6 @@ const navLinks = [
   { name: "Dashboard", path: "/employer/dashboard" },
   { name: "My Jobs", path: "/employer/my-jobs" },
   { name: "Applications", path: "/employer/applications" },
-  { name: "Customer Supports", path: "/employer/support" },
 ];
 
 const languages = [
