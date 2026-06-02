@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { ArrowRight, Plus, X } from "lucide-react";
-import { Facebook, Twitter, Instagram, Youtube, Linkedin } from "lucide-react";
+import {
+  ArrowRight,
+  Plus,
+  X,
+  Facebook,
+  Twitter,
+  Instagram,
+  Youtube,
+  Linkedin,
+} from "lucide-react";
 
 import ComboBox, { type OptionType } from "../../../components/ui/ComboBox";
 import Input from "../../../components/ui/Input";
