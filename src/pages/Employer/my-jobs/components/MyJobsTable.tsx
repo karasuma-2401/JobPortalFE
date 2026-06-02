@@ -6,6 +6,7 @@ import {
   ArrowUpCircle,
   Eye,
   XSquare,
+  Users,
 } from "lucide-react";
 
 export interface JobItem {
@@ -89,11 +90,11 @@ export default function MyJobsTable({
 
                   <td className="px-6 py-4">
                     {job.status === "Active" ? (
-                      <span className="flex items-center gap-1.5 text-sm font-medium text-green-600">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md border bg-green-50 border-green-200 text-sm font-medium text-green-700">
                         <CheckCircle2 size={16} /> {job.status}
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1.5 text-sm font-medium text-red-500">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md border bg-red-50 border-red-200 text-sm font-medium text-red-700">
                         <XCircle size={16} /> {job.status}
                       </span>
                     )}
@@ -101,9 +102,7 @@ export default function MyJobsTable({
 
                   <td className="px-6 py-4">
                     <span className="flex items-center gap-2 text-sm font-medium text-gray-600">
-                      <span className="text-gray-400">
-                        <i className="fa-solid fa-user-group text-xs"></i>
-                      </span>{" "}
+                      <Users size={16} className="text-gray-400" />
                       {job.applications} Applications
                     </span>
                   </td>
@@ -140,7 +139,7 @@ export default function MyJobsTable({
                             <ArrowUpCircle
                               size={16}
                               className="text-blue-500"
-                            />{" "}
+                            />
                             Promote Job
                           </button>
                           <button

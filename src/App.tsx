@@ -52,6 +52,9 @@ import FavoriteJobsPage from "./pages/jobseeker/dashboard/FavoriteJob/FavoriteJo
 import AppliedJobsPage from "./pages/jobseeker/dashboard/AppliedJob/AppliedJobs";
 import OverviewPage from "./pages/jobseeker/dashboard/Overview/Overview";
 import CandidateFullLayout from "./layouts/CandidateFullLayout";
+import JobDetailPage from "./pages/employer/my-jobs/JobDetailPage";
+import EditJobPage from "./pages/employer/my-jobs/components/EditJobPage";
+
 const router = createBrowserRouter([
   {
     element: <MainLayout />,
@@ -93,7 +96,11 @@ const router = createBrowserRouter([
       },
       {
         path: "my-jobs",
-        element: <MyJobsPage />,
+        children: [
+          { index: true, element: <MyJobsPage /> },
+          { path: ":id", element: <JobDetailPage /> },
+          { path: ":id/edit", element: <EditJobPage /> },
+        ],
       },
       {
         path: "post-job",
@@ -140,7 +147,6 @@ const router = createBrowserRouter([
       { path: "industries", element: <IndustryManagementPage /> },
     ],
   },
-
   {
     element: <CandidateFullLayout />,
     children: [

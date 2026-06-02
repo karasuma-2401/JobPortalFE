@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import MyJobsTable, { type JobItem } from "./components/MyJobsTable";
 import Pagination from "../../../components/ui/Pagination";
 import PromoteJobModal from "./components/PromoteJobModal";
+import CustomDropdown from "../../../components/ui/DropDown";
 
 const mockJobs: JobItem[] = [
   {
@@ -92,12 +93,16 @@ const mockJobs: JobItem[] = [
 
 const ITEMS_PER_PAGE = 6;
 
+const filterOptions = [
+  { label: "All Jobs", value: "All Jobs" },
+  { label: "Active", value: "Active" },
+  { label: "Expire", value: "Expire" },
+];
+
 export default function MyJobsPage() {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<JobItem[]>(mockJobs);
-  const [filter, setFilter] = useState<"All Jobs" | "Active" | "Expire">(
-    "All Jobs",
-  );
+  const [filter, setFilter] = useState<string>("All Jobs");
   const [currentPage, setCurrentPage] = useState(1);
 
   const [promoteModalData, setPromoteModalData] = useState<{
@@ -121,8 +126,8 @@ export default function MyJobsPage() {
     currentPage * ITEMS_PER_PAGE,
   );
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilter(e.target.value as "All Jobs" | "Active" | "Expire");
+  const handleFilterChange = (val: string) => {
+    setFilter(val);
     setCurrentPage(1);
   };
 
@@ -156,7 +161,7 @@ export default function MyJobsPage() {
   };
 
   const handleViewDetail = (id: string) => {
-    toast.info(`Viewing details for Job ID: ${id}`);
+    navigate(`/employer/my-jobs/${id}`);
   };
 
   const handleMarkExpired = (id: string) => {
@@ -176,16 +181,15 @@ export default function MyJobsPage() {
           </span>
         </h1>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-500">Job status</span>
-          <select
-            value={filter}
-            onChange={handleFilterChange}
-            className="px-4 py-2 bg-white border border-gray-200 rounded-md text-sm text-gray-700 focus:outline-none focus:border-blue-500 cursor-pointer"
-          >
-            <option value="All Jobs">All Jobs</option>
-            <option value="Active">Active</option>
-            <option value="Expire">Expire</option>
-          </select>
+          <span className="text-sm text-gray-500 font-medium">Job status</span>
+          <div className="w-36">
+            <CustomDropdown
+              options={filterOptions}
+              value={filter}
+              onChange={handleFilterChange}
+              className="w-full"
+            />
+          </div>
         </div>
       </div>
 
