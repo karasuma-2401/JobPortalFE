@@ -67,6 +67,16 @@ export default function SavedCandidatesPage() {
     setSelectedCandidateId(null);
   };
 
+  const formattedExpirationDate = useMemo(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + 30);
+    return new Intl.DateTimeFormat("en-US", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(date);
+  }, []);
+
   return (
     <div className="w-full max-w-5xl mx-auto animate-in fade-in duration-500 pb-16 min-h-[70vh] flex flex-col">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 border-b border-gray-100 pb-4 shrink-0">
@@ -76,16 +86,18 @@ export default function SavedCandidatesPage() {
             ({candidates.length})
           </span>
         </h1>
-        <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
+        <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg border border-gray-100">
           <Info size={16} className="text-blue-500" />
-          <span>All of the candidates are visible until 24 march, 2024</span>
+          <span>
+            All of the candidates are visible until {formattedExpirationDate}
+          </span>
         </div>
       </div>
 
       {candidates.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center p-10 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-200">
           <div className="w-20 h-20 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-4">
-            <FolderOpen size={40} />
+            <FolderOpen size={40} strokeWidth={1.5} />
           </div>
           <h2 className="text-lg font-bold text-gray-900 mb-2">
             No saved candidates found

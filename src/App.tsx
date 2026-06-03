@@ -42,6 +42,8 @@ import UserManagementPage from "./pages/admin/users/UserManagementPage";
 import AuditLogPage from "./pages/admin/audit-logs/AuditLogPage";
 import IndustryManagementPage from "./pages/admin/industry/IndustryManagementPage";
 import DashboardPage from "./pages/admin/dashboard/DashboardPage";
+import AdminProfilePage from "./pages/admin/profile/AdminProfilePage";
+import AdminSettingsPage from "./pages/admin/settings/AdminSettingsPage";
 import { NotificationProvider } from "./contexts/NotificationProvider";
 
 import CandidateLayout from "./layouts/CandidateDashBoardLayout";
@@ -145,6 +147,8 @@ const router = createBrowserRouter([
       { path: "users", element: <UserManagementPage /> },
       { path: "audit-logs", element: <AuditLogPage /> },
       { path: "industries", element: <IndustryManagementPage /> },
+      { path: "profile", element: <AdminProfilePage /> },
+      { path: "settings", element: <AdminSettingsPage /> },
     ],
   },
   {

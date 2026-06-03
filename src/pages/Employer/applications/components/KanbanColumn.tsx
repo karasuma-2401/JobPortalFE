@@ -1,7 +1,7 @@
 import { MoreVertical, Edit2, Trash2, Check, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import ApplicationCard from "./ApplicationCard";
-import type { Applicant } from "./ApplicationCard";
+import type { Candidate } from "../../../../types/candidate";
 
 export interface ColumnData {
   id: string;
@@ -10,7 +10,7 @@ export interface ColumnData {
 
 interface KanbanColumnProps {
   column: ColumnData;
-  applicants: Applicant[];
+  applicants: Candidate[];
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, columnId: string) => void;
   onDragStart: (e: React.DragEvent, id: string) => void;
