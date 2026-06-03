@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Shield, KeyRound } from "lucide-react";
+import { Bell, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AdminSettingsPage() {
@@ -119,45 +119,6 @@ export default function AdminSettingsPage() {
               </button>
             </div>
           </form>
-        </div>
-
-        <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-100">
-            <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600">
-              <Shield size={20} />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">
-                Security & Authentication
-              </h2>
-              <p className="text-sm text-gray-500">
-                Manage your account's extra security layers.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-bold text-gray-900">
-                Two-Factor Authentication (2FA)
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                Add an extra layer of security to your account.
-              </p>
-            </div>
-            <button
-              onClick={() => toggleSetting("twoFactorAuth")}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                settings.twoFactorAuth ? "bg-blue-600" : "bg-gray-200"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  settings.twoFactorAuth ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
-            </button>
-          </div>
         </div>
 
         <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">

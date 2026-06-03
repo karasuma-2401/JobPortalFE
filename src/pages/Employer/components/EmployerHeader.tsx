@@ -8,7 +8,7 @@ import NotificationBell from "../../../components/ui/NotificationBell";
 
 const navLinks = [
   { name: "Home", path: "/home" },
-  { name: "Find Candidate", path: "/employer/find-candidate" },
+  { name: "Find Candidate", path: "/employer/find-candidates" },
   { name: "Dashboard", path: "/employer/dashboard" },
   { name: "My Jobs", path: "/employer/my-jobs" },
   { name: "Applications", path: "/employer/applications" },

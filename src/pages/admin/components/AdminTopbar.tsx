@@ -64,7 +64,6 @@ export default function AdminTopbar() {
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Xử lý click ra ngoài để đóng cả 2 menu (Profile & Search)
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -100,7 +99,6 @@ export default function AdminTopbar() {
     setIsSearchOpen(false);
   };
 
-  // Logic lọc kết quả tìm kiếm
   const searchResults = searchQuery
     ? globalSearchData.filter(
         (item) =>
@@ -112,7 +110,6 @@ export default function AdminTopbar() {
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-50 shrink-0 shadow-sm">
-      {/* Khối Search Global */}
       <div className="relative w-full max-w-lg" ref={searchRef}>
         <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all">
           <Search size={18} className="text-gray-400 shrink-0" />
@@ -129,7 +126,6 @@ export default function AdminTopbar() {
           />
         </div>
 
-        {/* Dropdown kết quả tìm kiếm */}
         {isSearchOpen && searchQuery && (
           <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             {searchResults.length > 0 ? (
@@ -191,7 +187,6 @@ export default function AdminTopbar() {
 
         <div className="h-8 w-px bg-gray-200"></div>
 
-        {/* Khối Admin Profile */}
         <div className="flex items-center gap-3 relative" ref={profileRef}>
           <div
             className="flex items-center gap-3 cursor-pointer group"
@@ -219,12 +214,6 @@ export default function AdminTopbar() {
 
               <div className="py-2">
                 <button
-                  onClick={() => handleNavigate("/admin/profile")}
-                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
-                >
-                  <User size={16} /> My Profile
-                </button>
-                <button
                   onClick={() => handleNavigate("/admin/settings")}
                   className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                 >
@@ -243,14 +232,6 @@ export default function AdminTopbar() {
             </div>
           )}
         </div>
-
-        <button
-          onClick={handleLogout}
-          className="text-gray-400 hover:text-red-500 transition-colors ml-2"
-          title="Logout"
-        >
-          <LogOut size={20} />
-        </button>
       </div>
     </header>
   );

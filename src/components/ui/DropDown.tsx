@@ -8,6 +8,7 @@ interface CustomDropdownProps {
   onChange: (val: string) => void;
   placeholder?: string;
   className?: string;
+  dropUp?: boolean;
 }
 
 export default function CustomDropdown({
@@ -17,6 +18,7 @@ export default function CustomDropdown({
   onChange,
   placeholder = "Select...",
   className = "w-full",
+  dropUp = false,
 }: CustomDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -64,7 +66,13 @@ export default function CustomDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 w-full bg-white border border-gray-100 rounded-xl shadow-lg py-2 z-50 animate-in fade-in zoom-in-95 duration-100 max-h-60 overflow-y-auto">
+        <div
+          className={`absolute left-0 right-0 w-full bg-white border border-gray-100 rounded-xl shadow-lg py-2 z-50 animate-in fade-in zoom-in-95 duration-100 max-h-60 overflow-y-auto ${
+            dropUp
+              ? "bottom-full mb-2 origin-bottom"
+              : "top-full mt-2 origin-top"
+          }`}
+        >
           {options.map((option) => (
             <button
               type="button"

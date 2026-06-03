@@ -1,0 +1,111 @@
+import type { Candidate } from "../../../types/candidate";
+
+export const MOCK_CANDIDATES: Candidate[] = [
+  {
+    id: "c-1",
+    columnId: "col-1",
+    name: "Ronald Richards",
+    role: "Senior UI/UX Designer",
+    location: "New York, USA",
+    experience: "7 Years Experience",
+    education: "Master Degree",
+    biography:
+      "Passionate about creating intuitive and user-centered digital experiences for enterprise products.",
+    avatar:
+      "https://ui-avatars.com/api/?name=Ronald+Richards&background=eff6ff&color=2563eb",
+    appliedDate: "Jan 23, 2022",
+    coverLetter:
+      "I am excited to contribute my design expertise to your organization.",
+    dateOfBirth: "12 May 1994",
+    nationality: "American",
+    maritalStatus: "Single",
+    gender: "Male",
+    website: "ronaldrichards.com",
+    phone: "+1 123 456 789",
+    secondaryPhone: "+1 987 654 321",
+    email: "ronald@example.com",
+    social: { linkedin: "https://linkedin.com" },
+  },
+  {
+    id: "c-2",
+    columnId: "col-1",
+    name: "Theresa Webb",
+    role: "Frontend Developer",
+    location: "Toronto, Canada",
+    experience: "4 Years Experience",
+    education: "Bachelor Degree",
+    biography:
+      "Detail-oriented frontend engineer specializing in building highly performant web applications.",
+    avatar:
+      "https://ui-avatars.com/api/?name=Theresa+Webb&background=f0fdf4&color=16a34a",
+    appliedDate: "Feb 10, 2022",
+    coverLetter:
+      "I am passionate about crafting intuitive digital experiences.",
+    dateOfBirth: "15 Aug 1993",
+    nationality: "Canadian",
+    maritalStatus: "Married",
+    gender: "Female",
+    website: "theresawebb.com",
+    phone: "+1 555 111 222",
+    secondaryPhone: "+1 555 333 444",
+    email: "theresa@example.com",
+    social: { linkedin: "https://linkedin.com" },
+  },
+  {
+    id: "c-3",
+    columnId: "col-1",
+    name: "Cameron Williamson",
+    role: "Product Manager",
+    location: "London, UK",
+    experience: "8 Years Experience",
+    education: "Master Degree",
+    biography:
+      "Data-driven PM with a track record of launching successful SaaS products from scratch.",
+    avatar:
+      "https://ui-avatars.com/api/?name=Cameron+Williamson&background=fef2f2&color=dc2626",
+    appliedDate: "Mar 05, 2022",
+    coverLetter: "Looking forward to bringing my product vision to your team.",
+    dateOfBirth: "02 Nov 1990",
+    nationality: "British",
+    maritalStatus: "Married",
+    gender: "Male",
+    website: "cameronw.com",
+    phone: "+44 20 7123 4567",
+    secondaryPhone: "+44 20 7123 8901",
+    email: "cameron@example.com",
+    social: { linkedin: "https://linkedin.com" },
+  },
+  {
+    id: "c-4",
+    columnId: "col-1",
+    name: "Kristin Watson",
+    role: "Backend Engineer",
+    location: "Beverly Hills, California",
+    experience: "5 Years Experience",
+    education: "Bachelor Degree",
+    biography:
+      "Scalable systems architect. Love working with microservices and optimizing database queries.",
+    avatar: null,
+    appliedDate: "Apr 12, 2022",
+    coverLetter: "I specialize in high-availability backend systems.",
+    dateOfBirth: "14 June 1995",
+    nationality: "American",
+    maritalStatus: "Single",
+    gender: "Female",
+    website: "kristin.dev",
+    phone: "+1-202-555-0141",
+    secondaryPhone: "+1-202-555-0189",
+    email: "kristin@example.com",
+    social: { linkedin: "https://linkedin.com" },
+  },
+];
+
+export const JOB_CATEGORIES = [
+  "All",
+  "UI/UX Design",
+  "Frontend",
+  "Backend",
+  "Product Manager",
+  "Marketing",
+];
+export const EXPERIENCE_LEVELS = ["All", "0-2 Years", "3-5 Years", "5+ Years"];

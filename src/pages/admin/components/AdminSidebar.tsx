@@ -83,7 +83,7 @@ export default function AdminSidebar() {
           className="flex items-center gap-3 px-3 py-3 w-full text-left text-gray-400 hover:bg-gray-800 hover:text-white rounded-lg transition-colors"
         >
           <Settings size={20} />
-          <span className="text-sm">System Settings</span>
+          <span className="text-sm">Settings</span>
         </button>
       </div>
     </aside>
