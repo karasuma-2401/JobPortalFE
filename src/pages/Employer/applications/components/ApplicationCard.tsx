@@ -1,19 +1,10 @@
 import { Download, MoreVertical, Trash2, Eye } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
-
-export interface Applicant {
-  id: string;
-  columnId: string;
-  name: string;
-  avatar: string | null;
-  experience: string;
-  education: string;
-  appliedDate: string;
-}
+import type { Candidate } from "../../../../types/candidate";
 
 interface ApplicationCardProps {
-  applicant: Applicant;
+  applicant: Candidate;
   onDragStart: (e: React.DragEvent, id: string) => void;
   onDeleteApplicant: (id: string) => void;
   onViewProfile: (id: string) => void;

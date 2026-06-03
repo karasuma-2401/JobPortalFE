@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import ProfileHeader from "./components/ProfileHeader";
 import ProfileAbout from "./components/ProfileAbout";
-import ProfileSidebar from "./components/ProfileSideBar";
+import ProfileSidebar from "./components/ProfileSidebar";
 import OpenJobsList from "./components/OpenJobsList";
 
 const MOCK_COMPANY_DATA = {
@@ -15,7 +15,7 @@ const MOCK_COMPANY_DATA = {
   aboutUs:
     "TechVision is a leading software development company dedicated to building innovative products that solve real-world problems. With a strong focus on artificial intelligence and cloud computing, we empower businesses to scale globally.\n\nOur team consists of passionate engineers, designers, and product managers who thrive in a collaborative and fast-paced environment.",
   vision:
-    "To become the global standard for cloud-native solutions, empowering every organization to achieve more through technology and innovation.",
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce dignissim, magna sit amet sollicitudin luctus, purus quam viverra erat, ut venenatis felis nisi non libero. Sed in risus orci. Aenean sodales consequat lectus non lobortis. Suspendisse ullamcorper interdum nisl in dictum. Fusce varius enim eget tellus egestas porta. Vivamus ac elit nec libero dapibus tempor et vitae mauris. Donec cursus, nisl sed facilisis facilisis, est odio volutpat libero, in auctor odio nisl vel est. Nulla facilisi. Ut rhoncus erat non lectus lacinia imperdiet. Pellentesque laoreet volutpat odio, dictum hendrerit nunc. Donec ac varius nisi. Nulla fringilla augue vitae eros fringilla viverra. Nulla eu lacus elit. Curabitur metus mi, ornare bibendum urna non, egestas ornare augue.",
   founded: "14 June, 2010",
   teamSize: "201 - 500 Employees",
   industry: "Information Technology",

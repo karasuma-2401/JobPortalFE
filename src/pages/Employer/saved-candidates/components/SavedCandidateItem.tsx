@@ -38,6 +38,37 @@ export default function SavedCandidateItem({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleSendEmail = () => {
+    const subject = encodeURIComponent(
+      "Job Opportunity - Interview Invitation",
+    );
+    const body = encodeURIComponent(
+      `Hi ${candidate.name},\n\nWe came across your profile and were very impressed with your background as a ${candidate.role}.\n\nWe would love to schedule a quick chat with you to discuss a potential opportunity.\n\nBest regards,\nHR Team`,
+    );
+    window.location.href = `mailto:${candidate.email}?subject=${subject}&body=${body}`;
+    setShowMenu(false);
+    toast.success(`Opening email composer for ${candidate.name}...`);
+  };
+
+  const handleDownloadCv = () => {
+    // test download CV
+    const cvContent = `CANDIDATE PROFILE\n-----------------\nName: ${candidate.name}\nRole: ${candidate.role}\nEmail: ${candidate.email}\nPhone: ${candidate.phone}\nExperience: ${candidate.experience}\nEducation: ${candidate.education}\n\nBIOGRAPHY\n-----------------\n${candidate.biography}\n\nCOVER LETTER\n-----------------\n${candidate.coverLetter}`;
+    const blob = new Blob([cvContent], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = `${candidate.name.replace(/\s+/g, "_")}_CV.txt`;
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    setShowMenu(false);
+    toast.success(`Downloaded ${candidate.name}'s CV successfully!`);
+  };
+
   return (
     <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:border-blue-500 hover:shadow-sm transition-all group">
       <div className="flex items-center gap-4">
@@ -80,22 +111,16 @@ export default function SavedCandidateItem({
           {showMenu && (
             <div className="absolute right-0 top-10 w-48 bg-white border border-gray-100 rounded-lg shadow-xl py-1 z-10 animate-in fade-in zoom-in-95">
               <button
-                onClick={() => {
-                  toast.success(`Opening email composer for ${candidate.name}`);
-                  setShowMenu(false);
-                }}
+                onClick={handleSendEmail}
                 className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600"
               >
                 <Mail size={16} /> Send Email
               </button>
               <button
-                onClick={() => {
-                  toast.success(`Downloading ${candidate.name}'s CV`);
-                  setShowMenu(false);
-                }}
+                onClick={handleDownloadCv}
                 className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600"
               >
-                <Download size={16} /> Download Cv
+                <Download size={16} /> Download CV
               </button>
             </div>
           )}

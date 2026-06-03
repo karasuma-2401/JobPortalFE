@@ -4,6 +4,48 @@ import { toast } from "sonner";
 import ApplyJobType from "./components/ApplyJobType";
 import RichTextEditor from "../../../components/ui/RichTextEditor";
 import PostSuccessModal from "./components/PostSuccessModal";
+import Input from "../../../components/ui/Input";
+import CustomDropdown from "../../../components/ui/DropDown";
+import CustomDatePicker from "../../../components/ui/DatePicker";
+
+const roleOptions = [
+  { label: "Designer", value: "designer" },
+  { label: "Developer", value: "developer" },
+  { label: "Manager", value: "manager" },
+];
+
+const salaryTypeOptions = [
+  { label: "Monthly", value: "monthly" },
+  { label: "Yearly", value: "yearly" },
+  { label: "Hourly", value: "hourly" },
+];
+
+const educationOptions = [
+  { label: "Bachelor Degree", value: "bachelor" },
+  { label: "Master Degree", value: "master" },
+];
+
+const experienceOptions = [
+  { label: "1 Year", value: "1" },
+  { label: "2 Years", value: "2" },
+  { label: "5+ Years", value: "5" },
+];
+
+const jobTypeOptions = [
+  { label: "Full Time", value: "fulltime" },
+  { label: "Part Time", value: "parttime" },
+];
+
+const vacanciesOptions = [
+  { label: "1", value: "1" },
+  { label: "2", value: "2" },
+  { label: "5+", value: "5" },
+];
+
+const jobLevelOptions = [
+  { label: "Junior", value: "junior" },
+  { label: "Senior", value: "senior" },
+];
 
 export default function CreateJobForm() {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -25,6 +67,15 @@ export default function CreateJobForm() {
     responsibilities: "",
   });
 
+  const parseDate = (dStr: string) => (dStr ? new Date(dStr) : null);
+  const formatDate = (date: Date | null) => {
+    if (!date) return "";
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
+
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -45,100 +96,92 @@ export default function CreateJobForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        <div>
-          <label className="block text-sm font-semibold text-gray-900 mb-2">
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-semibold text-gray-900">
             Job Title
           </label>
-          <input
+          <Input
             type="text"
             placeholder="Add job title, role, vacancies etc"
             value={formData.title}
-            onChange={(e) => handleChange("title", e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-blue-500"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleChange("title", e.target.value)
+            }
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Tags
-            </label>
-            <input
+          <div className="flex flex-col gap-2 relative">
+            <label className="text-sm font-semibold text-gray-900">Tags</label>
+            <Input
               type="text"
               placeholder="Job keyword, tags etc..."
               value={formData.tags}
-              onChange={(e) => handleChange("tags", e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-blue-500"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleChange("tags", e.target.value)
+              }
             />
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+          <div className="flex flex-col gap-2 relative">
+            <label className="text-sm font-semibold text-gray-900">
               Job Role
             </label>
-            <select
+            <CustomDropdown
+              options={roleOptions}
               value={formData.role}
-              onChange={(e) => handleChange("role", e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-blue-500 bg-white"
-            >
-              <option value="">Select...</option>
-              <option value="designer">Designer</option>
-              <option value="developer">Developer</option>
-              <option value="manager">Manager</option>
-            </select>
+              onChange={(val: string) => handleChange("role", val)}
+            />
           </div>
         </div>
 
         <div className="mt-4">
           <h3 className="text-sm font-bold text-gray-900 mb-4">Salary</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="flex flex-col gap-2 relative">
+              <label className="text-sm font-medium text-gray-700">
                 Min Salary
               </label>
               <div className="relative">
-                <input
+                <Input
                   type="number"
                   placeholder="Minimum salary..."
                   value={formData.minSalary}
-                  onChange={(e) => handleChange("minSalary", e.target.value)}
-                  className="w-full pl-4 pr-12 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-blue-500"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleChange("minSalary", e.target.value)
+                  }
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium">
                   USD
                 </span>
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="flex flex-col gap-2 relative">
+              <label className="text-sm font-medium text-gray-700">
                 Max Salary
               </label>
               <div className="relative">
-                <input
+                <Input
                   type="number"
                   placeholder="Maximum salary..."
                   value={formData.maxSalary}
-                  onChange={(e) => handleChange("maxSalary", e.target.value)}
-                  className="w-full pl-4 pr-12 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-blue-500"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleChange("maxSalary", e.target.value)
+                  }
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium">
                   USD
                 </span>
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="flex flex-col gap-2 relative">
+              <label className="text-sm font-medium text-gray-700">
                 Salary Type
               </label>
-              <select
+              <CustomDropdown
+                options={salaryTypeOptions}
                 value={formData.salaryType}
-                onChange={(e) => handleChange("salaryType", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-blue-500 bg-white"
-              >
-                <option value="">Select...</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-                <option value="hourly">Hourly</option>
-              </select>
+                onChange={(val: string) => handleChange("salaryType", val)}
+              />
             </div>
           </div>
         </div>
@@ -148,88 +191,67 @@ export default function CreateJobForm() {
             Advance Information
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 gap-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="flex flex-col gap-2 relative">
+              <label className="text-sm font-medium text-gray-700">
                 Education
               </label>
-              <select
+              <CustomDropdown
+                options={educationOptions}
                 value={formData.education}
-                onChange={(e) => handleChange("education", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-blue-500 bg-white"
-              >
-                <option value="">Select...</option>
-                <option value="bachelor">Bachelor Degree</option>
-                <option value="master">Master Degree</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Experience
-              </label>
-              <select
-                value={formData.experience}
-                onChange={(e) => handleChange("experience", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-blue-500 bg-white"
-              >
-                <option value="">Select...</option>
-                <option value="1">1 Year</option>
-                <option value="2">2 Years</option>
-                <option value="5">5+ Years</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Job Type
-              </label>
-              <select
-                value={formData.jobType}
-                onChange={(e) => handleChange("jobType", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-blue-500 bg-white"
-              >
-                <option value="">Select...</option>
-                <option value="fulltime">Full Time</option>
-                <option value="parttime">Part Time</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Vacancies
-              </label>
-              <select
-                value={formData.vacancies}
-                onChange={(e) => handleChange("vacancies", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-blue-500 bg-white"
-              >
-                <option value="">Select...</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="5">5+</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Expiration Date
-              </label>
-              <input
-                type="date"
-                value={formData.expirationDate}
-                onChange={(e) => handleChange("expirationDate", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-blue-500 text-gray-600"
+                onChange={(val: string) => handleChange("education", val)}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="flex flex-col gap-2 relative">
+              <label className="text-sm font-medium text-gray-700">
+                Experience
+              </label>
+              <CustomDropdown
+                options={experienceOptions}
+                value={formData.experience}
+                onChange={(val: string) => handleChange("experience", val)}
+              />
+            </div>
+            <div className="flex flex-col gap-2 relative">
+              <label className="text-sm font-medium text-gray-700">
+                Job Type
+              </label>
+              <CustomDropdown
+                options={jobTypeOptions}
+                value={formData.jobType}
+                onChange={(val: string) => handleChange("jobType", val)}
+              />
+            </div>
+            <div className="flex flex-col gap-2 relative">
+              <label className="text-sm font-medium text-gray-700">
+                Vacancies
+              </label>
+              <CustomDropdown
+                options={vacanciesOptions}
+                value={formData.vacancies}
+                onChange={(val: string) => handleChange("vacancies", val)}
+              />
+            </div>
+            <div className="flex flex-col gap-2 relative">
+              <label className="text-sm font-medium text-gray-700">
+                Expiration Date
+              </label>
+              <CustomDatePicker
+                placeholder="dd/mm/yyyy"
+                onChange={(date) => {
+                  handleChange("expirationDate", formatDate(date));
+                }}
+                selected={parseDate(formData.expirationDate)}
+              />
+            </div>
+            <div className="flex flex-col gap-2 relative">
+              <label className="text-sm font-medium text-gray-700">
                 Job Level
               </label>
-              <select
+              <CustomDropdown
+                options={jobLevelOptions}
                 value={formData.jobLevel}
-                onChange={(e) => handleChange("jobLevel", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-blue-500 bg-white"
-              >
-                <option value="">Select...</option>
-                <option value="junior">Junior</option>
-                <option value="senior">Senior</option>
-              </select>
+                onChange={(val: string) => handleChange("jobLevel", val)}
+              />
             </div>
           </div>
         </div>
@@ -244,8 +266,8 @@ export default function CreateJobForm() {
             Description & Responsibility
           </h3>
 
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+          <div className="mb-6 flex flex-col gap-2">
+            <label className="text-sm font-semibold text-gray-900">
               Description
             </label>
             <RichTextEditor
@@ -255,8 +277,8 @@ export default function CreateJobForm() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-gray-900">
               Responsibilities
             </label>
             <RichTextEditor

@@ -57,57 +57,66 @@ export default function AuditLogFilterBar({
   };
 
   return (
-    <div className="relative z-20 p-5 border-b border-gray-200 flex flex-col gap-4 shrink-0 bg-gray-50/50">
-      <div className="flex flex-col xl:flex-row items-center justify-between gap-4">
-        <div className="relative w-full xl:max-w-md">
+    <div className="relative z-20 p-5 border-b border-gray-200 bg-gray-50/50">
+      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-5">
+        <div className="relative w-full xl:max-w-sm shrink-0">
           <Search
             size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
           />
           <input
             type="text"
             placeholder="Search by User ID or Email..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white shadow-sm"
+            className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white shadow-sm"
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+        <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-gray-400 uppercase">
+            <span className="text-xs font-bold text-gray-500 uppercase">
               From
             </span>
-            <CustomDatePicker
-              selected={parseDate(startDate)}
-              onChange={(date) => onStartDateChange(formatDate(date))}
-              placeholder="YYYY-MM-DD"
-            />
+            <div className="w-36">
+              <CustomDatePicker
+                selected={parseDate(startDate)}
+                onChange={(date) => onStartDateChange(formatDate(date))}
+                placeholder="YYYY-MM-DD"
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-gray-400 uppercase">
+            <span className="text-xs font-bold text-gray-500 uppercase">
               To
             </span>
-            <CustomDatePicker
-              selected={parseDate(endDate)}
-              onChange={(date) => onEndDateChange(formatDate(date))}
-              placeholder="YYYY-MM-DD"
+            <div className="w-36">
+              <CustomDatePicker
+                selected={parseDate(endDate)}
+                onChange={(date) => onEndDateChange(formatDate(date))}
+                placeholder="YYYY-MM-DD"
+              />
+            </div>
+          </div>
+
+          <div className="w-44">
+            <CustomDropdown
+              icon={Activity}
+              value={actionFilter}
+              options={ACTION_OPTIONS}
+              onChange={(val) => onActionChange(val as ActionType | "All")}
             />
           </div>
 
-          <CustomDropdown
-            icon={Activity}
-            value={actionFilter}
-            options={ACTION_OPTIONS}
-            onChange={(val) => onActionChange(val as ActionType | "All")}
-          />
-          <CustomDropdown
-            icon={Database}
-            value={entityFilter}
-            options={ENTITY_OPTIONS}
-            onChange={(val) => onEntityChange(val as EntityType | "All")}
-          />
+          <div className="w-44">
+            <CustomDropdown
+              icon={Database}
+              value={entityFilter}
+              options={ENTITY_OPTIONS}
+              onChange={(val) => onEntityChange(val as EntityType | "All")}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -42,6 +42,7 @@ import UserManagementPage from "./pages/admin/users/UserManagementPage";
 import AuditLogPage from "./pages/admin/audit-logs/AuditLogPage";
 import IndustryManagementPage from "./pages/admin/industry/IndustryManagementPage";
 import DashboardPage from "./pages/admin/dashboard/DashboardPage";
+import AdminSettingsPage from "./pages/admin/settings/AdminSettingsPage";
 import { NotificationProvider } from "./contexts/NotificationProvider";
 
 import CandidateLayout from "./layouts/CandidateDashBoardLayout";
@@ -52,6 +53,10 @@ import FavoriteJobsPage from "./pages/jobseeker/dashboard/FavoriteJob/FavoriteJo
 import AppliedJobsPage from "./pages/jobseeker/dashboard/AppliedJob/AppliedJobs";
 import OverviewPage from "./pages/jobseeker/dashboard/Overview/Overview";
 import CandidateFullLayout from "./layouts/CandidateFullLayout";
+import JobDetailPage from "./pages/employer/my-jobs/JobDetailPage";
+import EditJobPage from "./pages/employer/my-jobs/components/EditJobPage";
+import FindCandidatesPage from "./pages/employer/find-candidates/FindCandidatesPage";
+
 const router = createBrowserRouter([
   {
     element: <MainLayout />,
@@ -93,7 +98,11 @@ const router = createBrowserRouter([
       },
       {
         path: "my-jobs",
-        element: <MyJobsPage />,
+        children: [
+          { index: true, element: <MyJobsPage /> },
+          { path: ":id", element: <JobDetailPage /> },
+          { path: ":id/edit", element: <EditJobPage /> },
+        ],
       },
       {
         path: "post-job",
@@ -106,6 +115,7 @@ const router = createBrowserRouter([
         path: "applications",
         element: <ApplicationsPage />,
       },
+      { path: "find-candidates", element: <FindCandidatesPage /> },
       {
         path: "saved-candidates",
         element: <SavedCandidatesPage />,
@@ -138,9 +148,9 @@ const router = createBrowserRouter([
       { path: "users", element: <UserManagementPage /> },
       { path: "audit-logs", element: <AuditLogPage /> },
       { path: "industries", element: <IndustryManagementPage /> },
+      { path: "settings", element: <AdminSettingsPage /> },
     ],
   },
-
   {
     element: <CandidateFullLayout />,
     children: [
