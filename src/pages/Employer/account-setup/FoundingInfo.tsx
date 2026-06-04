@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
@@ -16,9 +16,9 @@ const orgTypes = [
 ];
 
 const industryTypes = [
-  { label: "Information Technology", value: "it" },
-  { label: "Finance & Banking", value: "finance" },
-  { label: "Healthcare", value: "healthcare" },
+  { label: "Information Technology", value: "Information Technology" },
+  { label: "Finance & Banking", value: "Finance & Banking" },
+  { label: "Healthcare", value: "Healthcare" },
 ];
 
 const teamSizes = [
@@ -32,6 +32,10 @@ interface FoundingInfoProps {
 }
 
 export default function FoundingInfo({ mode = "setup" }: FoundingInfoProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const previousState = location.state || {};
+
   const parseDate = (dStr: string) => (dStr ? new Date(dStr) : null);
   const formatDate = (date: Date | null) => {
     if (!date) return "";
@@ -40,25 +44,52 @@ export default function FoundingInfo({ mode = "setup" }: FoundingInfoProps) {
     const d = String(date.getDate()).padStart(2, "0");
     return `${y}-${m}-${d}`;
   };
-  const navigate = useNavigate();
-  const [orgType, setOrgType] = useState<OptionType | null>(null);
-  const [industry, setIndustry] = useState<OptionType | null>(null);
-  const [teamSize, setTeamSize] = useState<OptionType | null>(null);
-  const [establishedYear, setEstablishedYear] = useState("");
-  const [website, setWebsite] = useState("");
-  const [vision, setVision] = useState("");
+
+  const initialOrg =
+    orgTypes.find((o) => o.value === previousState.organizationType) || null;
+  const [orgType, setOrgType] = useState<OptionType | null>(initialOrg);
+
+  const initialIndustry =
+    industryTypes.find((i) => i.value === previousState.industry) || null;
+  const [industry, setIndustry] = useState<OptionType | null>(initialIndustry);
+
+  const initialTeamSize =
+    teamSizes.find((t) => t.value === previousState.teamSize) || null;
+  const [teamSize, setTeamSize] = useState<OptionType | null>(initialTeamSize);
+
+  const [establishedYear, setEstablishedYear] = useState(
+    previousState.founded || "",
+  );
+  const [website, setWebsite] = useState(previousState.companyWebsite || "");
+  const [vision, setVision] = useState(previousState.vision || "");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!website) {
+      toast.error("Company website is required!");
+      return;
+    }
+
+    const currentData = {
+      ...previousState,
+      organizationType: orgType?.value || "",
+      industry: industry?.value || "",
+      teamSize: teamSize?.value || "",
+      founded: establishedYear,
+      companyWebsite: website,
+      vision,
+    };
+
     if (mode === "setup") {
-      navigate("/employer/setup/social");
+      navigate("/employer/setup/social", { state: currentData });
     } else {
       toast.success("Founding information updated successfully!");
     }
   };
 
   const handlePrevious = () => {
-    navigate("/employer/setup/company");
+    navigate("/employer/setup/company", { state: previousState });
   };
 
   return (

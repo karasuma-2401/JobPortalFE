@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight, Mail, Loader2 } from "lucide-react";
 
 import ComboBox, { type OptionType } from "../../../components/ui/ComboBox";
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
+import { useSetupEmployer } from "../../../hooks/useEmployer";
 
 const CountryCodes = [
   {
@@ -22,23 +23,73 @@ interface ContactProps {
 
 export default function Contact({ mode = "setup" }: ContactProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const previousState = location.state || {};
 
-  const [mapLocation, setMapLocation] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  const { mutate: setupEmployer, isPending } = useSetupEmployer();
+
+  const [mapLocation, setMapLocation] = useState(previousState.address || "");
+  const [phone, setPhone] = useState(previousState.phone || "");
+  const [email, setEmail] = useState(previousState.email || "");
   const [countryCode, setCountryCode] = useState<OptionType>(CountryCodes[0]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!mapLocation || !phone || !email) {
+      toast.error("Please fill in all required contact fields!");
+      return;
+    }
+
     if (mode === "setup") {
-      navigate("/employer/setup/success");
+      const fullPhoneNumber = `${countryCode.value}${phone}`;
+      const formData = new FormData();
+
+      // Text Fields
+      formData.append("companyName", previousState.companyName || "");
+      formData.append("description", previousState.description || "");
+      formData.append("organizationType", previousState.organizationType || "");
+      formData.append("industry", previousState.industry || "");
+      formData.append("teamSize", previousState.teamSize || "");
+      formData.append("founded", previousState.founded || "");
+      formData.append("companyWebsite", previousState.companyWebsite || "");
+      formData.append("vision", previousState.vision || "");
+
+      formData.append("address", mapLocation);
+      formData.append("phone", fullPhoneNumber);
+      formData.append("email", email);
+
+      if (previousState.socialLinks && previousState.socialLinks.length > 0) {
+        const formattedLinks = previousState.socialLinks.map(
+          (link: { networkValue: string; url: string }) => ({
+            network: link.networkValue,
+            url: link.url,
+          }),
+        );
+        formData.append("socialLinks", JSON.stringify(formattedLinks));
+      }
+
+      if (previousState.logo) {
+        formData.append("logo", previousState.logo);
+      }
+      if (previousState.banner) {
+        formData.append("banner", previousState.banner);
+      }
+
+      setupEmployer(formData);
     } else {
       toast.success("Contact information updated successfully!");
     }
   };
 
   const handlePrevious = () => {
-    navigate("/employer/setup/social");
+    const currentData = {
+      ...previousState,
+      address: mapLocation,
+      phone,
+      email,
+    };
+    navigate("/employer/setup/social", { state: currentData });
   };
 
   return (
@@ -47,7 +98,7 @@ export default function Contact({ mode = "setup" }: ContactProps) {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <label className="font-medium text-sm text-gray-900">
-              Map Location
+              Map Location / Address
             </label>
             <Input
               type="text"
@@ -63,9 +114,7 @@ export default function Contact({ mode = "setup" }: ContactProps) {
                 <ComboBox
                   options={CountryCodes}
                   value={countryCode}
-                  onChange={(option) => {
-                    setCountryCode(option);
-                  }}
+                  onChange={(option) => setCountryCode(option)}
                 />
               </div>
               <Input
@@ -92,12 +141,14 @@ export default function Contact({ mode = "setup" }: ContactProps) {
             </div>
           </div>
         </div>
+
         <div className="flex items-center gap-4 mt-6">
           {mode === "setup" && (
             <button
               type="button"
               onClick={handlePrevious}
-              className="px-6 py-3 font-semibold rounded-md bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors"
+              disabled={isPending}
+              className="px-6 py-3 font-semibold rounded-md bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors disabled:opacity-50"
             >
               Previous
             </button>
@@ -105,12 +156,14 @@ export default function Contact({ mode = "setup" }: ContactProps) {
           <Button
             variant="primary"
             type="submit"
+            disabled={isPending}
             className={mode === "setup" ? "flex items-center gap-2" : ""}
           >
-            {mode === "setup" ? (
+            {isPending ? (
+              <Loader2 className="animate-spin mx-auto" size={20} />
+            ) : mode === "setup" ? (
               <>
-                Finish Editings
-                <ArrowRight size={18} />
+                Finish Editings <ArrowRight size={18} />
               </>
             ) : (
               "Save Changes"
