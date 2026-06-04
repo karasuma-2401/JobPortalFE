@@ -7,11 +7,13 @@ import {
   Globe,
   MapPin,
   Phone,
-  Facebook,
-  Twitter,
-  Linkedin,
   BookmarkMinus,
 } from "lucide-react";
+import {
+  FaFacebook,
+  FaTwitter,
+  FaLinkedin,
+} from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -219,7 +221,7 @@ export default function CandidateProfileModal({
                         rel="noreferrer"
                         className="w-10 h-10 flex items-center justify-center rounded bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
                       >
-                        <Facebook size={18} />
+                        <FaFacebook size={18} />
                       </a>
                     )}
                     {candidate.social?.twitter && (
@@ -229,7 +231,7 @@ export default function CandidateProfileModal({
                         rel="noreferrer"
                         className="w-10 h-10 flex items-center justify-center rounded bg-blue-50 text-blue-400 hover:bg-blue-400 hover:text-white transition-colors"
                       >
-                        <Twitter size={18} />
+                        <FaTwitter size={18} />
                       </a>
                     )}
                     {candidate.social?.linkedin && (
@@ -239,7 +241,7 @@ export default function CandidateProfileModal({
                         rel="noreferrer"
                         className="w-10 h-10 flex items-center justify-center rounded bg-blue-50 text-blue-700 hover:bg-blue-700 hover:text-white transition-colors"
                       >
-                        <Linkedin size={18} />
+                        <FaLinkedin size={18} />
                       </a>
                     )}
                   </div>

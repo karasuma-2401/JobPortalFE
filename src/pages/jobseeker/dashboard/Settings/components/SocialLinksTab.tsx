@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { Plus, X, Loader2 } from "lucide-react";
-import { Facebook, Twitter, Instagram, Youtube, Linkedin } from "lucide-react";
+import {
+  FaFacebook,
+  FaTwitter,
+  FaInstagram,
+  FaYoutube,
+  FaLinkedin,
+} from "react-icons/fa";
 import { toast } from "sonner";
 
 import ComboBox, {
@@ -12,27 +18,27 @@ import Button from "../../../../../components/ui/Button";
 const socialNetworks: OptionType[] = [
   {
     label: "Facebook",
-    icon: <Facebook className="text-blue-600" />,
+    icon: <FaFacebook className="text-blue-600" />,
     value: "facebook",
   },
   {
     label: "Twitter",
-    icon: <Twitter className="text-sky-500" />,
+    icon: <FaTwitter className="text-sky-500" />,
     value: "twitter",
   },
   {
     label: "Instagram",
-    icon: <Instagram className="text-pink-600" />,
+    icon: <FaInstagram className="text-pink-600" />,
     value: "instagram",
   },
   {
     label: "Youtube",
-    icon: <Youtube className="text-red-600" />,
+    icon: <FaYoutube className="text-red-600" />,
     value: "youtube",
   },
   {
     label: "LinkedIn",
-    icon: <Linkedin className="text-blue-700" />,
+    icon: <FaLinkedin className="text-blue-700" />,
     value: "linkedin",
   },
 ];

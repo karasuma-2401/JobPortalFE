@@ -3,7 +3,7 @@ import { TokenType } from "../bases/enums/jwt.enum";
 import {
   ACCESS_LIVE_TIME,
   REFRESH_LIVE_TIME,
-} from "../bases/constants/jwt.constants";
+} from "../bases/constants/jwt";
 export class CookiesService {
   static saveToken(token: string, type: TokenType) {
     const ti: number =
@@ -11,7 +11,7 @@ export class CookiesService {
     Cookies.set(type.toString(), token, {
       expires: ti,
       path: "/",
-      secure: true,
+      secure: false,
       sameSite: "Strict",
     });
   }
@@ -20,7 +20,7 @@ export class CookiesService {
     return token;
   }
 
-  static removeCookie(key: TokenType) {
+  static removeCookie(key: string) {
     Cookies.remove(key);
   }
 }

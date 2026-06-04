@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Bell, Check, CheckCircle2 } from "lucide-react";
-import { useNotification } from "../../contexts/useNotification";
+import { useNotification } from "../../contexts/notification/useNotification";
 
 export default function NotificationBell() {
   const { notifications, unreadCount, markAsRead, markAllAsRead } =

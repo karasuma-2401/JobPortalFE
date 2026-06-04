@@ -2,10 +2,10 @@ import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { getToken, onMessage } from "firebase/messaging";
 
-import { messaging } from "../firebase/firebase.ts";
+import { messaging } from "../../firebase/firebase.ts";
 import { NotificationContext } from "./NotificationContext";
 
-import type { NotificationItem } from "../types/notification";
+import type { NotificationItem } from "../../types/notification.ts";
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
