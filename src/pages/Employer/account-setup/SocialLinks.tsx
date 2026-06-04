@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { ArrowRight, Plus, X } from "lucide-react";
 import {
@@ -54,14 +54,18 @@ interface SocialLinksProps {
 
 export default function SocialLinks({ mode = "setup" }: SocialLinksProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const previousState = location.state || {};
 
-  const [links, setLinks] = useState<SocialLinkItem[]>([
-    {
-      id: new Date().getTime().toString(),
-      network: socialNetworks[0],
-      url: "",
-    },
-  ]);
+  const [links, setLinks] = useState<SocialLinkItem[]>(
+    previousState.socialLinks || [
+      {
+        id: new Date().getTime().toString(),
+        network: socialNetworks[0],
+        url: "",
+      },
+    ],
+  );
 
   const handleAddLink = () => {
     setLinks([
@@ -89,15 +93,20 @@ export default function SocialLinks({ mode = "setup" }: SocialLinksProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const currentData = {
+      ...previousState,
+      socialLinks: links,
+    };
+
     if (mode === "setup") {
-      navigate("/employer/setup/contact");
+      navigate("/employer/setup/contact", { state: currentData });
     } else {
       toast.success("Social links updated successfully!");
     }
   };
 
   const handlePrevious = () => {
-    navigate("/employer/setup/founding");
+    navigate("/employer/setup/founding", { state: previousState });
   };
 
   return (

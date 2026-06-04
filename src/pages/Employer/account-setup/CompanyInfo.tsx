@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
@@ -14,26 +14,39 @@ interface CompanyInfoProps {
 
 export default function CompanyInfo({ mode = "setup" }: CompanyInfoProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const previousState = location.state || {};
 
-  const [companyName, setCompanyName] = useState("");
-  const [aboutUs, setAboutUs] = useState("");
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [bannerFile, setBannerfile] = useState<File | null>(null);
+  const [companyName, setCompanyName] = useState(
+    previousState.companyName || "",
+  );
+  const [aboutUs, setAboutUs] = useState(previousState.description || "");
+  const [logoFile, setLogoFile] = useState<File | null>(
+    previousState.logo || null,
+  );
+  const [bannerFile, setBannerfile] = useState<File | null>(
+    previousState.banner || null,
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formData = {
+    if (!companyName) {
+      toast.error("Company name is required!");
+      return;
+    }
+
+    const currentData = {
+      ...previousState,
       companyName,
-      aboutUs,
-      logoFile,
-      bannerFile,
+      description: aboutUs,
+      logo: logoFile,
+      banner: bannerFile,
     };
 
-    console.log("Form Data Prepared:", formData);
-
     if (mode === "setup") {
-      navigate("/employer/setup/founding");
+      // Pass data to the next step via state
+      navigate("/employer/setup/founding", { state: currentData });
     } else {
       toast.success("Company information updated successfully!");
     }
