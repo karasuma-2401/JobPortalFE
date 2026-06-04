@@ -2,14 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { EmployerService } from "../services/employerService";
-
-interface ApiError {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-}
+import { type ApiError } from "../api/api";
 
 export const useSetupEmployer = () => {
   const navigate = useNavigate();
@@ -18,7 +11,7 @@ export const useSetupEmployer = () => {
     mutationFn: (formData: FormData) => EmployerService.setupProfile(formData),
     onSuccess: () => {
       toast.success("Employer profile created successfully!");
-      navigate("/employer/dashboard");
+      navigate("/employer/setup/success");
     },
     onError: (error: unknown) => {
       const apiError = error as ApiError;

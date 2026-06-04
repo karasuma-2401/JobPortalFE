@@ -1,8 +1,14 @@
+export interface SocialLinkPayload {
+  network: string;
+  url: string;
+}
+
 export interface EmployerSetupPayload {
   companyName: string;
   description: string;
   logo: File | null;
   banner: File | null;
+  organizationType: string;
   industry: string;
   teamSize: string;
   founded: string;
@@ -11,5 +17,5 @@ export interface EmployerSetupPayload {
   address: string;
   phone: string;
   email: string;
-  capacity?: number;
+  socialLinks: SocialLinkPayload[];
 }

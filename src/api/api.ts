@@ -1,6 +1,13 @@
-// src/api/api.ts
 import axios from "axios";
 import { toast } from "sonner";
+
+export interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
 
 const BASE_URL =
   import.meta.env.VITE_BACKEND_URL || "http://localhost:8081/api";

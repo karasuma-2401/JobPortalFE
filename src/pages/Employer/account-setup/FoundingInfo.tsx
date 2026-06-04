@@ -45,7 +45,9 @@ export default function FoundingInfo({ mode = "setup" }: FoundingInfoProps) {
     return `${y}-${m}-${d}`;
   };
 
-  const [orgType, setOrgType] = useState<OptionType | null>(null);
+  const initialOrg =
+    orgTypes.find((o) => o.value === previousState.organizationType) || null;
+  const [orgType, setOrgType] = useState<OptionType | null>(initialOrg);
 
   const initialIndustry =
     industryTypes.find((i) => i.value === previousState.industry) || null;
@@ -71,6 +73,7 @@ export default function FoundingInfo({ mode = "setup" }: FoundingInfoProps) {
 
     const currentData = {
       ...previousState,
+      organizationType: orgType?.value || "",
       industry: industry?.value || "",
       teamSize: teamSize?.value || "",
       founded: establishedYear,

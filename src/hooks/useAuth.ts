@@ -9,10 +9,11 @@ import type {
 } from "../types/auth";
 import { CookiesService } from "../services/cookieServices";
 import { TokenType } from "../bases/enums/jwt.enum";
+import { type ApiError } from "../api/api";
 
 interface AuthFlowError {
   type?: "LOGIN_ERROR" | "PROFILE_ERROR";
-  originalError?: unknown;
+  originalError?: ApiError;
 }
 
 export const useLogin = () => {
@@ -64,7 +65,8 @@ export const useLogin = () => {
       const authError = error as AuthFlowError;
 
       if (authError?.type === "LOGIN_ERROR") {
-        toast.error("Incorrect email or password.");
+        const beMessage = authError.originalError?.response?.data?.message;
+        toast.error(beMessage || "Incorrect email or password.");
       } else if (authError?.type === "PROFILE_ERROR") {
         toast.error(
           "Login successful, but failed to fetch profile. Please check the Backend API!",
@@ -86,8 +88,12 @@ export const useRegister = () => {
         "Registration successful! Please check your email to verify your account.",
       );
     },
-    onError: () => {
-      toast.error("Registration failed. The email may already exist.");
+    onError: (error: unknown) => {
+      const apiError = error as ApiError;
+      const beMessage = apiError.response?.data?.message;
+      toast.error(
+        beMessage || "Registration failed. The email may already exist.",
+      );
     },
   });
 };
@@ -98,8 +104,10 @@ export const useRequestPasswordReset = () => {
     onSuccess: () => {
       toast.success("Password reset link sent! Please check your email.");
     },
-    onError: () => {
-      toast.error("No account found with this email.");
+    onError: (error: unknown) => {
+      const apiError = error as ApiError;
+      const beMessage = apiError.response?.data?.message;
+      toast.error(beMessage || "No account found with this email.");
     },
   });
 };
@@ -113,8 +121,10 @@ export const useVerifyResetPassword = () => {
       toast.success("Password updated successfully! Please log in again.");
       navigate("/login");
     },
-    onError: () => {
-      toast.error("Invalid or expired token.");
+    onError: (error: unknown) => {
+      const apiError = error as ApiError;
+      const beMessage = apiError.response?.data?.message;
+      toast.error(beMessage || "Invalid or expired token.");
     },
   });
 };

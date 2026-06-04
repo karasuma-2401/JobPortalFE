@@ -45,18 +45,29 @@ export default function Contact({ mode = "setup" }: ContactProps) {
       const fullPhoneNumber = `${countryCode.value}${phone}`;
       const formData = new FormData();
 
+      // Text Fields
       formData.append("companyName", previousState.companyName || "");
       formData.append("description", previousState.description || "");
+      formData.append("organizationType", previousState.organizationType || "");
       formData.append("industry", previousState.industry || "");
       formData.append("teamSize", previousState.teamSize || "");
       formData.append("founded", previousState.founded || "");
       formData.append("companyWebsite", previousState.companyWebsite || "");
       formData.append("vision", previousState.vision || "");
-      formData.append("capacity", "0");
 
       formData.append("address", mapLocation);
       formData.append("phone", fullPhoneNumber);
       formData.append("email", email);
+
+      if (previousState.socialLinks && previousState.socialLinks.length > 0) {
+        const formattedLinks = previousState.socialLinks.map(
+          (link: { networkValue: string; url: string }) => ({
+            network: link.networkValue,
+            url: link.url,
+          }),
+        );
+        formData.append("socialLinks", JSON.stringify(formattedLinks));
+      }
 
       if (previousState.logo) {
         formData.append("logo", previousState.logo);
@@ -64,6 +75,7 @@ export default function Contact({ mode = "setup" }: ContactProps) {
       if (previousState.banner) {
         formData.append("banner", previousState.banner);
       }
+
       setupEmployer(formData);
     } else {
       toast.success("Contact information updated successfully!");
