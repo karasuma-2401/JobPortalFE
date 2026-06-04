@@ -26,13 +26,16 @@ export const useLogin = () => {
       } catch (err) {
         return Promise.reject({ type: "LOGIN_ERROR", originalError: err });
       }
+
       localStorage.setItem("accessToken", tokens.accessToken);
+
       if (tokens.refreshToken) {
-        localStorage.setItem("refreshToken", tokens.refreshToken);
+        CookiesService.saveToken(tokens.refreshToken, TokenType.REFRESH_TOKEN);
       }
-      CookiesService.saveToken(tokens.accessToken, TokenType.ACCESS_TOKEN);
+
       try {
         const user = await AuthService.getMe();
+        localStorage.setItem("user", JSON.stringify(user));
         return user;
       } catch (err) {
         return Promise.reject({ type: "PROFILE_ERROR", originalError: err });
@@ -40,14 +43,17 @@ export const useLogin = () => {
     },
     onSuccess: (user) => {
       toast.success("Login successful!");
+
+      const isEmployer = user.roles.includes("EMPLOYER");
+
       if (!user.hasProfile) {
-        if (user.role === "EMPLOYER") {
+        if (isEmployer) {
           navigate("/employer/account-setup");
         } else {
           navigate("/jobseeker/account-setup");
         }
       } else {
-        if (user.role === "EMPLOYER") {
+        if (isEmployer) {
           navigate("/employer/dashboard");
         } else {
           navigate("/jobseeker/dashboard");

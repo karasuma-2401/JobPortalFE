@@ -22,8 +22,8 @@ export interface VerifyResetPasswordRequest {
 }
 
 export interface UserResponse {
-  id: string;
   email: string;
-  role: Role;
+  roles: Role[];
   hasProfile: boolean;
+  employerApprovalStatus: string | null;
 }
