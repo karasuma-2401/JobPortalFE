@@ -1,13 +1,6 @@
-import {
-  Calendar,
-  Users,
-  Briefcase,
-  Mail,
-  Phone,
-  Facebook,
-  Twitter,
-  Linkedin,
-} from "lucide-react";
+import { Calendar, Users, Briefcase, Mail, Phone } from "lucide-react";
+
+import { FaFacebook, FaTwitter, FaLinkedin } from "react-icons/fa";
 
 interface ProfileSidebarProps {
   founded: string;
@@ -121,7 +114,7 @@ export default function ProfileSidebar({
               className="w-11 h-11 rounded-xl bg-[#1877F2]/10 text-[#1877F2] flex items-center justify-center transition-all duration-300 hover:bg-[#1877F2] hover:text-white hover:-translate-y-1 hover:shadow-md"
               title="Facebook"
             >
-              <Facebook size={18} strokeWidth={2} />
+              <FaFacebook size={18} strokeWidth={2} />
             </a>
           )}
           {socials.twitter && (
@@ -132,7 +125,7 @@ export default function ProfileSidebar({
               className="w-11 h-11 rounded-xl bg-[#1DA1F2]/10 text-[#1DA1F2] flex items-center justify-center transition-all duration-300 hover:bg-[#1DA1F2] hover:text-white hover:-translate-y-1 hover:shadow-md"
               title="Twitter"
             >
-              <Twitter size={18} strokeWidth={2} />
+              <FaTwitter size={18} strokeWidth={2} />
             </a>
           )}
           {socials.linkedin && (
@@ -143,7 +136,7 @@ export default function ProfileSidebar({
               className="w-11 h-11 rounded-xl bg-[#0A66C2]/10 text-[#0A66C2] flex items-center justify-center transition-all duration-300 hover:bg-[#0A66C2] hover:text-white hover:-translate-y-1 hover:shadow-md"
               title="LinkedIn"
             >
-              <Linkedin size={18} strokeWidth={2} />
+              <FaLinkedin size={18} strokeWidth={2} />
             </a>
           )}
         </div>

@@ -1,24 +1,23 @@
 import React, { useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { AuthService } from "../../services/authService";
-import type { ResetPasswordRequest } from "../../types/auth";
+import { useVerifyResetPassword } from "../../hooks/useAuth";
 
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 import JobLogo from "../../assets/JobLogo.svg";
 
 export default function ResetPassword() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleResetPassword = async (e: React.FormEvent) => {
+  const { mutate: resetPassword, isPending } = useVerifyResetPassword();
+
+  const handleResetPassword = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!token) {
@@ -35,34 +34,14 @@ export default function ResetPassword() {
       toast.error("Confirm password does not match!");
       return;
     }
-
-    try {
-      setIsLoading(true);
-      const payload: ResetPasswordRequest = {
-        token,
-        newPassword,
-        confirmPassword,
-      };
-
-      const message = await AuthService.resetPassword(payload);
-      toast.success(message);
-      navigate("/login");
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Reset password failed. Please try again!");
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    resetPassword({ token, password: newPassword });
   };
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-bg-white font-sans">
       <div className="w-full flex justify-center pt-12 pb-6">
         <div className="flex items-center gap-2 text-xl font-bold text-gray-900">
-          <span className="text-primary-500 text-2xl flex items-center">
+          <span className="text-blue-600 text-2xl flex items-center">
             <img
               src={JobLogo}
               alt="My Job logo"
@@ -72,6 +51,7 @@ export default function ResetPassword() {
           MyJob
         </div>
       </div>
+
       <div className="flex-1 flex flex-col items-center justify-center p-4 pb-24">
         <div className="w-full max-w-md text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
@@ -102,13 +82,13 @@ export default function ResetPassword() {
               variant="primary"
               fullWidth
               className="mt-2 flex items-center justify-center gap-2"
-              disabled={isLoading}
+              disabled={isPending}
             >
-              {isLoading ? (
+              {isPending ? (
                 <Loader2 className="animate-spin" size={20} />
               ) : (
                 <>
-                  Reset Password <ArrowRight size={20} />
+                  Confirm Reset <ArrowRight size={20} />
                 </>
               )}
             </Button>

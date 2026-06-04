@@ -13,7 +13,6 @@ import EmployerDashboardLayout from "./layouts/EmployerDashboardLayout";
 import Home from "./pages/home/Home";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import VerifyEmail from "./pages/auth/VerifyEmail";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 
@@ -43,7 +42,7 @@ import AuditLogPage from "./pages/admin/audit-logs/AuditLogPage";
 import IndustryManagementPage from "./pages/admin/industry/IndustryManagementPage";
 import DashboardPage from "./pages/admin/dashboard/DashboardPage";
 import AdminSettingsPage from "./pages/admin/settings/AdminSettingsPage";
-import { NotificationProvider } from "./contexts/NotificationProvider";
+import { NotificationProvider } from "./contexts/notification/NotificationProvider";
 
 import CandidateLayout from "./layouts/CandidateDashBoardLayout";
 import SettingsPage from "./pages/jobseeker/dashboard/Settings/Settings";
@@ -134,7 +133,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-  { path: "/verify-email", element: <VerifyEmail /> },
   { path: "/reset-password", element: <ResetPassword /> },
   {
     path: "/admin",

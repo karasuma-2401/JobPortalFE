@@ -1,75 +1,55 @@
+// src/api/api.ts
 import axios from "axios";
-import { CookiesService } from "../services/cookieServices";
-import { TokenType } from "../bases/enums/jwt.enum";
+import { toast } from "sonner";
 
-const publicApi = axios.create({
-  baseURL: "http://localhost:8080/api",
+const BASE_URL =
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:8081/api";
+
+export const publicApi = axios.create({
+  baseURL: BASE_URL,
   timeout: 10000,
 });
-const privateApi = axios.create({
-  baseURL: "http://localhost:8080/api",
-  timeout: 10000,
-});
 
-let isRefreshing = false;
-
-privateApi.interceptors.response.use(
+publicApi.interceptors.response.use(
   (response) => response.data,
-  async (error) => {
-    const originalRequest = error.config;
-    const status = error.response?.status;
-    if (status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      if (!isRefreshing) {
-        isRefreshing = true;
-        try {
-          const refreshToken = CookiesService.getToken(TokenType.REFRESH_TOKEN);
-          if (!refreshToken) throw new Error("No refresh token");
-          const res = await axios.post(
-            "http://localhost:8080/api/auth/refresh",
-            {
-              refreshToken,
-            },
-          );
-
-          const newAccessToken = res.data.value.accessToken;
-          CookiesService.saveToken(newAccessToken, TokenType.ACCESS_TOKEN);
-          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-          return privateApi(originalRequest);
-        } catch (refreshError) {
-          CookiesService.removeCookie(TokenType.ACCESS_TOKEN);
-          CookiesService.removeCookie(TokenType.REFRESH_TOKEN);
-          window.location.href = "/login";
-          return Promise.reject(refreshError);
-        } finally {
-          isRefreshing = false;
-        }
-      }
-    }
+  (error) => {
+    const message =
+      error.response?.data?.message || "An error occurred during processing.";
+    toast.error(message);
     return Promise.reject(error);
   },
 );
+
+export const privateApi = axios.create({
+  baseURL: BASE_URL,
+  timeout: 10000,
+});
 privateApi.interceptors.request.use(
   (config) => {
-    const token = CookiesService.getToken(TokenType.ACCESS_TOKEN);
-    if (token && config["headers"]) {
-      {
-        config.headers["Authorization"] = `Bearer ${token}`;
-      }
+    const token = localStorage.getItem("accessToken");
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => Promise.reject(error),
 );
+
 privateApi.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    const status = error.response.status;
-    if (status === 401) {
-      console.log("Invalid Session. Please login again");
+    if (error.response?.status === 401) {
+      toast.error("Session expired. Please log in again.");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+
+      // force return to login if session expired
+      window.location.href = "/login";
+    } else {
+      const message =
+        error.response?.data?.message || "An error occurred during processing.";
+      toast.error(message);
     }
     return Promise.reject(error);
   },
 );
-export { publicApi, privateApi };
