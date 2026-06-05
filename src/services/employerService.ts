@@ -13,4 +13,12 @@ export const EmployerService = {
     const response = await privateApi.get("/employer");
     return response;
   },
+  getRecentJobs: async () => {
+    const response = await privateApi.get("/jobpost");
+    return response.data;
+  },
+  getSavedCandidates: async () => {
+    const response = await privateApi.get("/saved-candidates");
+    return response.data;
+  },
 };
