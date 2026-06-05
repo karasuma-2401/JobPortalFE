@@ -1,16 +1,23 @@
-import { Calendar, Users, Briefcase, Mail, Phone } from "lucide-react";
-
-import { FaFacebook, FaTwitter, FaLinkedin } from "react-icons/fa";
+import {
+  Calendar,
+  Users,
+  Briefcase,
+  Mail,
+  Phone,
+  Building2,
+} from "lucide-react";
+import { FaFacebook, FaYoutube, FaLinkedin } from "react-icons/fa";
 
 interface ProfileSidebarProps {
   founded: string;
   teamSize: string;
   industry: string;
+  organizationType: string;
   email: string;
   phone: string;
   socials: {
     facebook?: string;
-    twitter?: string;
+    youtube?: string;
     linkedin?: string;
   };
 }
@@ -19,6 +26,7 @@ export default function ProfileSidebar({
   founded,
   teamSize,
   industry,
+  organizationType,
   email,
   phone,
   socials,
@@ -40,6 +48,20 @@ export default function ProfileSidebar({
               </p>
               <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
                 {founded}
+              </p>
+            </div>
+          </div>
+
+          <div className="group flex items-center gap-4 cursor-default">
+            <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110">
+              <Building2 size={20} strokeWidth={2} />
+            </div>
+            <div>
+              <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wider mb-1">
+                Organization Type
+              </p>
+              <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                {organizationType}
               </p>
             </div>
           </div>
@@ -117,15 +139,15 @@ export default function ProfileSidebar({
               <FaFacebook size={18} strokeWidth={2} />
             </a>
           )}
-          {socials.twitter && (
+          {socials.youtube && (
             <a
-              href={socials.twitter}
+              href={socials.youtube}
               target="_blank"
               rel="noreferrer"
-              className="w-11 h-11 rounded-xl bg-[#1DA1F2]/10 text-[#1DA1F2] flex items-center justify-center transition-all duration-300 hover:bg-[#1DA1F2] hover:text-white hover:-translate-y-1 hover:shadow-md"
-              title="Twitter"
+              className="w-11 h-11 rounded-xl bg-[#FF0000]/10 text-[#FF0000] flex items-center justify-center transition-all duration-300 hover:bg-[#FF0000] hover:text-white hover:-translate-y-1 hover:shadow-md"
+              title="YouTube"
             >
-              <FaTwitter size={18} strokeWidth={2} />
+              <FaYoutube size={18} strokeWidth={2} />
             </a>
           )}
           {socials.linkedin && (

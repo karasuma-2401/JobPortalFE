@@ -15,17 +15,23 @@ interface CompanyInfoProps {
 export default function CompanyInfo({ mode = "setup" }: CompanyInfoProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const previousState = location.state || {};
+
+  const previousState = location.state as {
+    companyName?: string;
+    description?: string;
+    logo?: File | null;
+    banner?: File | null;
+  } | null;
 
   const [companyName, setCompanyName] = useState(
-    previousState.companyName || "",
+    previousState?.companyName || "",
   );
-  const [aboutUs, setAboutUs] = useState(previousState.description || "");
+  const [aboutUs, setAboutUs] = useState(previousState?.description || "");
   const [logoFile, setLogoFile] = useState<File | null>(
-    previousState.logo || null,
+    previousState?.logo || null,
   );
   const [bannerFile, setBannerfile] = useState<File | null>(
-    previousState.banner || null,
+    previousState?.banner || null,
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -45,7 +51,6 @@ export default function CompanyInfo({ mode = "setup" }: CompanyInfoProps) {
     };
 
     if (mode === "setup") {
-      // Pass data to the next step via state
       navigate("/employer/setup/founding", { state: currentData });
     } else {
       toast.success("Company information updated successfully!");
@@ -70,7 +75,7 @@ export default function CompanyInfo({ mode = "setup" }: CompanyInfoProps) {
               label="Browse photo"
               subLabel="A photo larger than 400 pixels work best. Max photo size 5 MB."
               className="aspect-square max-w-70"
-              onChange={(file) => setLogoFile(file)}
+              onChange={(file: File | null) => setLogoFile(file)}
             />
           </div>
 
@@ -82,7 +87,7 @@ export default function CompanyInfo({ mode = "setup" }: CompanyInfoProps) {
               label="Browse photo"
               subLabel="Banner images optimal dimension 1520x400. Supported format JPEG, PNG. Max photo size 5 MB."
               className="h-70"
-              onChange={(file) => setBannerfile(file)}
+              onChange={(file: File | null) => setBannerfile(file)}
             />
           </div>
         </div>

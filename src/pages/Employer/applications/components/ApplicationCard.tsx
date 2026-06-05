@@ -99,7 +99,7 @@ export default function ApplicationCard({
         </div>
         <div className="flex items-start gap-2 text-xs text-gray-600">
           <span className="text-gray-400 font-medium">Applied:</span>
-          <span>{applicant.appliedDate}</span>
+          <span>{new Date(applicant.appliedDate).toLocaleDateString()}</span>
         </div>
       </div>
 

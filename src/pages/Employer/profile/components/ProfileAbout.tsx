@@ -8,9 +8,10 @@ export default function ProfileAbout({ aboutUs, vision }: ProfileAboutProps) {
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 flex flex-col gap-8">
       <section>
         <h2 className="text-lg font-bold text-gray-900 mb-4">About Us</h2>
-        <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-          {aboutUs}
-        </div>
+        <div 
+          className="text-sm text-gray-600 leading-relaxed max-w-none prose prose-sm"
+          dangerouslySetInnerHTML={{ __html: aboutUs || "No description provided." }}
+        />
       </section>
 
       <div className="w-full h-px bg-gray-100"></div>
@@ -18,7 +19,7 @@ export default function ProfileAbout({ aboutUs, vision }: ProfileAboutProps) {
       <section>
         <h2 className="text-lg font-bold text-gray-900 mb-4">Company Vision</h2>
         <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-line p-6 bg-blue-50/50 rounded-lg border border-blue-100 italic">
-          "{vision}"
+          "{vision || "No vision statement provided."}"
         </div>
       </section>
     </div>

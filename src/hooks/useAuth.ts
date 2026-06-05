@@ -49,7 +49,7 @@ export const useLogin = () => {
 
       if (!user.hasProfile) {
         if (isEmployer) {
-          navigate("/employer/account-setup");
+          navigate("/employer/setup/company");
         } else {
           navigate("/jobseeker/account-setup");
         }
