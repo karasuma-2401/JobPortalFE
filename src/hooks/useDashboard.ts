@@ -1,17 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { EmployerService } from "../services/employerService";
-
-interface JobResponse {
-  id: number;
-  title: string;
-  employmentType: string;
-  expiresAt: string;
-  status: string;
-}
+import type { JobResponse } from "../types/employer";
 
 interface SavedCandidateResponse {
   id: number;
 }
+
 interface MappedJob {
   id: number;
   title: string;
