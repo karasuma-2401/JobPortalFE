@@ -1,107 +1,39 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { Search, ChevronDown, Plus } from "lucide-react";
+import { Search, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import KanbanColumn, { type ColumnData } from "./components/KanbanColumn";
-import AddColumnModal from "./components/AddColumnModal";
 import CandidateProfileModal from "../components/CandidateProfileModal";
 
 import type { Candidate } from "../../../types/candidate";
+import type {
+  ApplicationStatus,
+  JobApplication,
+} from "../../../types/application";
+import {
+  useApplications,
+  useUpdateApplicationStatus,
+  useDeleteApplication,
+} from "../../../hooks/useApplications";
 
-const initialColumns: ColumnData[] = [
-  { id: "col-1", title: "All Application" },
-  { id: "col-2", title: "Reviewed" },
-];
-
-const initialCandidates: Candidate[] = [
-  {
-    id: "1",
-    columnId: "col-1",
-
-    name: "Ronald Richards",
-    avatar: null,
-
-    role: "Senior UI/UX Designer",
-
-    experience: "7 Years Experience",
-    education: "Master Degree",
-
-    appliedDate: "Jan 23, 2022",
-
-    biography:
-      "Senior UI/UX Designer with 7 years experience building enterprise products.",
-
-    coverLetter:
-      "I am excited to contribute my design expertise to your organization.",
-
-    dateOfBirth: "12 May 1994",
-    nationality: "American",
-    maritalStatus: "Single",
-    gender: "Male",
-
-    website: "ronaldrichards.com",
-    location: "New York, USA",
-
-    phone: "+1 123 456 789",
-    secondaryPhone: "+1 987 654 321",
-
-    email: "ronald@example.com",
-
-    social: {
-      linkedin: "https://linkedin.com",
-    },
-  },
-
-  {
-    id: "2",
-    columnId: "col-2",
-
-    name: "Theresa Webb",
-    avatar: null,
-
-    role: "Product Designer",
-
-    experience: "5 Years Experience",
-    education: "Product Design",
-
-    appliedDate: "Feb 10, 2022",
-
-    biography:
-      "Product Designer specialized in user-centered design and research.",
-
-    coverLetter:
-      "I am passionate about crafting intuitive digital experiences.",
-
-    dateOfBirth: "15 Aug 1993",
-    nationality: "Canadian",
-    maritalStatus: "Married",
-    gender: "Female",
-
-    website: "theresawebb.com",
-    location: "Toronto, Canada",
-
-    phone: "+1 555 111 222",
-    secondaryPhone: "+1 555 333 444",
-
-    email: "theresa@example.com",
-
-    social: {
-      linkedin: "https://linkedin.com",
-    },
-  },
+const FIXED_COLUMNS: ColumnData[] = [
+  { id: "PENDING", title: "Pending" },
+  { id: "REVIEWING", title: "Reviewing" },
+  { id: "ACCEPTED", title: "Accepted" },
+  { id: "REJECTED", title: "Rejected" },
 ];
 
 export default function ApplicationsPage() {
-  const [columns, setColumns] = useState<ColumnData[]>(initialColumns);
-  const [candidates, setCandidates] = useState<Candidate[]>(initialCandidates);
+  const queryClient = useQueryClient();
+  const { data: apiApplications, isLoading } = useApplications();
+  const { mutate: updateStatus } = useUpdateApplicationStatus();
+  const { mutate: deleteApplication } = useDeleteApplication();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
-
   const [showSortMenu, setShowSortMenu] = useState(false);
-
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(
     null,
   );
@@ -117,13 +49,36 @@ export default function ApplicationsPage() {
         setShowSortMenu(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const candidates: Candidate[] = useMemo(() => {
+    if (!apiApplications) return [];
+
+    return apiApplications.map((app: JobApplication) => ({
+      id: app.id.toString(),
+      columnId: app.status,
+      name: app.jobSeekerProfile?.fullName || "Unknown Applicant",
+      avatar: null,
+      role: "Applied Candidate",
+      experience: "Not specified",
+      education: "Not specified",
+      appliedDate: app.appliedAt || new Date().toISOString(),
+      biography: "No biography available.",
+      coverLetter: app.coverLetter || "No cover letter provided.",
+      dateOfBirth: "Unknown",
+      nationality: "Unknown",
+      maritalStatus: "Unknown",
+      gender: "Unknown",
+      website: "",
+      location: app.jobSeekerProfile?.address || "Unknown Location",
+      phone: app.jobSeekerProfile?.phone || "No Phone",
+      secondaryPhone: "",
+      email: "Unknown Email",
+      social: {},
+    }));
+  }, [apiApplications]);
 
   const filteredAndSortedCandidates = useMemo(() => {
     let result = [...candidates];
@@ -137,16 +92,12 @@ export default function ApplicationsPage() {
     return result.sort((a, b) => {
       const dateA = new Date(a.appliedDate).getTime();
       const dateB = new Date(b.appliedDate).getTime();
-
       return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
     });
   }, [candidates, searchQuery, sortOrder]);
 
   const selectedCandidate = useMemo(() => {
-    return (
-      candidates.find((candidate) => candidate.id === selectedCandidateId) ??
-      null
-    );
+    return candidates.find((c) => c.id === selectedCandidateId) ?? null;
   }, [candidates, selectedCandidateId]);
 
   const handleDragStart = (e: React.DragEvent, candidateId: string) => {
@@ -159,74 +110,42 @@ export default function ApplicationsPage() {
 
   const handleDrop = (e: React.DragEvent, targetColumnId: string) => {
     const candidateId = e.dataTransfer.getData("candidateId");
+    if (!candidateId) return;
 
-    setCandidates((prev) =>
-      prev.map((candidate) =>
-        candidate.id === candidateId
-          ? {
-              ...candidate,
-              columnId: targetColumnId,
-            }
-          : candidate,
-      ),
-    );
-  };
+    updateStatus({
+      id: Number(candidateId),
+      status: targetColumnId as ApplicationStatus,
+    });
 
-  const handleAddColumn = (name: string) => {
-    if (!name.trim()) return;
-
-    const newColumn: ColumnData = {
-      id: `col-${Date.now()}`,
-      title: name.trim(),
-    };
-
-    setColumns((prev) => [...prev, newColumn]);
-
-    toast.success("Column added successfully!");
-  };
-
-  const handleDeleteColumn = (columnId: string) => {
-    const hasCandidates = candidates.some(
-      (candidate) => candidate.columnId === columnId,
-    );
-
-    if (hasCandidates) {
-      toast.error("Cannot delete a column that contains candidates!");
-      return;
-    }
-
-    setColumns((prev) => prev.filter((column) => column.id !== columnId));
-
-    toast.success("Column deleted.");
-  };
-
-  const handleEditColumn = (columnId: string, newTitle: string) => {
-    setColumns((prev) =>
-      prev.map((column) =>
-        column.id === columnId
-          ? {
-              ...column,
-              title: newTitle,
-            }
-          : column,
-      ),
+    queryClient.setQueryData(
+      ["jobApplications"],
+      (oldData: JobApplication[] | undefined) => {
+        if (!oldData) return oldData;
+        return oldData.map((app) =>
+          app.id === Number(candidateId)
+            ? { ...app, status: targetColumnId as ApplicationStatus }
+            : app,
+        );
+      },
     );
   };
 
   const handleDeleteCandidate = (candidateId: string) => {
-    setCandidates((prev) =>
-      prev.filter((candidate) => candidate.id !== candidateId),
-    );
-
-    toast.success("Candidate deleted.");
+    deleteApplication(Number(candidateId));
   };
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-[calc(100vh-100px)] flex flex-col animate-in fade-in duration-500">
       <div className="flex items-center justify-between mb-8 shrink-0">
         <div>
-
-
           <h1 className="text-xl font-bold text-gray-900">Job Applications</h1>
         </div>
 
@@ -236,7 +155,6 @@ export default function ApplicationsPage() {
               size={16}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
             />
-
             <input
               type="text"
               placeholder="Search applicant..."
@@ -291,7 +209,7 @@ export default function ApplicationsPage() {
 
       <div className="flex gap-8 flex-1 min-h-0 relative">
         <div className="flex-1 flex gap-6 overflow-x-auto pb-4">
-          {columns.map((column) => (
+          {FIXED_COLUMNS.map((column) => (
             <KanbanColumn
               key={column.id}
               column={column}
@@ -301,37 +219,23 @@ export default function ApplicationsPage() {
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDrop={handleDrop}
-              onDelete={handleDeleteColumn}
-              onEdit={handleEditColumn}
+              onDelete={() => {}}
+              onEdit={() => {}}
               onDeleteApplicant={handleDeleteCandidate}
               onViewProfile={setSelectedCandidateId}
             />
           ))}
-
-          <div className="w-[320px] shrink-0 pt-2">
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center justify-center gap-2 w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-bold hover:bg-gray-50 hover:border-gray-400 hover:text-gray-900 transition-colors"
-            >
-              <Plus size={20} />
-              <span>Add New Column</span>
-            </button>
-          </div>
         </div>
       </div>
-
-      <AddColumnModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onAdd={handleAddColumn}
-      />
 
       <CandidateProfileModal
         isOpen={!!selectedCandidate}
         onClose={() => setSelectedCandidateId(null)}
         candidate={selectedCandidate}
         onHire={(candidateId) => {
-          toast.success(`Candidate ${candidateId} hired successfully`);
+          updateStatus({ id: Number(candidateId), status: "ACCEPTED" });
+          toast.success(`Candidate hired successfully!`);
+          setSelectedCandidateId(null);
         }}
       />
     </div>
