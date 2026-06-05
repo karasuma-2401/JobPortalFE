@@ -10,9 +10,9 @@ import RichTextEditor from "../../../components/ui/RichTextEditor";
 import CustomDatePicker from "../../../components/ui/DatePicker";
 
 const orgTypes = [
-  { label: "Private Company", value: "private" },
-  { label: "Public Company", value: "public" },
-  { label: "Non-profit", value: "non_profit" },
+  { label: "Private Company", value: "PRIVATE_COMPANY" },
+  { label: "Public Company", value: "PUBLIC_COMPANY" },
+  { label: "Non-profit", value: "NON_PROFIT" },
 ];
 
 const industryTypes = [
