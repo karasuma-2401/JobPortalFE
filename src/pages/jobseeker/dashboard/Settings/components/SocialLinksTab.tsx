@@ -46,7 +46,6 @@ interface SocialLinkItem {
 export default function SocialLinksTab() {
   const [isLoading, setIsLoading] = useState(false);
 
-  // Khởi tạo danh sách link dựa trên ảnh thiết kế (4 link mặc định)
   const [links, setLinks] = useState<SocialLinkItem[]>([
     { id: "1", network: socialNetworks[0], url: "" },
     { id: "2", network: socialNetworks[1], url: "" },

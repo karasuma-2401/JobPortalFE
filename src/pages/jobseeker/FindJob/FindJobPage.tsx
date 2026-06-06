@@ -6,11 +6,8 @@ import FilterSortBar from "./components/FilterSortBar";
 import JobList from "./components/JobList";
 
 const EXPLORE_MOCK_JOBS = [
-  { id: "1", title: "Marketing Manager", type: "Remote", isFeatured: true, logo: "https://logo.clearbit.com/stripe.com", location: "New Mexico, USA", salary: "$50k-$80k/month", daysRemaining: "4 Days Remaining" },
-  { id: "2", title: "Project Manager", type: "Full Time", isFeatured: true, logo: "https://logo.clearbit.com/shopify.com", location: "Dhaka, Bangladesh", salary: "$50k-$80k/month", daysRemaining: "4 Days Remaining" },
-  { id: "3", title: "Interaction Designer", type: "Full Time", isFeatured: true, logo: "https://logo.clearbit.com/figma.com", location: "New York, USA", salary: "$50k-$80k/month", daysRemaining: "4 Days Remaining" },
-  { id: "4", title: "Networking Engineer", type: "Full Time", isFeatured: false, logo: "https://logo.clearbit.com/cisco.com", location: "Washington, USA", salary: "$30k-$35k/month", daysRemaining: "4 Days Remaining" },
-  { id: "5", title: "Product Designer", type: "Full Time", isFeatured: false, logo: "https://logo.clearbit.com/airbnb.com", location: "Ohio, USA", salary: "$50k-$80k/month", daysRemaining: "4 Days Remaining" }
+  { id: "1", title: "Marketing Manager", companyName: "Stripe", type: "Remote", isFeatured: true, logo: "https://logo.clearbit.com/stripe.com", location: "New Mexico, USA", salary: "$50k-$80k/month", daysRemaining: "4 Days Remaining" },
+  { id: "2", title: "Project Manager", companyName: "Shopify", type: "Full Time", isFeatured: true, logo: "https://logo.clearbit.com/shopify.com", location: "Dhaka, Bangladesh", salary: "$50k-$80k/month", daysRemaining: "4 Days Remaining" },
 ];
 
 export default function FindJobPage() {
