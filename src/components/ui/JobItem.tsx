@@ -15,6 +15,7 @@ export interface JobItemProps {
   isSelected?: boolean;   
   
   onSelect?: () => void;
+  onDoubleClick?: () => void; 
   onBookmarkClick?: (id: string | number) => void;
   onApplyClick?: (id: string | number) => void;
 }
@@ -32,6 +33,7 @@ export default function JobItem({
   isBookmarked = false,
   isSelected = false,
   onSelect,
+  onDoubleClick, // Nhận prop ở đây
   onBookmarkClick,
   onApplyClick,
 }: JobItemProps) {
@@ -39,8 +41,9 @@ export default function JobItem({
   return (
     <div
       onClick={onSelect} 
+      onDoubleClick={onDoubleClick} 
       className={`flex items-center justify-between p-6 border rounded-xl bg-white transition-all ${
-        onSelect ? "cursor-pointer" : "cursor-default"
+        onSelect || onDoubleClick ? "cursor-pointer" : "cursor-default"
       } ${
         isSelected
           ? "border-primary-500 bg-blue-50/50 border-2 shadow-sm ring-1 ring-primary-500/10" 
@@ -101,7 +104,6 @@ export default function JobItem({
       </div>
 
       <div className="flex items-center gap-5 shrink-0">
-        
         <button 
           onClick={(e) => {
             e.stopPropagation(); 

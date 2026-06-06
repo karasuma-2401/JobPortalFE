@@ -4,6 +4,7 @@ import DashboardPagination from "../../../components/ui/DashboardPagination";
 import JobSearchBar from "./components/JobSearchBar";
 import FilterSortBar from "./components/FilterSortBar";
 import JobList from "./components/JobList";
+import JobDetailPage from "./JobDetailPage"; 
 
 const EXPLORE_MOCK_JOBS = [
   { id: "1", title: "Marketing Manager", companyName: "Stripe", type: "Remote", isFeatured: true, logo: "https://logo.clearbit.com/stripe.com", location: "New Mexico, USA", salary: "$50k-$80k/month", daysRemaining: "4 Days Remaining" },
@@ -16,6 +17,8 @@ export default function FindJobPage() {
   const [savedJobIds, setSavedJobIds] = useState<string[]>([]);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [locationKeyword, setLocationKeyword] = useState("");
+
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null); 
   
   const totalPages = 5;
 
@@ -32,6 +35,23 @@ export default function FindJobPage() {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  if (selectedJobId) {
+    return (
+      <div className="w-full bg-white font-sans min-h-screen pb-16 animate-fadeIn">
+        <div className="max-w-7xl mx-auto px-8 pt-6">
+          <button 
+            onClick={() => setSelectedJobId(null)}
+            className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-primary-500 transition-colors"
+          >
+            ← Back to Job List
+          </button>
+        </div>
+
+        <JobDetailPage jobId={selectedJobId} />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-white font-sans min-h-screen pb-16">
@@ -52,6 +72,7 @@ export default function FindJobPage() {
           viewMode={viewMode} 
           savedJobIds={savedJobIds} 
           onToggleSave={handleToggleSave} 
+          onJobDoubleClick={(id) => setSelectedJobId(id)} 
         />
 
         <DashboardPagination 

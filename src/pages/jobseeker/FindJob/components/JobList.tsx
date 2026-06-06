@@ -18,9 +18,16 @@ interface JobListProps {
   viewMode: "list" | "grid";
   savedJobIds: string[];
   onToggleSave: (id: string | number) => void;
+  onJobDoubleClick: (id: string) => void; 
 }
 
-export default function JobList({ jobs, viewMode, savedJobIds, onToggleSave }: JobListProps) {
+export default function JobList({ 
+  jobs, 
+  viewMode, 
+  savedJobIds, 
+  onToggleSave, 
+  onJobDoubleClick
+}: JobListProps) {
   
   if (viewMode === "grid") {
     return (
@@ -36,6 +43,7 @@ export default function JobList({ jobs, viewMode, savedJobIds, onToggleSave }: J
             salary={job.salary}
             daysRemaining={job.daysRemaining} 
             isFeatured={job.isFeatured}
+            onDoubleClick={() => onJobDoubleClick(job.id)} 
           />
         ))}
       </div>
@@ -58,6 +66,7 @@ export default function JobList({ jobs, viewMode, savedJobIds, onToggleSave }: J
           isBookmarked={savedJobIds.includes(job.id)}
           onBookmarkClick={onToggleSave}
           onApplyClick={(id) => console.log(`Apply Job ID: ${id}`)}
+          onDoubleClick={() => onJobDoubleClick(job.id)} 
         />
       ))}
     </div>
