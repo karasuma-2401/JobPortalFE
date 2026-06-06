@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import PaymentQRSection from "../post-job/components/PaymentQRSection";
-import OrderSummarySection from "../post-job/components/OrderSummarySection";
+import PaymentQRSection from "./components/PaymentQRSection";
+import OrderSummarySection from "./components/OrderSummarySection";
 
 const planDetails: Record<string, { title: string; price: number }> = {
   basic: { title: "BASIC", price: 19 },

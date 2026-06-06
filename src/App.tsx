@@ -60,9 +60,8 @@ const router = createBrowserRouter([
   {
     element: <MainLayout />,
     children: [
-      { path: "/", element: <Navigate to="/candidate/settings" /> },
       { path: "/job-alerts", element: <JobAlertPage /> },
-      { path: "/home", element: <Home /> },
+      { path: "/", element: <Home /> },
     ],
   },
   {
@@ -75,7 +74,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/employer/setup",
-    element: <EmployerSetupLayout />,
+    element: <EmployerSetupLayout />,   //Phai dang nhap thi moi cho vao cai route nay 
     children: [
       { index: true, element: <CompanyInfo /> },
       { path: "company", element: <CompanyInfo /> },
@@ -87,13 +86,13 @@ const router = createBrowserRouter([
   },
   {
     path: "/employer",
-    element: <EmployerDashboardLayout />,
+    element: <EmployerDashboardLayout />, //Phai dang nhap thi moi cho vao cai route nay dcm 
     children: [
       { index: true, element: <Navigate to="dashboard" replace /> },
       { path: "dashboard", element: <Overview /> },
       {
         path: "checkout",
-        element: <CheckoutPage />,
+      element: <CheckoutPage />,
       },
       {
         path: "my-jobs",

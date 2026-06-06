@@ -3,20 +3,19 @@ import { Link, NavLink } from "react-router-dom";
 import { Search, PhoneCall } from "lucide-react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Button from "../../../components/ui/Button";
-import JobLogo from "../../../assets/JobLogo.svg";
 import ComboBox, { type OptionType } from "../../../components/ui/ComboBox";
-
+import Logo from "../../../components/Logo";
 const languages = [
   { label: "English", value: "english" },
   { label: "Vietnamese", value: "vietnamese" },
 ];
 const navLinks = [
-  { path: "/home", label: "Home" },
+  { path: "/", label: "Home" },
   { path: "/find-job", label: "Find Job" },
   { path: "/employers", label: "Employers" },
-  { path: "/candicates", label: "Candicates" },
-  { path: "/pricing", label: "Pricing Plans" },
-  { path: "/customer", label: "Customer Supports" },
+  // { path: "/candicates", label: "Candicates" },
+  // { path: "/pricing", label: "Pricing Plans" },
+  // { path: "/customer", label: "Customer Supports" },
 ];
 
 export default function Header() {
@@ -72,20 +71,7 @@ export default function Header() {
       </div>
 
       <div className="flex justify-between items-center py-4 px-8">
-        <Link
-          to="/home"
-          className="flex items-center gap-2 text-2xl font-bold text-gray-900"
-        >
-          <span className="text-primary-500 flex items-center">
-            <img
-              src={JobLogo}
-              alt="My Job logo"
-              className="w-8 h-8 object-contain"
-            />
-          </span>
-          MyJob
-        </Link>
-
+          <Logo className = "flex items-center gap-2 text-2xl font-bold text-gray-900" /> 
         <div className="hidden lg:flex items-center border border-gray-100 rounded-md px-6 py-2 w-1/3 gap-4">
           <Search className="text-primary-500" size={28} />
           <input
@@ -104,9 +90,11 @@ export default function Header() {
               Sign In
             </Button>
           </Link>
-          <Button variant="primary" className="px-6 py-2">
-            Post A Job
-          </Button>
+          <Link to="/employer/post-job">
+            <Button variant="primary" className="px-6 py-2">
+              Post A Job
+            </Button>
+          </Link>
         </div>
       </div>
     </motion.header>

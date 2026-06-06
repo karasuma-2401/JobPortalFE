@@ -3,8 +3,18 @@ import { Outlet, useLocation } from "react-router-dom";
 import SetupHeader from "../pages/employer/components/SetupHeader";
 import SetupStepper from "../pages/employer/components/SetupStepper";
 import SetupFooter from "../pages/employer/components/SetupFooter";
-
+import useAuth from "../contexts/auth/useAuth";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from 'react' 
 export default function EmployerSetupLayout() {
+  const { isEmployer } = useAuth() 
+  const navigate = useNavigate(); 
+  
+  useEffect(() => {
+     if (!isEmployer) 
+        navigate("/login"); 
+  } , [isEmployer , navigate])
+ 
   const location = useLocation();
   const currentPath = location.pathname;
   let progress = 0;

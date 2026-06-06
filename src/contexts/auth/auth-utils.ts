@@ -12,7 +12,7 @@ export interface AuthState {
   user: AuthUser | null;
   roles: Role[];
   isAdmin: boolean;
-  isEmployee: boolean;
+  isEmployer: boolean;
   isJobSeeker: boolean;
 }
 
@@ -25,7 +25,7 @@ export const getAuthStateFromStorage = (): AuthState => {
     user: me ?? null,
     roles,
     isAdmin: roles.includes("ADMIN"),
-    isEmployee: roles.includes("EMPLOYERS"),
-    isJobSeeker: roles.includes("JOB-SEEKERS"),
+    isEmployer: roles.includes("EMPLOYER"),
+    isJobSeeker: roles.includes("SEEKER"),
   };
 };

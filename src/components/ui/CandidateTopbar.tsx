@@ -1,5 +1,6 @@
-import { Bell, Search, Briefcase, Phone } from "lucide-react";
+import { Bell, Search, Phone } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import Logo from "../Logo";
 
 export default function CandidateTopBar() {
   const location = useLocation();
@@ -8,9 +9,9 @@ export default function CandidateTopBar() {
     { label: "Home", path: "/" },
     { label: "Find Job", path: "/find-job" },
     { label: "Find Employers", path: "/employers" },
-    { label: "Dashboard", path: "/candidate/overview" }, 
-    { label: "Job Alerts", path: "/job-alerts" }, 
-    { label: "Customer Supports", path: "/support" },
+    // { label: "Dashboard", path: "/candidate/overview" }, 
+    // { label: "Job Alerts", path: "/job-alerts" }, 
+    // { label: "Customer Supports", path: "/support" },
   ];
 
   return (
@@ -54,13 +55,7 @@ export default function CandidateTopBar() {
       <div className="w-full bg-white h-20 px-8 flex items-center justify-between border-b border-b-gray-100">
         
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5">
-          <Briefcase size={28} className="text-primary-500" strokeWidth={2.5} />
-          <span className="text-[22px] font-extrabold text-gray-900 tracking-tight">
-            MyJob
-          </span>
-        </Link>
-
+       <Logo className = "flex items-center gap-2 text-2xl font-bold text-gray-900" /> 
         <div className="flex items-center border border-gray-200 rounded-lg p-1.5 w-[650px] focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500 transition-all bg-white shadow-sm">
           <div className="flex items-center gap-3 flex-1 px-2">
             <Search size={20} className="text-primary-500 shrink-0" />

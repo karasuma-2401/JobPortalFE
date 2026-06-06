@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import briefcaseIcon from "../assets/briefcaseIcon.svg";
 import BuildingsIcon from "../assets/buildingsIcon.svg";
-import JobLogo from "../assets/JobLogo.svg";
+import Logo from "../components/Logo";
 
 export default function AuthLayout() {
   return (
@@ -9,16 +9,7 @@ export default function AuthLayout() {
       <div className="flex w-full min-h-screen relative z-10">
         <div className="w-full lg:w-1/2 flex flex-col justify-start items-center p-8 bg-transparent">
           <div className="w-full max-w-md">
-            <div className="flex items-center gap-2 mb-20 text-xl font-bold text-gray-900">
-              <span className="text-primary-500 text-2xl">
-                <img
-                  src={JobLogo}
-                  alt="My Job logo"
-                  className="w-8 h-8 object-contain"
-                />
-              </span>
-              MyJob
-            </div>
+            <Logo /> 
             <Outlet />
           </div>
         </div>
