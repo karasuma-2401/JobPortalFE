@@ -1,64 +1,53 @@
 import { useState, useMemo } from "react";
-import { Info, FolderOpen } from "lucide-react";
+import { Info, FolderOpen, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import SavedCandidateItem from "./components/SavedCandidateItem";
 import CandidateProfileModal, {
   type Candidate,
 } from "../components/CandidateProfileModal";
-
-const MOCK_BIO =
-  "I've been passionate about graphic design and digital art from an early age. I can create high-quality and aesthetically pleasing designs in a quick turnaround time.\n\nI mostly use Adobe Photoshop, Illustrator, XD and Figma.";
-const MOCK_COVER_LETTER =
-  "Dear Hiring Manager,\n\nI am writing to express my strong interest in the open position. I am confident that my academic background and skills would be successfully utilized in this role.\n\nSincerely,\nCandidate";
-
-const generateMockCandidates = (): Candidate[] => {
-  const names = [
-    "Guy Hawkins",
-    "Jacob Jones",
-    "Cameron Williamson",
-    "Robert Fox",
-    "Kathryn Murphy",
-    "Darlene Robertson",
-    "Kristin Watson",
-    "Jenny Wilson",
-  ];
-
-  return names.map((name, index) => ({
-    id: `c-${index + 1}`,
-    name,
-    role: "Senior UI/UX Designer",
-    avatar: null,
-    biography: MOCK_BIO,
-    coverLetter: MOCK_COVER_LETTER,
-    dateOfBirth: "14 June, 1995",
-    nationality: "United States",
-    maritalStatus: "Single",
-    gender: "Male",
-    experience: "7 Years",
-    education: "Master Degree",
-    website: `www.${name.toLowerCase().replace(" ", "")}.com`,
-    location: "Beverly Hills, California 90202\n1372 Spring Avenue",
-    phone: "+1-202-555-0141",
-    secondaryPhone: "+1-202-555-0189",
-    email: `${name.toLowerCase().replace(" ", "")}@company.com`,
-  }));
-};
+import {
+  useSavedCandidates,
+  useRemoveSavedCandidate,
+} from "../../../hooks/useSavedCandidates";
 
 export default function SavedCandidatesPage() {
-  const [candidates, setCandidates] = useState<Candidate[]>(
-    generateMockCandidates(),
-  );
+  const { data: apiSavedCandidates, isLoading } = useSavedCandidates();
+  const { mutate: removeCandidate } = useRemoveSavedCandidate();
+
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(
     null,
   );
+
+  const candidates: Candidate[] = useMemo(() => {
+    if (!apiSavedCandidates) return [];
+
+    return apiSavedCandidates.map((saved) => ({
+      id: saved.jobSeekerId.toString(),
+      name: saved.jobSeekerName,
+      email: saved.jobSeekerEmail,
+      role: "Candidate",
+      avatar: null,
+      biography: "Full profile details will be available soon.",
+      coverLetter: "No cover letter provided.",
+      dateOfBirth: "Not specified",
+      nationality: "Not specified",
+      maritalStatus: "Not specified",
+      gender: "Not specified",
+      experience: "Not specified",
+      education: "Not specified",
+      website: "",
+      location: "Not specified",
+      phone: "Not specified",
+      secondaryPhone: "",
+    }));
+  }, [apiSavedCandidates]);
 
   const selectedCandidate = useMemo(() => {
     return candidates.find((c) => c.id === selectedCandidateId) || null;
   }, [candidates, selectedCandidateId]);
 
   const handleRemoveCandidate = (id: string) => {
-    setCandidates((prev) => prev.filter((c) => c.id !== id));
-    toast.success("Removed candidate from saved list.");
+    removeCandidate(Number(id));
   };
 
   const handleHireCandidate = (id: string) => {
@@ -76,6 +65,14 @@ export default function SavedCandidatesPage() {
       year: "numeric",
     }).format(date);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-[70vh] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-5xl mx-auto animate-in fade-in duration-500 pb-16 min-h-[70vh] flex flex-col">
