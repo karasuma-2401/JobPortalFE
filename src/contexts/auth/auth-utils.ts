@@ -1,31 +1,31 @@
-import type { Role } from "../../bases/constants/app";
-import { LocalStorageService } from "../../services/local-storage";
+import type { Role } from '../../bases/constants/app';
+import { LocalStorageService } from '../../services/local-storage';
 
 export interface AuthUser {
-  roles?: Role[];
-  name?: string;
-  email?: string;
-  [key: string]: unknown;
+    roles?: Role[];
+    name?: string;
+    email?: string;
+    [key: string]: unknown;
 }
 
 export interface AuthState {
-  user: AuthUser | null;
-  roles: Role[];
-  isAdmin: boolean;
-  isEmployer: boolean;
-  isJobSeeker: boolean;
+    user: AuthUser | null;
+    roles: Role[];
+    isAdmin: boolean;
+    isEmployer: boolean;
+    isJobSeeker: boolean;
 }
 
 export const getAuthStateFromStorage = (): AuthState => {
-  const me = LocalStorageService.getValue<AuthUser>("me");
+    const me = LocalStorageService.getValue<AuthUser>('me');
 
-  const roles = Array.isArray(me?.roles) ? me.roles : [];
+    const roles = Array.isArray(me?.roles) ? me.roles : [];
 
-  return {
-    user: me ?? null,
-    roles,
-    isAdmin: roles.includes("ADMIN"),
-    isEmployer: roles.includes("EMPLOYER"),
-    isJobSeeker: roles.includes("SEEKER"),
-  };
+    return {
+        user: me ?? null,
+        roles,
+        isAdmin: roles.includes('ADMIN'),
+        isEmployer: roles.includes('EMPLOYER'),
+        isJobSeeker: roles.includes('SEEKER'),
+    };
 };

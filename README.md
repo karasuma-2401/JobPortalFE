@@ -157,13 +157,13 @@ the commit will be rejected automatically.
 
 ## 📜 Available Scripts
 
-| Script | Description |
-|--------|------------|
-| `dev` | Start development server |
-| `build` | Create production build |
-| `preview` | Preview production build |
-| `lint` | Run ESLint |
-| `format` | Format code (if configured) |
+| Script    | Description                 |
+| --------- | --------------------------- |
+| `dev`     | Start development server    |
+| `build`   | Create production build     |
+| `preview` | Preview production build    |
+| `lint`    | Run ESLint                  |
+| `format`  | Format code (if configured) |
 
 ---
 
@@ -182,4 +182,4 @@ MIT License
 
 ---
 
-Built with ❤️ love. 
+Built with ❤️ love.

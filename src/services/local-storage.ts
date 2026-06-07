@@ -1,44 +1,44 @@
-const AUTH_STORAGE_EVENT = "myjob-auth-storage-change";
+const AUTH_STORAGE_EVENT = 'myjob-auth-storage-change';
 
 export class LocalStorageService {
-  private static notifyAuthChanged(key: string) {
-    if (key !== "me" || typeof window === "undefined") return;
+    private static notifyAuthChanged(key: string) {
+        if (key !== 'me' || typeof window === 'undefined') return;
 
-    window.dispatchEvent(new Event(AUTH_STORAGE_EVENT));
-  }
-
-  static saveValue<T>(key: string, value: T): boolean {
-    try {
-      const data = JSON.stringify(value);
-
-      localStorage.setItem(key, data);
-
-      this.notifyAuthChanged(key);
-
-      return true;
-    } catch (error) {
-      console.error(error);
-      return false;
+        window.dispatchEvent(new Event(AUTH_STORAGE_EVENT));
     }
-  }
 
-  static getValue<T>(key: string): T | undefined {
-    const value = localStorage.getItem(key);
+    static saveValue<T>(key: string, value: T): boolean {
+        try {
+            const data = JSON.stringify(value);
 
-    if (!value) return undefined;
+            localStorage.setItem(key, data);
 
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      return value as T;
+            this.notifyAuthChanged(key);
+
+            return true;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
     }
-  }
 
-  static removeValue(key: string) {
-    localStorage.removeItem(key);
+    static getValue<T>(key: string): T | undefined {
+        const value = localStorage.getItem(key);
 
-    this.notifyAuthChanged(key);
-  }
+        if (!value) return undefined;
+
+        try {
+            return JSON.parse(value) as T;
+        } catch {
+            return value as T;
+        }
+    }
+
+    static removeValue(key: string) {
+        localStorage.removeItem(key);
+
+        this.notifyAuthChanged(key);
+    }
 }
 
 export { AUTH_STORAGE_EVENT };

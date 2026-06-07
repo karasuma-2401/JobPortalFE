@@ -1,44 +1,50 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { ApplicationService } from "../services/applicationService";
-import type { ApplicationStatus } from "../types/application";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { type ApiError } from '../api/api';
+import { ApplicationService } from '../services/applicationService';
+import type { ApplicationStatus } from '../types/application';
 
 export const useApplications = () => {
-  return useQuery({
-    queryKey: ["jobApplications"],
-    queryFn: async () => {
-      const response = await ApplicationService.getApplications();
-      return response.data;
-    },
-  });
+    return useQuery({
+        queryKey: ['jobApplications'],
+        queryFn: async () => {
+            const response = await ApplicationService.getApplications();
+            return response.data;
+        },
+    });
 };
 
 export const useUpdateApplicationStatus = () => {
-  const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ id, status }: { id: number; status: ApplicationStatus }) =>
-      ApplicationService.updateStatus(id, status),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["jobApplications"] });
-    },
-    onError: () => {
-      toast.error("Failed to update candidate status.");
-    },
-  });
+    return useMutation({
+        mutationFn: ({
+            id,
+            status,
+        }: {
+            id: number;
+            status: ApplicationStatus;
+        }) => ApplicationService.updateStatus(id, status),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['jobApplications'] });
+        },
+        onError: (error: ApiError) => {
+            toast.error(error.message);
+        },
+    });
 };
 
 export const useDeleteApplication = () => {
-  const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (id: number) => ApplicationService.deleteApplication(id),
-    onSuccess: () => {
-      toast.success("Application deleted successfully.");
-      queryClient.invalidateQueries({ queryKey: ["jobApplications"] });
-    },
-    onError: () => {
-      toast.error("Failed to delete application.");
-    },
-  });
+    return useMutation({
+        mutationFn: (id: number) => ApplicationService.deleteApplication(id),
+        onSuccess: () => {
+            toast.success('Application deleted successfully.');
+            queryClient.invalidateQueries({ queryKey: ['jobApplications'] });
+        },
+        onError: (error: ApiError) => {
+            toast.error(error.message);
+        },
+    });
 };

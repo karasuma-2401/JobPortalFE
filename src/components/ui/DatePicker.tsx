@@ -1,30 +1,30 @@
-import { forwardRef } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { Calendar, X } from "lucide-react";
+import { forwardRef } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { Calendar, X } from 'lucide-react';
 
 interface CustomDatePickerProps {
-  selected: Date | null;
-  onChange: (date: Date | null) => void;
-  placeholder?: string;
-  className?: string;
+    selected: Date | null;
+    onChange: (date: Date | null) => void;
+    placeholder?: string;
+    className?: string;
 }
 
 interface CustomInputProps {
-  value?: string;
-  onClick?: () => void;
-  placeholderText?: string;
-  onClear?: () => void;
-  className?: string;
+    value?: string;
+    onClick?: () => void;
+    placeholderText?: string;
+    onClear?: () => void;
+    className?: string;
 }
 
 const CustomInput = forwardRef<HTMLButtonElement, CustomInputProps>(
-  ({ value, onClick, placeholderText, onClear, className = "" }, ref) => (
-    <button
-      type="button"
-      onClick={onClick}
-      ref={ref}
-      className={`
+    ({ value, onClick, placeholderText, onClear, className = '' }, ref) => (
+        <button
+            type='button'
+            onClick={onClick}
+            ref={ref}
+            className={`
         flex items-center justify-between
         w-full
         bg-white
@@ -39,64 +39,64 @@ const CustomInput = forwardRef<HTMLButtonElement, CustomInputProps>(
         transition-all
         ${className}
       `}
-    >
-      <div className="flex items-center gap-2 overflow-hidden">
-        <Calendar size={18} className="text-gray-400 shrink-0" />
-
-        <span
-          className={`truncate text-sm ${
-            value ? "text-gray-900 font-medium" : "text-gray-400"
-          }`}
         >
-          {value || placeholderText}
-        </span>
-      </div>
+            <div className='flex items-center gap-2 overflow-hidden'>
+                <Calendar size={18} className='text-gray-400 shrink-0' />
 
-      {value && onClear && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClear();
-          }}
-          className="
+                <span
+                    className={`truncate text-sm ${
+                        value ? 'text-gray-900 font-medium' : 'text-gray-400'
+                    }`}
+                >
+                    {value || placeholderText}
+                </span>
+            </div>
+
+            {value && onClear && (
+                <button
+                    type='button'
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onClear();
+                    }}
+                    className='
             p-1
             rounded-full
             text-gray-400
             hover:text-red-500
             hover:bg-gray-100
             transition-colors
-          "
-          aria-label="Clear date"
-        >
-          <X size={16} />
+          '
+                    aria-label='Clear date'
+                >
+                    <X size={16} />
+                </button>
+            )}
         </button>
-      )}
-    </button>
-  ),
+    )
 );
 
-CustomInput.displayName = "CustomInput";
+CustomInput.displayName = 'CustomInput';
 
 export default function CustomDatePicker({
-  selected,
-  onChange,
-  placeholder = "dd/mm/yyyy",
-  className = "",
+    selected,
+    onChange,
+    placeholder = 'dd/mm/yyyy',
+    className = '',
 }: CustomDatePickerProps) {
-  return (
-    <DatePicker
-      selected={selected}
-      onChange={onChange}
-      dateFormat="dd/MM/yyyy"
-      popperPlacement="bottom-start"
-      customInput={
-        <CustomInput
-          placeholderText={placeholder}
-          onClear={() => onChange(null)}
-          className={className}
+    return (
+        <DatePicker
+            selected={selected}
+            onChange={onChange}
+            dateFormat='dd/MM/yyyy'
+            popperPlacement='bottom-start'
+            customInput={
+                <CustomInput
+                    placeholderText={placeholder}
+                    onClear={() => onChange(null)}
+                    className={className}
+                />
+            }
         />
-      }
-    />
-  );
+    );
 }
