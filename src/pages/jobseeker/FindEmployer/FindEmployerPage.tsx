@@ -1,12 +1,13 @@
 import { useState } from "react";
-import EmployerSearchBar from "./components/EmployerSearchBar";
-import EmployerFilterSidebar from "./components/EmployerFilterSideBar";
-import EmployerCard from "./components/EmployerCard";
-import type { Employer } from "./components/EmployerCard";
 import DashboardPagination from "../../../components/ui/DashboardPagination";
-import { LayoutGrid, List } from "lucide-react";
 
-const MOCK_EMPLOYERS: Employer[] = [
+import EmployerSearchBar from "./components/EmployerSearchBar";
+import FilterSortBar from "./components/EmployerFilterSortBar"; 
+import EmployerList from "./components/EmployerList";
+import EmployerDetailPage from "./EmployerDetailPage";
+
+
+const EXPLORE_MOCK_EMPLOYERS = [
   { id: "1", name: "Dribbble", logo: "https://logo.clearbit.com/dribbble.com", location: "United States", openJobsCount: 3 },
   { id: "2", name: "Udemy", logo: "https://logo.clearbit.com/udemy.com", location: "China", openJobsCount: 3 },
   { id: "3", name: "Figma", logo: "https://logo.clearbit.com/figma.com", location: "United States", openJobsCount: 3 },
@@ -15,93 +16,70 @@ const MOCK_EMPLOYERS: Employer[] = [
 ];
 
 export default function FindEmployerPage() {
-  // Search States
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [currentPage, setCurrentPage] = useState(1);
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("");
   
-  // Filter States
-  const [radius, setRadius] = useState(32);
-  const [orgType, setOrgType] = useState("");
-  
-  // View & Pagination
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedEmployerId, setSelectedEmployerId] = useState<string | null>(null);
+
+  const totalPages = 5;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Tìm kiếm:", { keyword, location, category });
+    console.log("Tìm kiếm với điều kiện:", { keyword, location, category });
   };
 
+  if (selectedEmployerId) {
+    return (
+      <div className="w-full bg-[#F8F9FA] font-sans min-h-screen pb-16 animate-fadeIn">
+        <div className="max-w-7xl mx-auto px-8 pt-6 text-left">
+          <button 
+            onClick={() => setSelectedEmployerId(null)}
+            className="inline-flex items-center gap-2 text-[14px] font-semibold text-gray-500 hover:text-primary-500 transition-colors bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm"
+          >
+            ← Back to Employer List
+          </button>
+        </div>
+        
+        <EmployerDetailPage employerId={selectedEmployerId} /> 
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full bg-[#F8F9FA] min-h-screen pb-16 font-sans text-gray-800">
-      
-      {/* Thanh Tìm Kiếm */}
+    <div className="w-full bg-white font-sans min-h-screen pb-16">
       <EmployerSearchBar 
-        keyword={keyword} setKeyword={setKeyword}
-        location={location} setLocation={setLocation}
-        category={category} setCategory={setCategory}
+        keyword={keyword}
+        setKeyword={setKeyword}
+        location={location}
+        setLocation={setLocation}
+        category={category}
+        setCategory={setCategory}
         onSearch={handleSearch}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
-        
-        {/* Cột trái: Bộ lọc */}
-        <div className="lg:col-span-1">
-          <EmployerFilterSidebar 
-            radius={radius} setRadius={setRadius}
-            orgType={orgType} setOrgType={setOrgType}
+      <div className="max-w-7xl mx-auto px-8 mt-8">
+        <FilterSortBar viewMode={viewMode} setViewMode={setViewMode} />
+
+        <EmployerList 
+          employers={EXPLORE_MOCK_EMPLOYERS} 
+          viewMode={viewMode} 
+          onEmployerDoubleClick={(id) => setSelectedEmployerId(id)} 
+        />
+
+        <div className="mt-8">
+          <DashboardPagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
           />
-        </div>
-
-        {/* Cột phải: Danh sách & Phân trang */}
-        <div className="lg:col-span-3 flex flex-col gap-5">
-          
-          {/* Thanh Sort & View Mode (Header của danh sách) */}
-          <div className="flex flex-wrap items-center justify-end gap-3 mb-2">
-            <select className="border border-gray-200 text-gray-600 bg-white px-4 py-2.5 rounded-lg text-sm outline-none cursor-pointer">
-              <option>Latest</option>
-              <option>Oldest</option>
-            </select>
-            <select className="border border-gray-200 text-gray-600 bg-white px-4 py-2.5 rounded-lg text-sm outline-none cursor-pointer">
-              <option>12 per page</option>
-              <option>24 per page</option>
-            </select>
-            <div className="flex bg-white border border-gray-200 rounded-lg p-1">
-              <button 
-                onClick={() => setViewMode("grid")}
-                className={`p-2 rounded ${viewMode === "grid" ? "bg-blue-50 text-primary-500" : "text-gray-400"}`}
-              >
-                <LayoutGrid size={18} />
-              </button>
-              <button 
-                onClick={() => setViewMode("list")}
-                className={`p-2 rounded ${viewMode === "list" ? "bg-blue-50 text-primary-500" : "text-gray-400"}`}
-              >
-                <List size={18} />
-              </button>
-            </div>
-          </div>
-
-          {/* Danh sách Employers */}
-          <div className={`grid gap-4 ${viewMode === "grid" ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"}`}>
-            {MOCK_EMPLOYERS.map((employer) => (
-              <EmployerCard key={employer.id} employer={employer} />
-            ))}
-          </div>
-
-          {/* Phân trang */}
-          <div className="mt-8">
-            <DashboardPagination 
-              currentPage={currentPage}
-              totalPages={5}
-              onPageChange={(page) => {
-                setCurrentPage(page);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-            />
-          </div>
-
         </div>
       </div>
     </div>

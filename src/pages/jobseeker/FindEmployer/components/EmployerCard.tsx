@@ -1,4 +1,5 @@
-import { MapPin, Briefcase, ArrowRight } from "lucide-react";
+import { MapPin, Briefcase} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export interface Employer {
   id: string;
@@ -12,33 +13,44 @@ interface EmployerCardProps {
   employer: Employer;
 }
 
-export default function EmployerCard({ employer }: EmployerCardProps) {
+export default function EmployerCardItem({ employer }: EmployerCardProps) {
+  const navigate = useNavigate();
+
+  const handleDoubleClick = () => {
+    navigate(`/find-employer/${employer.id}`);
+  };
+
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 bg-white border border-gray-100 rounded-xl hover:shadow-md transition-all gap-4">
-      <div className="flex items-center gap-5">
+    <div 
+      onDoubleClick={handleDoubleClick}
+      className="bg-white border border-gray-100 p-5 rounded-xl flex items-center justify-between gap-4 hover:shadow-md transition-all cursor-pointer select-none group active:scale-[0.99]"
+      title="Double click to view details"
+    >
+      <div className="flex items-center gap-4">
         <img 
           src={employer.logo} 
           alt={employer.name} 
-          className="w-14 h-14 rounded-xl object-cover border border-gray-100 p-1 bg-white shrink-0 shadow-sm"
+          className="w-12 h-12 rounded-lg object-cover"
         />
-        <div className="space-y-1.5 text-left">
-          <h3 className="text-[18px] font-bold text-gray-900 hover:text-primary-500 transition-colors cursor-pointer">
+        <div className="text-left space-y-1">
+          <h4 className="text-[16px] font-bold text-gray-900 group-hover:text-primary-500 transition-colors">
             {employer.name}
-          </h3>
-          <div className="flex items-center gap-4 text-[14px] text-gray-500 flex-wrap">
-            <span className="flex items-center gap-1.5">
-              <MapPin size={16} className="text-gray-400" /> {employer.location}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Briefcase size={16} className="text-gray-400" /> {employer.openJobsCount} - open Job
-            </span>
+          </h4>
+          <div className="flex items-center gap-3 text-[13px] text-gray-400">
+            <span className="flex items-center gap-1"><MapPin size={14} /> {employer.location}</span>
+            <span className="flex items-center gap-1"><Briefcase size={14} /> {employer.openJobsCount} - open Job</span>
           </div>
         </div>
       </div>
 
-      <button className="w-full sm:w-auto px-6 py-3 flex items-center justify-center gap-2 text-[14px] font-bold rounded-lg text-primary-500 bg-blue-50 hover:bg-primary-500 hover:text-white transition-all group shrink-0">
-        <span>Open Position</span>
-        <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
+      <button 
+        onClick={(e) => {
+          e.stopPropagation(); 
+          navigate(`/find-employer/${employer.id}`);
+        }}
+        className="px-4 py-2.5 bg-blue-50 text-primary-500 hover:bg-primary-500 hover:text-white rounded-lg text-[14px] font-semibold flex items-center gap-2 transition-all"
+      >
+        Open Position →
       </button>
     </div>
   );

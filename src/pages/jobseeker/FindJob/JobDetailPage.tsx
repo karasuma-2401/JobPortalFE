@@ -1,6 +1,6 @@
 import { Link as LinkIcon, Phone, Mail, Bookmark, ArrowRight, Facebook, Twitter } from "lucide-react";
 import JobOverviewSidebar from "./components/JobOverviewSidebar";
-import RelatedJobs from "./components/RelatedJobs";
+import JobGridSection from "../../../components/ui/JobGridSection"; 
 import { MOCK_JOB_DETAILS } from "./mockJobDetails"; 
 import { useState } from "react"; 
 import ApplyJobModal from "./components/ApplyJobModal";
@@ -8,7 +8,10 @@ import ApplyJobModal from "./components/ApplyJobModal";
 interface JobDetailPageProps {
   jobId: string; 
 }
-
+const MOCK_RELATED_JOBS = [
+  { id: "r1", title: "UI/UX Designer", companyName: "Stripe", type: "Full Time", isFeatured: true, logo: "https://logo.clearbit.com/stripe.com", location: "San Francisco, USA", salary: "$60k-$90k/month", daysRemaining: "2 Days Remaining" },
+  { id: "r2", title: "Product Researcher", companyName: "Figma", type: "Remote", isFeatured: false, logo: "https://logo.clearbit.com/figma.com", location: "New York, USA", salary: "$45k-$70k/month", daysRemaining: "5 Days Remaining" }
+];
 export default function JobDetailPage({ jobId }: JobDetailPageProps) {
   const jobData = MOCK_JOB_DETAILS[jobId] || MOCK_JOB_DETAILS["1"];
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
@@ -117,7 +120,13 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
           </div>
         </div>
 
-        <RelatedJobs />
+        <div className="border-t border-gray-100 pt-8">
+        <JobGridSection 
+          title="Related Jobs"
+          jobs={MOCK_RELATED_JOBS}
+          onJobDoubleClick={(id) => console.log("Chuyển tiếp sang công việc liên quan:", id)}
+        />
+      </div>
 
       </div>
 
