@@ -62,28 +62,37 @@ export default function JobSearchBar({
 
           <div className="hidden md:block w-[1px] h-8 bg-gray-200 shrink-0" />
 
-          <div className="flex items-center gap-3 flex-1 w-full px-3 py-2 md:py-0">
-            <MapPin size={22} className="text-primary-500 shrink-0" />
-            <input 
-              type="text" 
-              value={locationKeyword}
-              onChange={(e) => setLocationKeyword(e.target.value)}
-              placeholder="Location" 
-              className="w-full outline-none text-[15px] text-gray-700 placeholder:text-gray-400 bg-transparent"
-            />
-          </div>
+                    <div className='flex items-center gap-3 flex-1 w-full px-3 py-2 md:py-0'>
+                        <MapPin
+                            size={22}
+                            className='text-primary-500 shrink-0'
+                        />
+                        <input
+                            type='text'
+                            value={locationKeyword}
+                            onChange={(e) => setLocationKeyword(e.target.value)}
+                            placeholder='Location'
+                            className='w-full outline-none text-[15px] text-gray-700 placeholder:text-gray-400 bg-transparent'
+                        />
+                    </div>
 
           <div className="hidden md:block w-[1px] h-8 bg-gray-200 shrink-0" />
 
-          <div className="flex items-center justify-between flex-1 w-full px-3 py-2 md:py-0 cursor-pointer group">
-            <div className="flex items-center gap-3">
-              <Briefcase size={22} className="text-primary-500 shrink-0" />
-              <span className="text-[15px] text-gray-400 select-none group-hover:text-gray-600 transition-colors">
-                Select Category
-              </span>
-            </div>
-            <ChevronDown size={18} className="text-gray-400 group-hover:text-gray-600 transition-colors" />
-          </div>
+                    <div className='flex items-center justify-between flex-1 w-full px-3 py-2 md:py-0 cursor-pointer group'>
+                        <div className='flex items-center gap-3'>
+                            <Briefcase
+                                size={22}
+                                className='text-primary-500 shrink-0'
+                            />
+                            <span className='text-[15px] text-gray-400 select-none group-hover:text-gray-600 transition-colors'>
+                                Select Category
+                            </span>
+                        </div>
+                        <ChevronDown
+                            size={18}
+                            className='text-gray-400 group-hover:text-gray-600 transition-colors'
+                        />
+                    </div>
 
           <button 
             type="button"

@@ -1,72 +1,102 @@
-import { forwardRef } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { Calendar, X } from "lucide-react";
+import { forwardRef } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { Calendar, X } from 'lucide-react';
 
 interface CustomDatePickerProps {
-  selected: Date | null;
-  onChange: (date: Date | null) => void;
-  placeholder?: string;
+    selected: Date | null;
+    onChange: (date: Date | null) => void;
+    placeholder?: string;
+    className?: string;
 }
+
 interface CustomInputProps {
-  value?: string;
-  onClick?: () => void;
-  placeholderText?: string;
-  onClear?: () => void;
+    value?: string;
+    onClick?: () => void;
+    placeholderText?: string;
+    onClear?: () => void;
+    className?: string;
 }
 
 const CustomInput = forwardRef<HTMLButtonElement, CustomInputProps>(
-  ({ value, onClick, placeholderText, onClear }, ref) => (
-    <button
-      type="button"
-      onClick={onClick}
-      ref={ref}
-      className="flex items-center justify-between bg-white border border-gray-300 rounded-lg px-3 py-2 shadow-sm hover:border-blue-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all w-37.5 outline-none group"
-    >
-      <div className="flex items-center gap-2 overflow-hidden">
-        <Calendar size={16} className="text-gray-400 shrink-0" />
-        <span
-          className={`text-sm truncate ${
-            value ? "text-gray-900 font-semibold" : "text-gray-400"
-          }`}
+    ({ value, onClick, placeholderText, onClear, className = '' }, ref) => (
+        <button
+            type='button'
+            onClick={onClick}
+            ref={ref}
+            className={`
+        flex items-center justify-between
+        w-full
+        bg-white
+        border border-gray-100
+        rounded-md
+        px-4 py-3
+        text-left
+        hover:border-primary-500
+        focus:outline-none
+        focus:ring-2
+        focus:ring-primary-500
+        transition-all
+        ${className}
+      `}
         >
-          {value || placeholderText}
-        </span>
-      </div>
-      {value && onClear && (
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-            onClear();
-          }}
-          className="p-0.5 hover:bg-gray-100 rounded-full text-gray-400 hover:text-red-500 transition-colors ml-1 shrink-0"
-          title="Clear date"
-        >
-          <X size={14} />
-        </div>
-      )}
-    </button>
-  ),
+            <div className='flex items-center gap-2 overflow-hidden'>
+                <Calendar size={18} className='text-gray-400 shrink-0' />
+
+                <span
+                    className={`truncate text-sm ${
+                        value ? 'text-gray-900 font-medium' : 'text-gray-400'
+                    }`}
+                >
+                    {value || placeholderText}
+                </span>
+            </div>
+
+            {value && onClear && (
+                <button
+                    type='button'
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onClear();
+                    }}
+                    className='
+            p-1
+            rounded-full
+            text-gray-400
+            hover:text-red-500
+            hover:bg-gray-100
+            transition-colors
+          '
+                    aria-label='Clear date'
+                >
+                    <X size={16} />
+                </button>
+            )}
+        </button>
+    )
 );
-CustomInput.displayName = "CustomInput";
+
+CustomInput.displayName = 'CustomInput';
 
 export default function CustomDatePicker({
-  selected,
-  onChange,
-  placeholder = "Select date",
+    selected,
+    onChange,
+    placeholder = 'dd/mm/yyyy',
+    className = '',
 }: CustomDatePickerProps) {
-  return (
-    <DatePicker
-      selected={selected}
-      onChange={onChange}
-      customInput={
-        <CustomInput
-          placeholderText={placeholder}
-          onClear={() => onChange(null)}
+    return (
+        <DatePicker
+            selected={selected}
+            onChange={onChange}
+            dateFormat='dd/MM/yyyy'
+            popperPlacement='bottom-start'
+            customInput={
+                <CustomInput
+                    placeholderText={placeholder}
+                    onClear={() => onChange(null)}
+                    className={className}
+                />
+            }
         />
-      }
-      dateFormat="yyyy-MM-dd"
-      popperPlacement="bottom-start"
-    />
-  );
+    );
 }

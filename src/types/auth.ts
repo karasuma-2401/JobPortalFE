@@ -1,34 +1,29 @@
-export type ApiResponse<T> = {
-  isSuccess: boolean;
-  value: T | null;
-  errorMessage: string | null;
-};
+import type { Role } from '../bases/constants/app';
 
-export type LoginResponseDto = {
-  accessToken: string;
-  refreshToken: string;
-  role?: string;
-};
+export interface LoginRequest {
+    email: string;
+    password: string;
+}
 
-export type LoginRequest = {
-  email: string;
-  password: string;
-};
+export interface LoginResponse {
+    accessToken: string;
+    refreshToken: string;
+}
 
-export type RegisterRequest = {
-  role: string;
-  fullName: string;
-  username: string;
-  email: string;
-  password: string;
-};
+export interface RegisterRequest {
+    role: Role;
+    email: string;
+    password: string;
+}
 
-export type ForgotPasswordRequest = {
-  email: string;
-};
+export interface VerifyResetPasswordRequest {
+    token: string;
+    password: string;
+}
 
-export type ResetPasswordRequest = {
-  token: string;
-  newPassword: string;
-  confirmPassword: string;
-};
+export interface UserResponse {
+    email: string;
+    roles: Role[];
+    hasProfile: boolean;
+    employerApprovalStatus: string | null;
+}

@@ -30,12 +30,14 @@ export default function OverviewPage() {
     );
   }
 
-  return (
-    <div className="space-y-8 text-left animate-fade-in pb-8">
-      <div>
-        <h1 className="text-[22px] font-bold text-gray-900">Hello</h1>
-        <p className="text-[15px] text-gray-500 mt-1">Here is your daily activities and job alerts</p>
-      </div>
+    return (
+        <div className='space-y-8 text-left animate-fade-in pb-8'>
+            <div>
+                <h1 className='text-[22px] font-bold text-gray-900'>Hello</h1>
+                <p className='text-[15px] text-gray-500 mt-1'>
+                    Here is your daily activities and job alerts
+                </p>
+            </div>
 
       <div className="grid grid-cols-3 gap-6">
         <StatCard 

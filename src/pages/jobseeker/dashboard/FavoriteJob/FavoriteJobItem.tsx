@@ -1,4 +1,11 @@
-import { Bookmark, MapPin, DollarSign, CalendarDays, ArrowRight, XCircle } from "lucide-react";
+import {
+    Bookmark,
+    MapPin,
+    DollarSign,
+    CalendarDays,
+    ArrowRight,
+    XCircle,
+} from 'lucide-react';
 
 export interface FavoriteJobItemProps {
   id: string;
@@ -29,51 +36,61 @@ export default function FavoriteJobItem({
   onBookmarkClick,
   onApplyClick,
 }: FavoriteJobItemProps) {
-  return (
-    <div
-      onClick={onSelect} 
-      className={`flex items-center justify-between p-6 border rounded-xl bg-white cursor-pointer transition-all ${
-        isSelected
-          ? "border-primary-500 bg-blue-50/50 border-2 shadow-sm ring-1 ring-primary-500/10" 
-          : "border-gray-100"
-      }`}
-    >
-      <div className="flex items-center gap-6 flex-1">
-        <img
-          src={logo}
-          alt={role}
-          className="w-14 h-14 rounded-full object-cover shrink-0"
-        />
+    return (
+        <div
+            onClick={onSelect}
+            className={`flex items-center justify-between p-6 border rounded-xl bg-white cursor-pointer transition-all ${
+                isSelected
+                    ? 'border-primary-500 bg-blue-50/50 border-2 shadow-sm ring-1 ring-primary-500/10'
+                    : 'border-gray-100'
+            }`}
+        >
+            <div className='flex items-center gap-6 flex-1'>
+                <img
+                    src={logo}
+                    alt={role}
+                    className='w-14 h-14 rounded-full object-cover shrink-0'
+                />
 
-        <div className="flex-1 space-y-1.5 text-left">
-          <div className="flex items-center gap-3">
-            <h3 className="text-base font-bold text-gray-900">{role}</h3>
-            <span className="text-[11px] font-extrabold px-3 py-1 rounded-full bg-blue-50 text-primary-500">
-              {type}
-            </span>
-          </div>
+                <div className='flex-1 space-y-1.5 text-left'>
+                    <div className='flex items-center gap-3'>
+                        <h3 className='text-base font-bold text-gray-900'>
+                            {role}
+                        </h3>
+                        <span className='text-[11px] font-extrabold px-3 py-1 rounded-full bg-blue-50 text-primary-500'>
+                            {type}
+                        </span>
+                    </div>
 
-          <div className="flex items-center gap-6 text-sm text-gray-500">
-            <div className="flex items-center gap-2">
-              <MapPin size={16} className="text-gray-400" />
-              {location}
+                    <div className='flex items-center gap-6 text-sm text-gray-500'>
+                        <div className='flex items-center gap-2'>
+                            <MapPin size={16} className='text-gray-400' />
+                            {location}
+                        </div>
+                        <div className='flex items-center gap-2'>
+                            <DollarSign size={16} className='text-gray-400' />
+                            {salary}
+                        </div>
+
+                        <div
+                            className={`flex items-center gap-2 font-medium ${isExpired ? 'text-danger-500' : 'text-gray-500'}`}
+                        >
+                            {isExpired ? (
+                                <XCircle
+                                    size={16}
+                                    className='text-danger-500'
+                                />
+                            ) : (
+                                <CalendarDays
+                                    size={16}
+                                    className='text-gray-400'
+                                />
+                            )}
+                            {timeStatus}
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div className="flex items-center gap-2">
-              <DollarSign size={16} className="text-gray-400" />
-              {salary}
-            </div>
-            
-            <div className={`flex items-center gap-2 font-medium ${isExpired ? "text-danger-500" : "text-gray-500"}`}>
-              {isExpired ? (
-                <XCircle size={16} className="text-danger-500" />
-              ) : (
-                <CalendarDays size={16} className="text-gray-400" />
-              )}
-              {timeStatus}
-            </div>
-          </div>
-        </div>
-      </div>
 
       <div className="flex items-center gap-5">
         {/* Nút Bookmark */}
