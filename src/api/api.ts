@@ -46,7 +46,19 @@ privateApi.interceptors.request.use(
 );
 
 privateApi.interceptors.response.use(
-    (response) => response.data,
+    (response) => {
+        const data = response.data;
+
+
+        // Unwrap ApiResponse<T> that backend returns (success/message/data)
+        // If backend does not wrap, just return original payload.
+        if (data && typeof data === 'object' && 'data' in data && 'success' in data) {
+            // Backend: { success, message?, data }
+            return (data as { data: unknown }).data;
+        }
+
+        return data;
+    },
     async (error) => {
         if (error.response?.status === 401) {
             const token = localStorage.getItem(TokenType.REFRESH_TOKEN);

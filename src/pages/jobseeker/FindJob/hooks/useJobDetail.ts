@@ -51,6 +51,9 @@ export function useJobDetail(jobId: string) {
 
   const handleApplySubmit = useCallback(async (data: { resumeId: string; coverLetter: string }) => {
     if (!jobData) return;
+
+
+
     try {
       await JobseekerService.applyJob({
         jobId: jobData.id,

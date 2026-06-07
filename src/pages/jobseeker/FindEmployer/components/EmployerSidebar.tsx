@@ -1,4 +1,5 @@
-import { Calendar, Building2, Users, Layers, Globe, Phone, Mail, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { Calendar, Building2, Users, Layers, Globe, Phone, Mail } from "lucide-react";
+
 
 interface SidebarProps {
   overview: {
@@ -76,10 +77,10 @@ export default function EmployerSidebar({ overview, contact }: SidebarProps) {
       <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-4">
         <h3 className="text-[16px] font-bold text-gray-900">Follow us on:</h3>
         <div className="flex items-center gap-2.5">
-          <a href="#" className="p-2.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all"><Facebook size={18} /></a>
-          <a href="#" className="p-2.5 rounded-lg bg-cyan-50 text-cyan-500 hover:bg-cyan-500 hover:text-white transition-all"><Twitter size={18} /></a>
-          <a href="#" className="p-2.5 rounded-lg bg-pink-50 text-pink-600 hover:bg-pink-600 hover:text-white transition-all"><Instagram size={18} /></a>
-          <a href="#" className="p-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all"><Youtube size={18} /></a>
+          <a href="#" className="p-2.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all">Facebook</a>
+          <a href="#" className="p-2.5 rounded-lg bg-cyan-50 text-cyan-500 hover:bg-cyan-500 hover:text-white transition-all">Twitter</a>
+          <a href="#" className="p-2.5 rounded-lg bg-pink-50 text-pink-600 hover:bg-pink-600 hover:text-white transition-all">Instagram</a>
+          <a href="#" className="p-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all">Youtube</a>
         </div>
       </div>
     </div>

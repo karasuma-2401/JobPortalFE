@@ -63,7 +63,7 @@ export const JobseekerService = {
     page: number,
     limit: number
   ): Promise<{ items: AppliedJobType[]; totalCount: number }> => {
-    return privateApi.get("/jobseeker/applied-jobs", {
+    return privateApi.get("/job-seeker/applied-jobs", {
       params: { page, limit },
     });
   },
@@ -73,7 +73,7 @@ export const JobseekerService = {
     page: number,
     limit: number
   ): Promise<{ items: FavoriteJobType[]; totalCount: number }> => {
-    return privateApi.get("/jobseeker/favorite-jobs", {
+    return privateApi.get("/job-seeker/favorite-jobs", {
       params: { page, limit },
     });
   },
@@ -83,7 +83,7 @@ export const JobseekerService = {
     page: number,
     limit: number
   ): Promise<{ items: JobAlertItemType[]; totalCount: number }> => {
-    return privateApi.get("/jobseeker/job-alerts", {
+    return privateApi.get("/job-seeker/job-alerts", {
       params: { page, limit },
     });
   },

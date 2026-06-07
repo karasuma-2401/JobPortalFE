@@ -1,4 +1,5 @@
-import { Link as LinkIcon, Phone, Mail, Bookmark, ArrowRight, Facebook, Twitter } from "lucide-react";
+import { Link as LinkIcon, Phone, Mail, Bookmark, ArrowRight} from "lucide-react";
+import { FaFacebook, FaTwitter } from 'react-icons/fa';
 import JobOverviewSidebar from "./components/JobOverviewSidebar";
 import JobGridSection from "../../../components/ui/JobGridSection"; 
 import ApplyJobModal from "./components/ApplyJobModal";
@@ -127,10 +128,10 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
             <div className="flex items-center gap-3 mt-6 pt-6 border-t border-gray-150">
               <span className="text-[14px] font-semibold text-gray-700">Share this job:</span>
               <button className="flex items-center gap-1.5 px-3 py-1.5 border border-blue-100 rounded-md text-[13px] text-blue-600 hover:bg-blue-50 transition-colors font-medium">
-                <Facebook size={14} className="fill-current" /> Facebook
+                <FaFacebook size={14} className="fill-current" /> Facebook
               </button>
               <button className="flex items-center gap-1.5 px-3 py-1.5 border border-sky-100 rounded-md text-[13px] text-sky-500 hover:bg-sky-50 transition-colors font-medium">
-                <Twitter size={14} className="fill-current" /> Twitter
+                <FaTwitter size={14} className="fill-current" /> Twitter
               </button>
             </div>
           </div>
