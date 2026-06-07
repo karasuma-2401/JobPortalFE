@@ -33,7 +33,7 @@ export const useLogin = () => {
                     originalError: apiError,
                 });
             }
-
+            console.log(tokens) 
             localStorage.setItem(TokenType.ACCESS_TOKEN, tokens.accessToken);
 
             if (tokens.refreshToken) {
@@ -45,7 +45,8 @@ export const useLogin = () => {
 
             try {
                 const user = await AuthService.getMe();
-                localStorage.setItem('user', JSON.stringify(user));
+                console.log("user la: " , user) 
+                localStorage.setItem('me', JSON.stringify(user));
                 return user;
             } catch (err) {
                 const apiError = err as ApiError;
@@ -61,7 +62,7 @@ export const useLogin = () => {
             toast.success('Login successful!');
 
             const isEmployer = user.roles.includes('EMPLOYER');
-
+            console.log("OK") 
             if (!user.hasProfile) {
                 if (isEmployer) {
                     navigate('/employer/setup/company');
