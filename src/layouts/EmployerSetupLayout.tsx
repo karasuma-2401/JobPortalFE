@@ -3,18 +3,9 @@ import { Outlet, useLocation } from 'react-router-dom';
 import SetupHeader from '../pages/employer/components/SetupHeader';
 import SetupStepper from '../pages/employer/components/SetupStepper';
 import SetupFooter from '../pages/employer/components/SetupFooter';
-import useAuth from '../contexts/auth/useAuth';
-import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import ProtectedRoute from '../routes/ProtectedRoute';
+
 export default function EmployerSetupLayout() {
-    const { isEmployer } = useAuth();
-    console.log(isEmployer) 
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (!isEmployer) navigate('/login');
-    }, [isEmployer, navigate]);
-
     const location = useLocation();
     const currentPath = location.pathname;
     let progress = 0;
@@ -38,18 +29,20 @@ export default function EmployerSetupLayout() {
     }
     const isSuccessPage = currentPath.includes('success');
     return (
-        <div className='min-h-screen flex flex-col bg-white font-sans'>
-            <SetupHeader progress={progress} isSuccessPage={isSuccessPage} />
-            <main className='flex-1 flex flex-col items-center pt-8 pb-24 px-4'>
-                <SetupStepper
-                    currentStepIndex={currentStepIndex}
-                    isSuccessPage={isSuccessPage}
-                />
-                <div className='w-full max-w-4xl'>
-                    <Outlet />
-                </div>
-            </main>
-            <SetupFooter />
-        </div>
+        <ProtectedRoute allowedRoles={['EMPLOYER']}>
+            <div className='min-h-screen flex flex-col bg-white font-sans'>
+                <SetupHeader progress={progress} isSuccessPage={isSuccessPage} />
+                <main className='flex-1 flex flex-col items-center pt-8 pb-24 px-4'>
+                    <SetupStepper
+                        currentStepIndex={currentStepIndex}
+                        isSuccessPage={isSuccessPage}
+                    />
+                    <div className='w-full max-w-4xl'>
+                        <Outlet />
+                    </div>
+                </main>
+                <SetupFooter />
+            </div>
+        </ProtectedRoute>
     );
 }

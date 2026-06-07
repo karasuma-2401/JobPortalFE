@@ -1,4 +1,4 @@
-import { privateApi } from "../api/api";
+import { privateApi, publicApi } from "../api/api";
 import type {
   Job,
   JobDetailType,
@@ -27,12 +27,12 @@ export const JobseekerService = {
   // Jobs
   getJobs: async (
     params: JobFilterParams
-  ): Promise<{ items: Job[]; totalCount: number }> => {
-    return privateApi.get("/jobpost", { params });
+  ) => {
+    return publicApi.get("/jobpost", { params });
   },
 
   getJobDetail: async (id: string): Promise<JobDetailType> => {
-    return privateApi.get(`/jobpost/${id}`);
+    return publicApi.get(`/jobpost/${id}`);
   },
 
   applyJob: async (payload: ApplyJobRequest): Promise<void> => {
@@ -43,15 +43,15 @@ export const JobseekerService = {
   getEmployers: async (
     params: EmployerFilterParams
   ): Promise<{ items: Employer[]; totalCount: number }> => {
-    return privateApi.get("/employer", { params });
+    return publicApi.get("/employer", { params });
   },
 
   getEmployerDetail: async (id: string): Promise<EmployerDetail> => {
-    return privateApi.get(`/employer/${id}`);
+    return publicApi.get(`/employer/${id}`);
   },
 
   getJobsByEmployer: async (employerId: string): Promise<Job[]> => {
-    return privateApi.get(`/employer/${employerId}/jobs`);
+    return publicApi.get(`/employer/${employerId}/jobs`);
   },
 
   // Dashboard

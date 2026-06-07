@@ -49,6 +49,8 @@ export function useFindJobs() {
     setLoading(true);
     setError(null);
     try {
+      console.log(currentPage) 
+      console.log(itemsPerPage) 
       const result = await JobseekerService.getJobs({
         keyword: filterParams.keyword,
         location: filterParams.location,
@@ -60,8 +62,11 @@ export function useFindJobs() {
         page: currentPage,
         limit: itemsPerPage,
       });
-      setJobs(result.items);
-      setTotalCount(result.totalCount);
+      const data = result.data 
+      console.log(data) 
+      setJobs(data.items);
+
+      setTotalCount(data.totalItems);
     } catch (err: unknown) {
       console.warn("JobseekerService.getJobs API failed, falling back to local mock data:", err);
       const localResult = getFilteredJobsLocal({

@@ -7,10 +7,12 @@ import {
     Settings,
     LogOut,
 } from 'lucide-react';
+import useAuth from '../../contexts/auth/useAuth';
 
 export default function DashboardSidebar() {
     const location = useLocation();
     const navigate = useNavigate();
+    const { logout } = useAuth();
 
     const menuItems = [
         {
@@ -91,7 +93,10 @@ export default function DashboardSidebar() {
 
             <div className='p-4 border-t border-gray-50'>
                 <button
-                    onClick={() => navigate('/login')}
+                    onClick={() => {
+                        logout();
+                        navigate('/login', { replace: true });
+                    }}
                     className='flex items-center gap-3 w-full px-4 py-3 text-[15px] font-medium text-gray-500 hover:text-danger-500 hover:bg-red-50/50 rounded-lg transition-all'
                 >
                     <LogOut

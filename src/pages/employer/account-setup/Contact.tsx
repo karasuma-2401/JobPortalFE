@@ -29,7 +29,7 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
     const navigate = useNavigate();
     const location = useLocation();
     const previousState = location.state || {};
-
+    
     const { mutate: setupEmployer, isPending } = useSetupEmployer();
 
     const [mapLocation, setMapLocation] = useState(previousState.address || '');
@@ -76,8 +76,8 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
                     (link: { networkValue: string; url: string }) => {
                         if (link.networkValue === 'facebook')
                             formData.append('facebookUrl', link.url);
-                        if (link.networkValue === 'youtube')
-                            formData.append('youtubeUrl', link.url);
+                        if (link.networkValue === 'twitter')
+                            formData.append('twitterUrl', link.url);
                         if (link.networkValue === 'linkedin')
                             formData.append('linkedinUrl', link.url);
                     }
@@ -87,7 +87,7 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
             if (previousState.logo) formData.append('logo', previousState.logo);
             if (previousState.banner)
                 formData.append('banner', previousState.banner);
-
+            // console.log(formData.get('founded')) 
             setupEmployer(formData);
         } else {
             toast.success('Contact information updated successfully!');
