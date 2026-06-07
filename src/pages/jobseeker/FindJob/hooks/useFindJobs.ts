@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { JobseekerService } from "../../../../services/jobseekerService";
+import {
+  getFilteredJobsLocal,
+  readFavoriteJobs,
+  toggleFavoriteJobLocal,
+  saveAppliedJobLocal,
+} from "../../../../utils/jobseekerMockDb";
 import type { Job } from "../../../../types/jobseeker";
 
 export function useFindJobs() {
@@ -57,8 +63,20 @@ export function useFindJobs() {
       setJobs(result.items);
       setTotalCount(result.totalCount);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to fetch jobs";
-      setError(message);
+      console.warn("JobseekerService.getJobs API failed, falling back to local mock data:", err);
+      const localResult = getFilteredJobsLocal({
+        keyword: filterParams.keyword,
+        location: filterParams.location,
+        experience: filterParams.experience,
+        salaryRange: filterParams.salaryRange,
+        jobTypes: filterParams.jobTypes,
+        education: filterParams.education,
+        jobLevel: filterParams.jobLevel,
+        page: currentPage,
+        limit: itemsPerPage,
+      });
+      setJobs(localResult.items);
+      setTotalCount(localResult.totalCount);
     } finally {
       setLoading(false);
     }
@@ -68,17 +86,20 @@ export function useFindJobs() {
     fetchJobs();
   }, [fetchJobs]);
 
-  useEffect(() => {
-    const loadSavedIds = async () => {
-      try {
-        const ids = await JobseekerService.getFavoriteJobIds();
-        setSavedJobIds(ids);
-      } catch (err) {
-        console.error("Failed to load favorite job IDs:", err);
-      }
-    };
-    loadSavedIds();
+  const loadSavedIds = useCallback(async () => {
+    try {
+      const ids = await JobseekerService.getFavoriteJobIds();
+      setSavedJobIds(ids);
+    } catch (err) {
+      console.warn("JobseekerService.getFavoriteJobIds API failed, falling back to local mock data:", err);
+      const ids = readFavoriteJobs().map((f) => f.id);
+      setSavedJobIds(ids);
+    }
   }, []);
+
+  useEffect(() => {
+    loadSavedIds();
+  }, [loadSavedIds]);
 
   const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault();
@@ -121,10 +142,16 @@ export function useFindJobs() {
 
   const handleToggleSave = useCallback(async (id: string | number) => {
     const stringId = String(id);
-    await JobseekerService.toggleFavoriteJob(stringId);
-    const ids = await JobseekerService.getFavoriteJobIds();
-    setSavedJobIds(ids);
-  }, []);
+    try {
+      await JobseekerService.toggleFavoriteJob(stringId);
+      await loadSavedIds();
+    } catch (err) {
+      console.warn("JobseekerService.toggleFavoriteJob API failed, updating locally:", err);
+      toggleFavoriteJobLocal(stringId);
+      const ids = readFavoriteJobs().map((f) => f.id);
+      setSavedJobIds(ids);
+    }
+  }, [loadSavedIds]);
 
   const handleApplyClickFromList = useCallback((id: string) => {
     const targetJob = jobs.find((job) => job.id === id);
@@ -142,11 +169,22 @@ export function useFindJobs() {
         resumeId: data.resumeId,
         coverLetter: data.coverLetter,
       });
+
+      alertSuccess();
+    } catch (err: unknown) {
+      console.warn("API failed, fallback local:", err);
+
+      try {
+        saveAppliedJobLocal(applyingJobId);
+        alertSuccess();
+      } catch {
+        alert("Ứng tuyển thất bại");
+      }
+    }
+
+    function alertSuccess() {
       setIsListApplyModalOpen(false);
       alert(`Ứng tuyển thành công vị trí: ${applyingJobTitle}`);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Ứng tuyển thất bại";
-      alert(`Ứng tuyển thất bại: ${message}`);
     }
   }, [applyingJobId, applyingJobTitle]);
 

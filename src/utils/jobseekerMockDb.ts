@@ -1,4 +1,4 @@
-import { LocalStorageService } from "./localStorageService";
+import { LocalStorageService } from "../services/localStorageService";
 import type {
   Job,
   JobDetailType,
@@ -12,8 +12,10 @@ import type {
   DashboardOverviewType,
 } from "../types/jobseeker";
 
-// Mock Data Fallbacks cho Jobs
-const MOCK_JOBS: Job[] = [
+// ============================================================================
+// MOCK DATA CONSTANTS
+// ============================================================================
+export const MOCK_JOBS: Job[] = [
   {
     id: "1",
     title: "Marketing Manager",
@@ -72,7 +74,7 @@ const MOCK_JOBS: Job[] = [
   },
 ];
 
-const MOCK_JOB_DETAILS: Record<string, JobDetailType> = {
+export const MOCK_JOB_DETAILS: Record<string, JobDetailType> = {
   "1": {
     id: "1",
     title: "Marketing Manager",
@@ -147,7 +149,7 @@ const MOCK_JOB_DETAILS: Record<string, JobDetailType> = {
   },
 };
 
-const MOCK_EMPLOYERS: Employer[] = [
+export const MOCK_EMPLOYERS: Employer[] = [
   {
     id: "1",
     name: "Dribbble",
@@ -190,7 +192,7 @@ const MOCK_EMPLOYERS: Employer[] = [
   },
 ];
 
-const MOCK_EMPLOYER_DETAILS: Record<string, EmployerDetail> = {
+export const MOCK_EMPLOYER_DETAILS: Record<string, EmployerDetail> = {
   "1": {
     id: "1",
     name: "Dribbble",
@@ -243,7 +245,7 @@ const MOCK_EMPLOYER_DETAILS: Record<string, EmployerDetail> = {
   },
 };
 
-const MOCK_JOB_ALERTS: JobAlertItemType[] = [
+export const MOCK_JOB_ALERTS: JobAlertItemType[] = [
   { id: "1", logo: "https://logo.clearbit.com/google.com", role: "Technical Support Specialist", type: "Full Time", location: "Idaho, USA", salary: "$15K-$20K", daysRemaining: "Job Expire" },
   { id: "2", logo: "https://logo.clearbit.com/youtube.com", role: "UI/UX Designer", type: "Full Time", location: "Minnesota, USA", salary: "$10K-$15K", daysRemaining: "4 Days Remaining" },
 ];
@@ -262,177 +264,154 @@ function ensureStoredArrays() {
   }
 }
 
-export class JobseekerStorageService {
-  static getMockJobs(): Job[] {
-    return MOCK_JOBS;
+export function readAppliedJobs(): StoredAppliedJobs {
+  ensureStoredArrays();
+  return (LocalStorageService.getValue(LS_APPLIED_JOBS_KEY) as StoredAppliedJobs) ?? [];
+}
+
+export function readFavoriteJobs(): StoredFavoriteJobs {
+  ensureStoredArrays();
+  return (LocalStorageService.getValue(LS_FAVORITE_JOBS_KEY) as StoredFavoriteJobs) ?? [];
+}
+
+export function saveAppliedJobs(jobs: StoredAppliedJobs) {
+  LocalStorageService.saveValue<StoredAppliedJobs>(LS_APPLIED_JOBS_KEY, jobs);
+}
+
+export function saveFavoriteJobs(jobs: StoredFavoriteJobs) {
+  LocalStorageService.saveValue<StoredFavoriteJobs>(LS_FAVORITE_JOBS_KEY, jobs);
+}
+
+// ============================================================================
+// SIMULATION HELPERS FOR HOOK FALLBACKS
+// ============================================================================
+export function toggleFavoriteJobLocal(jobId: string) {
+  const favs = readFavoriteJobs();
+  const exists = favs.some((j) => j.id === jobId);
+  const job = MOCK_JOBS.find((j) => j.id === jobId) || (MOCK_JOB_DETAILS[jobId] ? {
+    logo: MOCK_JOB_DETAILS[jobId].logo,
+    title: MOCK_JOB_DETAILS[jobId].title,
+    type: MOCK_JOB_DETAILS[jobId].type,
+    location: MOCK_JOB_DETAILS[jobId].overview.location,
+    salary: MOCK_JOB_DETAILS[jobId].overview.salary,
+    daysRemaining: MOCK_JOB_DETAILS[jobId].overview.expireIn || "Saved",
+  } : null);
+
+  const placeholder: FavoriteJobType = {
+    id: jobId,
+    logo: job?.logo || "https://logo.clearbit.com/placeholder.com",
+    role: job?.title || "Favorite Job",
+    type: job?.type || "Favorite",
+    location: job?.location || "",
+    salary: job?.salary || "",
+    timeStatus: job?.daysRemaining || "Saved",
+    isExpired: false,
+  };
+
+  const updated = exists ? favs.filter((j) => j.id !== jobId) : [...favs, placeholder];
+  saveFavoriteJobs(updated);
+}
+
+export function saveAppliedJobLocal(jobId: string) {
+  const applied = readAppliedJobs();
+  const job = MOCK_JOBS.find((j) => j.id === jobId) || (MOCK_JOB_DETAILS[jobId] ? {
+    logo: MOCK_JOB_DETAILS[jobId].logo,
+    title: MOCK_JOB_DETAILS[jobId].title,
+    type: MOCK_JOB_DETAILS[jobId].type,
+    location: MOCK_JOB_DETAILS[jobId].overview.location,
+    salary: MOCK_JOB_DETAILS[jobId].overview.salary,
+  } : null);
+
+  const newApplied: AppliedJobType = {
+    id: jobId,
+    logo: job?.logo || "https://logo.clearbit.com/placeholder.com",
+    role: job?.title || "Applied Job",
+    type: job?.type || "Applied",
+    location: job?.location || "",
+    salary: job?.salary || "",
+    dateApplied: new Date().toLocaleString(),
+    status: "Active",
+  };
+
+  const updated = applied.some((j) => j.id === newApplied.id)
+    ? applied.map((j) => (j.id === newApplied.id ? newApplied : j))
+    : [...applied, newApplied];
+  saveAppliedJobs(updated);
+}
+
+export function getFilteredJobsLocal(params: JobFilterParams): { items: Job[]; totalCount: number } {
+  let filtered = [...MOCK_JOBS];
+  if (params.keyword) {
+    filtered = filtered.filter(
+      (j) =>
+        j.title.toLowerCase().includes(params.keyword!.toLowerCase()) ||
+        j.companyName.toLowerCase().includes(params.keyword!.toLowerCase())
+    );
+  }
+  if (params.location) {
+    filtered = filtered.filter((j) =>
+      j.location.toLowerCase().includes(params.location!.toLowerCase())
+    );
   }
 
-  static getMockJobDetail(id: string): JobDetailType {
-    return MOCK_JOB_DETAILS[id] || MOCK_JOB_DETAILS["1"];
+  if (params.jobTypes && params.jobTypes.length > 0 && !params.jobTypes.includes("All")) {
+    filtered = filtered.filter((j) => params.jobTypes!.includes(j.type));
   }
 
-  static getMockEmployers(): Employer[] {
-    return MOCK_EMPLOYERS;
+  if (params.experience) {
+    filtered = filtered.filter((j) => j.experience === params.experience);
   }
 
-  static getMockEmployerDetail(id: string): EmployerDetail {
-    return MOCK_EMPLOYER_DETAILS[id] || MOCK_EMPLOYER_DETAILS["1"];
+  if (params.education && params.education.length > 0 && !params.education.includes("All")) {
+    filtered = filtered.filter((j) => j.education && params.education!.includes(j.education));
   }
 
-  static getMockJobAlerts(): JobAlertItemType[] {
-    return MOCK_JOB_ALERTS;
+  if (params.jobLevel) {
+    filtered = filtered.filter((j) => j.jobLevel === params.jobLevel);
   }
 
-  static readAppliedJobs(): AppliedJobType[] {
-    ensureStoredArrays();
-    return (LocalStorageService.getValue(LS_APPLIED_JOBS_KEY) as StoredAppliedJobs) ?? [];
+  if (params.salaryRange) {
+    filtered = filtered.filter((j) => j.salary.includes(params.salaryRange!) || params.salaryRange!.includes(j.salary));
   }
 
-  static readFavoriteJobs(): FavoriteJobType[] {
-    ensureStoredArrays();
-    return (LocalStorageService.getValue(LS_FAVORITE_JOBS_KEY) as StoredFavoriteJobs) ?? [];
+  const start = (params.page - 1) * params.limit;
+  return {
+    items: filtered.slice(start, start + params.limit),
+    totalCount: filtered.length,
+  };
+}
+
+export function getFilteredEmployersLocal(params: EmployerFilterParams): { items: Employer[]; totalCount: number } {
+  let filtered = [...MOCK_EMPLOYERS];
+  if (params.keyword) {
+    filtered = filtered.filter((e) =>
+      e.name.toLowerCase().includes(params.keyword!.toLowerCase())
+    );
+  }
+  if (params.location) {
+    filtered = filtered.filter((e) =>
+      e.location.toLowerCase().includes(params.location!.toLowerCase())
+    );
+  }
+  if (params.category) {
+    filtered = filtered.filter((e) => e.category === params.category);
   }
 
-  static saveAppliedJobs(jobs: AppliedJobType[]) {
-    LocalStorageService.saveValue<StoredAppliedJobs>(LS_APPLIED_JOBS_KEY, jobs);
-  }
+  const start = (params.page - 1) * params.limit;
+  return {
+    items: filtered.slice(start, start + params.limit),
+    totalCount: filtered.length,
+  };
+}
 
-  static saveFavoriteJobs(jobs: FavoriteJobType[]) {
-    LocalStorageService.saveValue<StoredFavoriteJobs>(LS_FAVORITE_JOBS_KEY, jobs);
-  }
-
-  static async getFavoriteJobIds(): Promise<string[]> {
-    return this.readFavoriteJobs().map((f) => f.id);
-  }
-
-  static async toggleFavoriteJob(jobId: string): Promise<void> {
-    const favs = this.readFavoriteJobs();
-    const exists = favs.some((j) => j.id === jobId);
-    const job = MOCK_JOBS.find((j) => j.id === jobId) || (MOCK_JOB_DETAILS[jobId] ? {
-      logo: MOCK_JOB_DETAILS[jobId].logo,
-      title: MOCK_JOB_DETAILS[jobId].title,
-      type: MOCK_JOB_DETAILS[jobId].type,
-      location: MOCK_JOB_DETAILS[jobId].overview.location,
-      salary: MOCK_JOB_DETAILS[jobId].overview.salary,
-      daysRemaining: MOCK_JOB_DETAILS[jobId].overview.expireIn || "Saved",
-    } : null);
-
-    const placeholder: FavoriteJobType = {
-      id: jobId,
-      logo: job?.logo || "https://logo.clearbit.com/placeholder.com",
-      role: job?.title || "Favorite Job",
-      type: job?.type || "Favorite",
-      location: job?.location || "",
-      salary: job?.salary || "",
-      timeStatus: job?.daysRemaining || "Saved",
-      isExpired: false,
-    };
-
-    const updated = exists ? favs.filter((j) => j.id !== jobId) : [...favs, placeholder];
-    this.saveFavoriteJobs(updated);
-  }
-
-  static saveAppliedJob(jobId: string): void {
-    const applied = this.readAppliedJobs();
-    const job = MOCK_JOBS.find((j) => j.id === jobId) || (MOCK_JOB_DETAILS[jobId] ? {
-      logo: MOCK_JOB_DETAILS[jobId].logo,
-      title: MOCK_JOB_DETAILS[jobId].title,
-      type: MOCK_JOB_DETAILS[jobId].type,
-      location: MOCK_JOB_DETAILS[jobId].overview.location,
-      salary: MOCK_JOB_DETAILS[jobId].overview.salary,
-    } : null);
-
-    const newApplied: AppliedJobType = {
-      id: jobId,
-      logo: job?.logo || "https://logo.clearbit.com/placeholder.com",
-      role: job?.title || "Applied Job",
-      type: job?.type || "Applied",
-      location: job?.location || "",
-      salary: job?.salary || "",
-      dateApplied: new Date().toLocaleString(),
-      status: "Active",
-    };
-
-    const updated = applied.some((j) => j.id === newApplied.id)
-      ? applied.map((j) => (j.id === newApplied.id ? newApplied : j))
-      : [...applied, newApplied];
-    this.saveAppliedJobs(updated);
-  }
-
-  static getFilteredJobs(params: JobFilterParams): { items: Job[]; totalCount: number } {
-    let filtered = [...MOCK_JOBS];
-    if (params.keyword) {
-      filtered = filtered.filter(
-        (j) =>
-          j.title.toLowerCase().includes(params.keyword!.toLowerCase()) ||
-          j.companyName.toLowerCase().includes(params.keyword!.toLowerCase())
-      );
-    }
-    if (params.location) {
-      filtered = filtered.filter((j) =>
-        j.location.toLowerCase().includes(params.location!.toLowerCase())
-      );
-    }
-
-    if (params.jobTypes && params.jobTypes.length > 0 && !params.jobTypes.includes("All")) {
-      filtered = filtered.filter((j) => params.jobTypes!.includes(j.type));
-    }
-
-    if (params.experience) {
-      filtered = filtered.filter((j) => j.experience === params.experience);
-    }
-
-    if (params.education && params.education.length > 0 && !params.education.includes("All")) {
-      filtered = filtered.filter((j) => j.education && params.education!.includes(j.education));
-    }
-
-    if (params.jobLevel) {
-      filtered = filtered.filter((j) => j.jobLevel === params.jobLevel);
-    }
-
-    if (params.salaryRange) {
-      filtered = filtered.filter((j) => j.salary.includes(params.salaryRange!) || params.salaryRange!.includes(j.salary));
-    }
-
-    const start = (params.page - 1) * params.limit;
-    return {
-      items: filtered.slice(start, start + params.limit),
-      totalCount: filtered.length,
-    };
-  }
-
-  static getFilteredEmployers(params: EmployerFilterParams): { items: Employer[]; totalCount: number } {
-    let filtered = [...MOCK_EMPLOYERS];
-    if (params.keyword) {
-      filtered = filtered.filter((e) =>
-        e.name.toLowerCase().includes(params.keyword!.toLowerCase())
-      );
-    }
-    if (params.location) {
-      filtered = filtered.filter((e) =>
-        e.location.toLowerCase().includes(params.location!.toLowerCase())
-      );
-    }
-    if (params.category) {
-      filtered = filtered.filter((e) => e.category === params.category);
-    }
-
-    const start = (params.page - 1) * params.limit;
-    return {
-      items: filtered.slice(start, start + params.limit),
-      totalCount: filtered.length,
-    };
-  }
-
-  static getDashboardOverview(): DashboardOverviewType {
-    const appliedJobs = this.readAppliedJobs();
-    const favoriteJobs = this.readFavoriteJobs();
-    return {
-      appliedCount: appliedJobs.length,
-      favoriteCount: favoriteJobs.length,
-      alertCount: MOCK_JOB_ALERTS.length,
-      recentApplied: [...appliedJobs].slice(-4).reverse(),
-      isProfileCompleted: false,
-    };
-  }
+export function getDashboardOverviewLocal(): DashboardOverviewType {
+  const appliedJobs = readAppliedJobs();
+  const favoriteJobs = readFavoriteJobs();
+  return {
+    appliedCount: appliedJobs.length,
+    favoriteCount: favoriteJobs.length,
+    alertCount: MOCK_JOB_ALERTS.length,
+    recentApplied: [...appliedJobs].slice(-4).reverse(),
+    isProfileCompleted: false,
+  };
 }
