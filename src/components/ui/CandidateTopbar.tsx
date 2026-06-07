@@ -7,7 +7,7 @@ export default function CandidateTopBar() {
   const topNavItems = [
     { label: "Home", path: "/" },
     { label: "Find Job", path: "/find-job" },
-    { label: "Find Employers", path: "/employers" },
+    { label: "Find Employers", path: "/find-employer" },
     { label: "Dashboard", path: "/candidate/overview" }, 
     { label: "Job Alerts", path: "/job-alerts" }, 
     { label: "Customer Supports", path: "/support" },
@@ -24,8 +24,8 @@ export default function CandidateTopBar() {
               item.path === "/"
                 ? location.pathname === "/" || location.pathname === "/home"
                 : item.label === "Dashboard"
-                ? location.pathname.startsWith("/candidate") // Sáng Dashboard cho TẤT CẢ các trang có /candidate (bao gồm cả job alert của sidebar)
-                : location.pathname.startsWith(item.path);   // Trang nào khớp URL trang đó (Ví dụ /job-alerts thì chỉ Job Alerts sáng)
+                ? location.pathname.startsWith("/candidate") 
+                : location.pathname.startsWith(item.path);   
 
             return (
               <Link

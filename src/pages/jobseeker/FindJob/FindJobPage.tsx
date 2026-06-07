@@ -5,7 +5,7 @@ import JobSearchBar from "./components/JobSearchBar";
 import FilterSortBar from "./components/FilterSortBar";
 import JobList from "./components/JobList";
 import JobDetailPage from "./JobDetailPage";
-import ApplyJobModal from "./components/ApplyJobModal";
+import ApplyJobModal from "./components/ApplyJobModal"; 
 
 const EXPLORE_MOCK_JOBS = [
   { id: "1", title: "Marketing Manager", companyName: "Stripe", type: "Remote", isFeatured: true, logo: "https://logo.clearbit.com/stripe.com", location: "New Mexico, USA", salary: "$50k-$80k/month", daysRemaining: "4 Days Remaining" },
