@@ -91,7 +91,7 @@ export default function EmployerProfilePage() {
                         phone={profile.phone}
                         socials={{
                             facebook: profile.facebookUrl,
-                            youtube: profile.youtubeUrl,
+                            twitter: profile.twitterUrl,
                             linkedin: profile.linkedInUrl,
                         }}
                     />

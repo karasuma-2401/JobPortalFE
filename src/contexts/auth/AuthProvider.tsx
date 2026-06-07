@@ -10,8 +10,8 @@ import { AuthContext } from './AuthContext';
 
 import {
     AUTH_STORAGE_EVENT,
-    LocalStorageService,
 } from '../../services/local-storage';
+import { AuthSessionService } from '../../services/authSessionService';
 
 import { getAuthStateFromStorage, type AuthState } from './auth-utils';
 
@@ -25,7 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const logout = useCallback(() => {
-        LocalStorageService.removeValue('me');
+        AuthSessionService.clear();
     }, []);
 
     useEffect(() => {

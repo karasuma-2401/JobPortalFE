@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import sulkyunggu from '../../../assets/sulkyunggu.jpg';
 import ComboBox, { type OptionType } from '../../../components/ui/ComboBox';
 import NotificationBell from '../../../components/ui/NotificationBell';
+import useAuth from '../../../contexts/auth/useAuth';
 
 const navLinks = [
     { name: 'Home', path: '/home' },
@@ -24,6 +25,7 @@ export default function EmployerHeader() {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const profileRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+    const { logout } = useAuth();
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -40,8 +42,9 @@ export default function EmployerHeader() {
     }, []);
 
     const handleLogout = () => {
+        logout();
         toast.success('Logged out successfully!');
-        navigate('/login');
+        navigate('/login', { replace: true });
     };
 
     return (

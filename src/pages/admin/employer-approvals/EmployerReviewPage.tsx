@@ -32,15 +32,13 @@ const MOCK_DETAIL: EmployerProfile = {
 };
 
 export default function EmployerReviewPage() {
-    // fix id declare but note use
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id } = useParams();
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleApprove = () => {
         toast.success(
-            `${MOCK_DETAIL.companyName} has been approved successfully.`
+            `${MOCK_DETAIL.companyName} (${id ?? MOCK_DETAIL.id}) has been approved successfully.`
         );
         navigate('/admin/employer-approvals');
     };

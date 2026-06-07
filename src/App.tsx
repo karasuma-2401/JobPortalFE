@@ -56,6 +56,7 @@ import CandidateFullLayout from './layouts/CandidateFullLayout';
 import JobDetailPage from './pages/employer/my-jobs/JobDetailPage';
 import EditJobPage from './pages/employer/my-jobs/components/EditJobPage';
 import FindCandidatesPage from './pages/employer/find-candidates/FindCandidatesPage';
+import GuestRoute from './routes/GuestRoute';
 
 const router = createBrowserRouter([
     {
@@ -68,8 +69,22 @@ const router = createBrowserRouter([
     {
         element: <AuthLayout />,
         children: [
-            { path: '/login', element: <Login /> },
-            { path: '/register', element: <Register /> },
+            {
+                path: '/login',
+                element: (
+                    <GuestRoute>
+                        <Login />
+                    </GuestRoute>
+                ),
+            },
+            {
+                path: '/register',
+                element: (
+                    <GuestRoute>
+                        <Register />
+                    </GuestRoute>
+                ),
+            },
             { path: '/forgot-password', element: <ForgotPassword /> },
             { path: '/verify', element: <VerifyPage /> },
         ],
