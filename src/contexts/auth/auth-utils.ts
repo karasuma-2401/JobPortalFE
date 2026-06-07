@@ -18,9 +18,9 @@ export interface AuthState {
 
 export const getAuthStateFromStorage = (): AuthState => {
     const me = LocalStorageService.getValue<AuthUser>('me');
-
+    console.log(me) 
     const roles = Array.isArray(me?.roles) ? me.roles : [];
-
+    console.log(roles) 
     return {
         user: me ?? null,
         roles,
