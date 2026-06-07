@@ -1,40 +1,30 @@
-import { useState } from "react";
 import DashboardPagination from "../../../components/ui/DashboardPagination";
-
 import EmployerSearchBar from "./components/EmployerSearchBar";
 import FilterSortBar from "./components/EmployerFilterSortBar"; 
 import EmployerList from "./components/EmployerList";
 import EmployerDetailPage from "./EmployerDetailPage";
-
-
-const EXPLORE_MOCK_EMPLOYERS = [
-  { id: "1", name: "Dribbble", logo: "https://logo.clearbit.com/dribbble.com", location: "United States", openJobsCount: 3 },
-  { id: "2", name: "Udemy", logo: "https://logo.clearbit.com/udemy.com", location: "China", openJobsCount: 3 },
-  { id: "3", name: "Figma", logo: "https://logo.clearbit.com/figma.com", location: "United States", openJobsCount: 3 },
-  { id: "4", name: "Google", logo: "https://logo.clearbit.com/google.com", location: "Australia", openJobsCount: 3 },
-  { id: "5", name: "Microsoft", logo: "https://logo.clearbit.com/microsoft.com", location: "Australia", openJobsCount: 3 },
-];
+import { useFindEmployers } from "./hooks/useFindEmployers";
 
 export default function FindEmployerPage() {
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [keyword, setKeyword] = useState("");
-  const [location, setLocation] = useState("");
-  const [category, setCategory] = useState("");
-  
-  const [selectedEmployerId, setSelectedEmployerId] = useState<string | null>(null);
-
-  const totalPages = 5;
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Tìm kiếm với điều kiện:", { keyword, location, category });
-  };
+  const {
+    employers,
+    loading,
+    error,
+    viewMode,
+    setViewMode,
+    currentPage,
+    keyword,
+    setKeyword,
+    location,
+    setLocation,
+    category,
+    setCategory,
+    selectedEmployerId,
+    setSelectedEmployerId,
+    totalPages,
+    handleSearch,
+    handlePageChange,
+  } = useFindEmployers();
 
   if (selectedEmployerId) {
     return (
@@ -68,19 +58,29 @@ export default function FindEmployerPage() {
       <div className="max-w-7xl mx-auto px-8 mt-8">
         <FilterSortBar viewMode={viewMode} setViewMode={setViewMode} />
 
-        <EmployerList 
-          employers={EXPLORE_MOCK_EMPLOYERS} 
-          viewMode={viewMode} 
-          onEmployerDoubleClick={(id) => setSelectedEmployerId(id)} 
-        />
-
-        <div className="mt-8">
-          <DashboardPagination 
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-20 text-red-500 font-semibold">{error}</div>
+        ) : (
+          <EmployerList 
+            employers={employers} 
+            viewMode={viewMode} 
+            onEmployerDoubleClick={(id) => setSelectedEmployerId(id)} 
           />
-        </div>
+        )}
+
+        {employers.length > 0 && (
+          <div className="mt-8">
+            <DashboardPagination 
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

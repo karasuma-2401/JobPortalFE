@@ -1,25 +1,45 @@
 import { Link as LinkIcon, Phone, Mail, Bookmark, ArrowRight, Facebook, Twitter } from "lucide-react";
 import JobOverviewSidebar from "./components/JobOverviewSidebar";
 import JobGridSection from "../../../components/ui/JobGridSection"; 
-import { MOCK_JOB_DETAILS } from "./mockJobDetails"; 
-import { useState } from "react"; 
 import ApplyJobModal from "./components/ApplyJobModal";
+import { useJobDetail } from "./hooks/useJobDetail";
 
 interface JobDetailPageProps {
   jobId: string; 
 }
-const MOCK_RELATED_JOBS = [
-  { id: "r1", title: "UI/UX Designer", companyName: "Stripe", type: "Full Time", isFeatured: true, logo: "https://logo.clearbit.com/stripe.com", location: "San Francisco, USA", salary: "$60k-$90k/month", daysRemaining: "2 Days Remaining" },
-  { id: "r2", title: "Product Researcher", companyName: "Figma", type: "Remote", isFeatured: false, logo: "https://logo.clearbit.com/figma.com", location: "New York, USA", salary: "$45k-$70k/month", daysRemaining: "5 Days Remaining" }
-];
-export default function JobDetailPage({ jobId }: JobDetailPageProps) {
-  const jobData = MOCK_JOB_DETAILS[jobId] || MOCK_JOB_DETAILS["1"];
-  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
 
-  const handleApplySubmit = (data: { resumeId: string; coverLetter: string }) => {
-    console.log("Dữ liệu ứng tuyển:", data);
-    alert(`Ứng tuyển thành công vị trí: ${jobData.title}`);
-  };
+const MOCK_RELATED_JOBS = [
+  { id: "1", title: "Marketing Manager", companyName: "Stripe", type: "Remote", isFeatured: true, logo: "https://logo.clearbit.com/stripe.com", location: "New Mexico, USA", salary: "$50k-$80k/month", daysRemaining: "4 Days Remaining" },
+  { id: "2", title: "Project Manager", companyName: "Shopify", type: "Full Time", isFeatured: true, logo: "https://logo.clearbit.com/shopify.com", location: "Dhaka, Bangladesh", salary: "$50k-$80k/month", daysRemaining: "4 Days Remaining" }
+];
+
+export default function JobDetailPage({ jobId }: JobDetailPageProps) {
+  const {
+    jobData,
+    loading,
+    error,
+    isApplyModalOpen,
+    setIsApplyModalOpen,
+    isSaved,
+    handleToggleSave,
+    handleApplySubmit,
+  } = useJobDetail(jobId);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20 min-h-screen">
+        <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error || !jobData) {
+    return (
+      <div className="text-center py-20 text-red-500 font-semibold min-h-screen">
+        {error || "Job not found"}
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-white min-h-screen py-8 px-4 sm:px-6 lg:px-8">
@@ -59,8 +79,16 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center lg:items-end gap-3 shrink-0 self-start lg:self-center">
             <div className="flex items-center gap-3 w-full sm:w-auto">
-              <button className="p-3.5 bg-blue-50 text-primary-500 rounded-lg hover:bg-blue-100 transition-colors">
-                <Bookmark size={20} className="fill-current" />
+              <button 
+                onClick={handleToggleSave}
+                className={`p-3.5 rounded-lg transition-colors ${
+                  isSaved 
+                    ? "bg-[#E6F0FA] text-[#0A65CC]" 
+                    : "bg-blue-50 text-primary-500 hover:bg-blue-100"
+                }`}
+                title={isSaved ? "Remove from Favorite" : "Save to Favorite"}
+              >
+                <Bookmark size={20} fill={isSaved ? "currentColor" : "none"} />
               </button>
               
               <button 
@@ -121,12 +149,12 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
         </div>
 
         <div className="border-t border-gray-100 pt-8">
-        <JobGridSection 
-          title="Related Jobs"
-          jobs={MOCK_RELATED_JOBS}
-          onJobDoubleClick={(id) => console.log("Chuyển tiếp sang công việc liên quan:", id)}
-        />
-      </div>
+          <JobGridSection 
+            title="Related Jobs"
+            jobs={MOCK_RELATED_JOBS}
+            onJobDoubleClick={(id) => console.log("Related job double clicked:", id)}
+          />
+        </div>
 
       </div>
 

@@ -11,6 +11,8 @@ export interface FavoriteJobItemProps {
   isExpired?: boolean;
   isSelected: boolean; 
   onSelect: () => void; 
+  onBookmarkClick?: (id: string) => void;
+  onApplyClick?: (id: string) => void;
 }
 
 export default function FavoriteJobItem({
@@ -24,6 +26,8 @@ export default function FavoriteJobItem({
   isExpired = false,
   isSelected,
   onSelect,
+  onBookmarkClick,
+  onApplyClick,
 }: FavoriteJobItemProps) {
   return (
     <div
@@ -76,11 +80,12 @@ export default function FavoriteJobItem({
         <button 
           onClick={(e) => {
             e.stopPropagation(); 
-            console.log(`Unsaved favorite job id: ${id}`);
+            if (onBookmarkClick) onBookmarkClick(id);
           }}
           className="text-gray-900 hover:text-gray-600 transition-colors"
+          title="Remove from Favorite"
         >
-          <Bookmark size={20} fill="currentColor" />
+          <Bookmark size={20} fill="currentColor" className="text-primary-500" />
         </button>
 
         {isExpired ? (
@@ -95,7 +100,7 @@ export default function FavoriteJobItem({
           <button
             onClick={(e) => {
               e.stopPropagation(); 
-              console.log(`Apply job id: ${id}`);
+              if (onApplyClick) onApplyClick(id);
             }}
             className={`px-6 py-3.5 flex items-center justify-center gap-3 text-[15px] font-bold rounded-lg transition-colors w-[160px] ${
               isSelected

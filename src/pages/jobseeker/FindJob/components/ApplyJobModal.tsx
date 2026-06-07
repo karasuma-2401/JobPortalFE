@@ -17,7 +17,6 @@ export default function ApplyJobModal({ isOpen, onClose, jobTitle, onSubmit }: A
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({ resumeId: selectedResume, coverLetter });
-    onClose();
   };
 
   return (

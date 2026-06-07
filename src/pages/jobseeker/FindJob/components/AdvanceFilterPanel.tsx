@@ -1,12 +1,32 @@
-import { useState } from "react";
 
-export default function AdvanceFilterPanel() {
-  const [experience, setExperience] = useState("4 - 6 Years");
-  const [salary, setSalary] = useState("$6000 - $8000");
-  const [jobTypes, setJobTypes] = useState<string[]>(["Full Time"]);
-  const [education, setEducation] = useState<string[]>(["Graduation"]);
-  const [jobLevel, setJobLevel] = useState("Mid Level");
 
+interface AdvanceFilterPanelProps {
+  experience: string;
+  setExperience: (val: string) => void;
+  salaryRange: string;
+  setSalaryRange: (val: string) => void;
+  jobTypes: string[];
+  setJobTypes: (val: string[]) => void;
+  education: string[];
+  setEducation: (val: string[]) => void;
+  jobLevel: string;
+  setJobLevel: (val: string) => void;
+  handleResetFilters: () => void;
+}
+
+export default function AdvanceFilterPanel({
+  experience,
+  setExperience,
+  salaryRange,
+  setSalaryRange,
+  jobTypes,
+  setJobTypes,
+  education,
+  setEducation,
+  jobLevel,
+  setJobLevel,
+  handleResetFilters,
+}: AdvanceFilterPanelProps) {
   const handleCheckboxChange = (value: string, state: string[], setState: (val: string[]) => void) => {
     if (state.includes(value)) {
       setState(state.filter((item) => item !== value));
@@ -45,8 +65,8 @@ export default function AdvanceFilterPanel() {
                 <input
                   type="radio"
                   name="salary"
-                  checked={salary === sal}
-                  onChange={() => setSalary(sal)}
+                  checked={salaryRange === sal}
+                  onChange={() => setSalaryRange(sal)}
                   className="w-4 h-4 accent-primary-500 cursor-pointer"
                 />
                 <span className="group-hover:text-gray-900 transition-colors">{sal}</span>
@@ -107,6 +127,15 @@ export default function AdvanceFilterPanel() {
           </div>
         </div>
 
+      </div>
+      <div className="flex justify-end bg-gray-50/50 px-6 py-3 border-t border-gray-100">
+        <button 
+          type="button"
+          onClick={handleResetFilters}
+          className="text-sm font-semibold text-primary-500 hover:text-primary-600 transition-colors"
+        >
+          Reset Filters
+        </button>
       </div>
     </div>
   );

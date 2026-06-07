@@ -1,22 +1,34 @@
-import { useState } from "react";
 import { Briefcase, Bookmark, Bell, ArrowRight } from "lucide-react";
-
-// Import các component con đã được tách ra
 import AppliedJobItem from "../AppliedJob/AppliedJobItem";
 import StatCard from "./components/StatCard";
 import ProfileAlert from "./components/ProfileAlert";
 import JobTableHeader from "./components/JobTableHeader";
-
-const mockRecentJobs = [
-  { id: "1", logo: "https://logo.clearbit.com/upwork.com", role: "Networking Engineer", type: "Remote", location: "Washington", salary: "$50k-80k/month", dateApplied: "Feb 2, 2019 19:28", status: "Active" },
-  { id: "2", logo: "https://logo.clearbit.com/dribbble.com", role: "Product Designer", type: "Full Time", location: "Dhaka", salary: "$50k-80k/month", dateApplied: "Dec 7, 2019 23:26", status: "Active" },
-  { id: "3", logo: "https://logo.clearbit.com/apple.com", role: "Junior Graphic Designer", type: "Temporary", location: "Brazil", salary: "$50k-80k/month", dateApplied: "Feb 2, 2019 19:28", status: "Active" },
-  { id: "4", logo: "https://logo.clearbit.com/microsoft.com", role: "Visual Designer", type: "Contract Base", location: "Wisconsin", salary: "$50k-80k/month", dateApplied: "Dec 7, 2019 23:26", status: "Active" },
-];
+import { useDashboardOverview } from "./hooks/useDashboardOverview";
 
 export default function OverviewPage() {
-  const [selectedJobId, setSelectedJobId] = useState<string | null>("4");
-  const [isProfileCompleted] = useState(false);
+  const {
+    loading,
+    error,
+    stats,
+    recentApplied,
+    isProfileCompleted,
+    selectedJobId,
+    setSelectedJobId,
+  } = useDashboardOverview();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-20 text-red-500 font-semibold">{error}</div>
+    );
+  }
 
   return (
     <div className="space-y-8 text-left animate-fade-in pb-8">
@@ -27,19 +39,19 @@ export default function OverviewPage() {
 
       <div className="grid grid-cols-3 gap-6">
         <StatCard 
-          count="589" 
+          count={String(stats.appliedCount)} 
           label="Applied jobs" 
           variant="blue"
           icon={<Briefcase size={26} strokeWidth={2.5} />} 
         />
         <StatCard 
-          count="238" 
+          count={String(stats.favoriteCount)} 
           label="Favorite jobs" 
           variant="orange"
           icon={<Bookmark size={26} strokeWidth={2.5} />} 
         />
         <StatCard 
-          count="574" 
+          count={String(stats.alertCount)} 
           label="Job Alerts" 
           variant="green"
           icon={<Bell size={26} strokeWidth={2.5} />} 
@@ -47,6 +59,7 @@ export default function OverviewPage() {
       </div>
 
       {!isProfileCompleted && <ProfileAlert />}
+
       <div className="space-y-5">
         <div className="flex items-center justify-between">
           <h2 className="text-[18px] font-bold text-gray-900">Recently Applied</h2>
@@ -55,20 +68,33 @@ export default function OverviewPage() {
           </button>
         </div>
 
-        <JobTableHeader />
-
-        <div className="flex flex-col gap-3">
-          {mockRecentJobs.map((job) => (
-            <AppliedJobItem
-              key={job.id}
-              {...job}
-              isSelected={selectedJobId === job.id}
-              onSelect={() => setSelectedJobId(job.id)}
-            />
-          ))}
-        </div>
+        {recentApplied.length === 0 ? (
+          <div className="text-center py-10 bg-white border border-gray-100 rounded-xl">
+            <p className="text-[15px] text-gray-400">You haven't applied to any jobs yet.</p>
+          </div>
+        ) : (
+          <>
+            <JobTableHeader />
+            <div className="flex flex-col gap-3">
+              {recentApplied.map((job) => (
+                <AppliedJobItem
+                  key={job.id}
+                  id={job.id}
+                  logo={job.logo}
+                  role={job.role}
+                  type={job.type}
+                  location={job.location}
+                  salary={job.salary}
+                  dateApplied={job.dateApplied}
+                  status={job.status}
+                  isSelected={selectedJobId === job.id}
+                  onSelect={() => setSelectedJobId(job.id)}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
-      
     </div>
   );
 }

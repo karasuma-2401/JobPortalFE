@@ -1,45 +1,41 @@
-import { useState } from "react";
 import { Pencil } from "lucide-react";
-import JobAlertItem, { type JobAlertItemProps } from "./JobAlertItem";
+import JobAlertItem from "./JobAlertItem";
 import DashboardPagination from "../../../../components/ui/DashboardPagination";
+import { useJobAlerts } from "./hooks/useJobAlerts";
 
 export default function JobAlertPage() {
-  const [currentPage, setCurrentPage] = useState(1); 
-  const [totalPages] = useState(12);   
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const {
+    jobAlerts,
+    loading,
+    error,
+    totalCount,
+    currentPage,
+    selectedJobId,
+    setSelectedJobId,
+    totalPages,
+    handlePageChange,
+  } = useJobAlerts();
 
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-    console.log(`Gọi API lấy data cho trang: ${pageNumber}`);
-  };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
-  const mockJobs: Omit<JobAlertItemProps, "isSelected" | "onSelect">[] = [
-  { 
-    id: "1", 
-    logo: "https://logo.clearbit.com/google.com", 
-    role: "Technical Support Specialist", 
-    type: "Full Time", 
-    location: "Idaho, USA", 
-    salary: "$15K-$20K", 
-    daysRemaining: "Job Expire" 
-  },
-  { 
-    id: "2", 
-    logo: "https://logo.clearbit.com/youtube.com", 
-    role: "UI/UX Designer", 
-    type: "Full Time", 
-    location: "Minnesota, USA", 
-    salary: "$10K-$15K", 
-    daysRemaining: "4 Days Remaining" 
-  },
-];
+  if (error) {
+    return (
+      <div className="text-center py-20 text-red-500 font-semibold">{error}</div>
+    );
+  }
 
   return (
-    <div className="space-y-8 text-left animate-fade-in">
+    <div className="space-y-8 text-left animate-fade-in pb-8">
       <div className="flex items-center justify-between gap-6 pb-2 border-b border-gray-50">
         <div className="flex items-end gap-3">
           <h1 className="text-xl font-bold text-gray-900">Job Alerts</h1>
-          <span className="text-sm font-medium text-gray-400 mb-0.5">(9 new jobs)</span>
+          <span className="text-sm font-medium text-gray-400 mb-0.5">({totalCount} jobs)</span>
         </div>
         <button className="flex items-center gap-2.5 px-6 py-3.5 text-[15px] font-bold text-primary-500 bg-blue-50 hover:bg-primary-500 hover:text-white rounded-lg transition-colors">
           <Pencil size={18} />
@@ -48,21 +44,35 @@ export default function JobAlertPage() {
       </div>
 
       <div className="flex flex-col gap-5">
-        {mockJobs.map((job) => (
-          <JobAlertItem 
-            key={job.id} 
-            {...job} 
-            isSelected={selectedJobId === job.id}
-            onSelect={() => setSelectedJobId(job.id === selectedJobId ? null : job.id)}
-          />
-        ))}
+        {jobAlerts.length === 0 ? (
+          <div className="text-center py-10 bg-white border border-gray-100 rounded-xl">
+            <p className="text-[15px] text-gray-400">No job alerts found.</p>
+          </div>
+        ) : (
+          jobAlerts.map((job) => (
+            <JobAlertItem 
+              key={job.id} 
+              id={job.id}
+              logo={job.logo}
+              role={job.role}
+              type={job.type}
+              location={job.location}
+              salary={job.salary}
+              daysRemaining={job.daysRemaining}
+              isSelected={selectedJobId === job.id}
+              onSelect={() => setSelectedJobId(job.id === selectedJobId ? null : job.id)}
+            />
+          ))
+        )}
       </div>
 
-      <DashboardPagination 
-        currentPage={currentPage} 
-        totalPages={totalPages} 
-        onPageChange={handlePageChange} 
-      />
+      {jobAlerts.length > 0 && (
+        <DashboardPagination 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+          onPageChange={handlePageChange} 
+        />
+      )}
     </div>
   );
 }
