@@ -2,19 +2,26 @@ import { Link as LinkIcon, Phone, Mail, Bookmark, ArrowRight, Facebook, Twitter 
 import JobOverviewSidebar from "./components/JobOverviewSidebar";
 import RelatedJobs from "./components/RelatedJobs";
 import { MOCK_JOB_DETAILS } from "./mockJobDetails"; 
+import { useState } from "react"; 
+import ApplyJobModal from "./components/ApplyJobModal";
 
 interface JobDetailPageProps {
   jobId: string; 
 }
 
 export default function JobDetailPage({ jobId }: JobDetailPageProps) {
-  // Tìm kiếm dữ liệu dựa trên ID, nếu không thấy thì lấy mẫu ID "1" làm fallback tránh crash ứng dụng
   const jobData = MOCK_JOB_DETAILS[jobId] || MOCK_JOB_DETAILS["1"];
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+
+  const handleApplySubmit = (data: { resumeId: string; coverLetter: string }) => {
+    console.log("Dữ liệu ứng tuyển:", data);
+    alert(`Ứng tuyển thành công vị trí: ${jobData.title}`);
+  };
 
   return (
     <div className="w-full bg-white min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        
+
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-8 border-b border-gray-100 mb-8">
           <div className="flex items-start sm:items-center gap-5">
             <img 
@@ -52,7 +59,11 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
               <button className="p-3.5 bg-blue-50 text-primary-500 rounded-lg hover:bg-blue-100 transition-colors">
                 <Bookmark size={20} className="fill-current" />
               </button>
-              <button className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-bold px-6 py-3.5 rounded-lg shadow-sm transition-all active:scale-[0.98]">
+              
+              <button 
+                onClick={() => setIsApplyModalOpen(true)}
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-bold px-6 py-3.5 rounded-lg shadow-sm transition-all active:scale-[0.98]"
+              >
                 <span>Apply Now</span>
                 <ArrowRight size={18} />
               </button>
@@ -64,8 +75,7 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* CỘT TRÁI */}
+
           <div className="lg:col-span-2 flex flex-col gap-6 text-[15px] text-gray-600 leading-relaxed">
             <div>
               <h3 className="text-[18px] font-bold text-gray-900 mb-3.5">Job Description</h3>
@@ -110,6 +120,13 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
         <RelatedJobs />
 
       </div>
+
+      <ApplyJobModal 
+        isOpen={isApplyModalOpen}
+        onClose={() => setIsApplyModalOpen(false)}
+        jobTitle={jobData.title} 
+        onSubmit={handleApplySubmit}
+      />
     </div>
   );
 }

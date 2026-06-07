@@ -4,7 +4,8 @@ import DashboardPagination from "../../../components/ui/DashboardPagination";
 import JobSearchBar from "./components/JobSearchBar";
 import FilterSortBar from "./components/FilterSortBar";
 import JobList from "./components/JobList";
-import JobDetailPage from "./JobDetailPage"; 
+import JobDetailPage from "./JobDetailPage";
+import ApplyJobModal from "./components/ApplyJobModal";
 
 const EXPLORE_MOCK_JOBS = [
   { id: "1", title: "Marketing Manager", companyName: "Stripe", type: "Remote", isFeatured: true, logo: "https://logo.clearbit.com/stripe.com", location: "New Mexico, USA", salary: "$50k-$80k/month", daysRemaining: "4 Days Remaining" },
@@ -17,9 +18,11 @@ export default function FindJobPage() {
   const [savedJobIds, setSavedJobIds] = useState<string[]>([]);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [locationKeyword, setLocationKeyword] = useState("");
-
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(null); 
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   
+  const [isListApplyModalOpen, setIsListApplyModalOpen] = useState(false);
+  const [applyingJobTitle, setApplyingJobTitle] = useState("");
+
   const totalPages = 5;
 
   const handleToggleSave = (id: string | number) => {
@@ -36,6 +39,19 @@ export default function FindJobPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleListApplySubmit = (data: { resumeId: string; coverLetter: string }) => {
+    console.log("Hồ sơ gửi từ danh sách:", data);
+    alert(`Ứng tuyển thành công vị trí: ${applyingJobTitle}`);
+  };
+
+  const handleApplyClickFromList = (id: string) => {
+    const targetJob = EXPLORE_MOCK_JOBS.find(job => job.id === id);
+    if (targetJob) {
+      setApplyingJobTitle(targetJob.title); 
+      setIsListApplyModalOpen(true);       
+    }
+  };
+
   if (selectedJobId) {
     return (
       <div className="w-full bg-white font-sans min-h-screen pb-16 animate-fadeIn">
@@ -47,15 +63,13 @@ export default function FindJobPage() {
             ← Back to Job List
           </button>
         </div>
-
-        <JobDetailPage jobId={selectedJobId} />
+        <JobDetailPage jobId={selectedJobId} /> 
       </div>
     );
   }
 
   return (
     <div className="w-full bg-white font-sans min-h-screen pb-16">
-
       <JobSearchBar 
         searchKeyword={searchKeyword}
         setSearchKeyword={setSearchKeyword}
@@ -64,7 +78,6 @@ export default function FindJobPage() {
       />
 
       <div className="max-w-7xl mx-auto px-8 mt-8">
-
         <FilterSortBar viewMode={viewMode} setViewMode={setViewMode} />
 
         <JobList 
@@ -73,6 +86,7 @@ export default function FindJobPage() {
           savedJobIds={savedJobIds} 
           onToggleSave={handleToggleSave} 
           onJobDoubleClick={(id) => setSelectedJobId(id)} 
+          onApplyClick={handleApplyClickFromList}
         />
 
         <DashboardPagination 
@@ -80,8 +94,14 @@ export default function FindJobPage() {
           totalPages={totalPages}
           onPageChange={handlePageChange}
         />
-
       </div>
+
+      <ApplyJobModal 
+        isOpen={isListApplyModalOpen}
+        onClose={() => setIsListApplyModalOpen(false)}
+        jobTitle={applyingJobTitle}
+        onSubmit={handleListApplySubmit}
+      />
     </div>
   );
 }
