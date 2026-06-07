@@ -98,7 +98,10 @@ export function useFindJobs() {
   }, []);
 
   useEffect(() => {
-    loadSavedIds();
+    const user = localStorage.getItem('me');
+    if (user) {
+      loadSavedIds();
+    }
   }, [loadSavedIds]);
 
   const handleSearch = useCallback((e: React.FormEvent) => {

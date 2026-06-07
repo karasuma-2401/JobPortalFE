@@ -73,7 +73,8 @@ export const useLogin = () => {
                 if (isEmployer) {
                     navigate('/employer/dashboard');
                 } else {
-                    navigate('/jobseeker/dashboard');
+                    navigate('/jobseeker');
+
                 }
             }
         },

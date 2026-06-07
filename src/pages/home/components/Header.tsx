@@ -12,7 +12,7 @@ const languages = [
 const navLinks = [
     { path: '/', label: 'Home' },
     { path: '/find-job', label: 'Find Job' },
-    { path: '/employers', label: 'Employers' },
+    { path: '/find-employers', label: 'Employers' },
     // { path: "/candicates", label: "Candicates" },
     // { path: "/pricing", label: "Pricing Plans" },
     // { path: "/customer", label: "Customer Supports" },

@@ -14,28 +14,28 @@ export default function DashboardSidebar() {
 
     const menuItems = [
         {
-            path: '/candidate/overview',
+            path: '/jobseeker/DashBoard/overview',
             label: 'Overview',
             icon: <LayoutDashboard size={22} />,
         },
         {
-            path: '/candidate/applied',
+            path: '/jobseeker/DashBoard/applied',
             label: 'Applied Jobs',
             icon: <Briefcase size={22} />,
         },
         {
-            path: '/candidate/favorites',
+            path: '/jobseeker/DashBoard/favorites',
             label: 'Favorite Jobs',
             icon: <Bookmark size={22} />,
         },
         {
-            path: '/candidate/jobalerts',
+            path: '/jobseeker/DashBoard/jobalerts',
             label: 'Job Alert',
             icon: <Bell size={22} />,
             badge: '09',
         },
         {
-            path: '/candidate/settings',
+            path: '/jobseeker/DashBoard/settings',
             label: 'Settings',
             icon: <Settings size={22} />,
         },
@@ -49,7 +49,7 @@ export default function DashboardSidebar() {
                 </span>
                 <nav className='flex flex-col w-full'>
                     {menuItems.map((item) => {
-                        const isActive = location.pathname.includes(item.path);
+                        const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
                         return (
                             <Link
                                 key={item.path}

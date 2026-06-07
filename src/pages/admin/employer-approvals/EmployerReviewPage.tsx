@@ -32,9 +32,8 @@ const MOCK_DETAIL: EmployerProfile = {
 };
 
 export default function EmployerReviewPage() {
-    // fix id declare but note use
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id } = useParams();
+    useParams();
+
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
 

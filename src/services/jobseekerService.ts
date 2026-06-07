@@ -11,6 +11,7 @@ import type {
   FavoriteJobType,
   JobAlertItemType,
   DashboardOverviewType,
+  Resume
 } from "../types/jobseeker";
 
 export const JobseekerService = {
@@ -27,11 +28,11 @@ export const JobseekerService = {
   getJobs: async (
     params: JobFilterParams
   ): Promise<{ items: Job[]; totalCount: number }> => {
-    return privateApi.get("/jobs", { params });
+    return privateApi.get("/jobpost", { params });
   },
 
   getJobDetail: async (id: string): Promise<JobDetailType> => {
-    return privateApi.get(`/jobs/${id}`);
+    return privateApi.get(`/jobpost/${id}`);
   },
 
   applyJob: async (payload: ApplyJobRequest): Promise<void> => {
@@ -42,15 +43,15 @@ export const JobseekerService = {
   getEmployers: async (
     params: EmployerFilterParams
   ): Promise<{ items: Employer[]; totalCount: number }> => {
-    return privateApi.get("/employers", { params });
+    return privateApi.get("/employer", { params });
   },
 
   getEmployerDetail: async (id: string): Promise<EmployerDetail> => {
-    return privateApi.get(`/employers/${id}`);
+    return privateApi.get(`/employer/${id}`);
   },
 
   getJobsByEmployer: async (employerId: string): Promise<Job[]> => {
-    return privateApi.get(`/employers/${employerId}/jobs`);
+    return privateApi.get(`/employer/${employerId}/jobs`);
   },
 
   // Dashboard
@@ -63,8 +64,10 @@ export const JobseekerService = {
     page: number,
     limit: number
   ): Promise<{ items: AppliedJobType[]; totalCount: number }> => {
-    return privateApi.get("/job-seeker/applied-jobs", {
-      params: { page, limit },
+    const offset = (page - 1) * limit; 
+    
+    return privateApi.get("/job-application", {
+      params: { offset, limit },
     });
   },
 
@@ -83,8 +86,18 @@ export const JobseekerService = {
     page: number,
     limit: number
   ): Promise<{ items: JobAlertItemType[]; totalCount: number }> => {
-    return privateApi.get("/job-seeker/job-alerts", {
-      params: { page, limit },
+    const offset = (page - 1) * limit;
+    return privateApi.get("/jobpost", {
+      params: { offset, limit },
     });
   },
+  getMyResumes: async (): Promise<Resume[]> => {
+        try {
+            return privateApi.get("/job-seeker/resume")
+            
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách CV:", error);
+            throw error;
+        }
+    },
 };

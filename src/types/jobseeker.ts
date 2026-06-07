@@ -151,3 +151,10 @@ export interface DashboardOverviewType {
   recentApplied: AppliedJobType[];
   isProfileCompleted: boolean;
 }
+
+export interface Resume {
+    id: string;
+    name: string; // Tên file hoặc tên CV
+    fileUrl?: string; // Đường dẫn tải/xem CV (nếu có)
+    createdAt?: string; // Ngày tạo (nếu có)
+}

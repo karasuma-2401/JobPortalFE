@@ -45,14 +45,17 @@ import DashboardPage from './pages/admin/dashboard/DashboardPage';
 import AdminSettingsPage from './pages/admin/settings/AdminSettingsPage';
 import { NotificationProvider } from './contexts/notification/NotificationProvider';
 
-import CandidateLayout from './layouts/CandidateDashBoardLayout';
+import CandidateDashBoardLayout from './layouts/CandidateDashBoardLayout';
+import CandidateFullLayout from './layouts/CandidateFullLayout';
+
+
 import SettingsPage from './pages/jobseeker/dashboard/Settings/Settings';
 import JobAlertPage from './pages/jobseeker/dashboard/JobAlert/JobAlert';
 import FindJobPage from './pages/jobseeker/FindJob/FindJobPage';
 import FavoriteJobsPage from './pages/jobseeker/dashboard/FavoriteJob/FavoriteJobs';
 import AppliedJobsPage from './pages/jobseeker/dashboard/AppliedJob/AppliedJobs';
 import OverviewPage from './pages/jobseeker/dashboard/Overview/Overview';
-import CandidateFullLayout from './layouts/CandidateFullLayout';
+
 import JobDetailPage from './pages/employer/my-jobs/JobDetailPage';
 import EditJobPage from './pages/employer/my-jobs/components/EditJobPage';
 import FindCandidatesPage from './pages/employer/find-candidates/FindCandidatesPage';
@@ -63,6 +66,8 @@ const router = createBrowserRouter([
       children: [
         { path: "/", element: <Navigate to="/home" /> }, 
         { path: "/home", element: <Home /> },
+        { path: "/find-job", element: <FindJobPage /> },
+        { path: "/find-employers", element: <FindEmployerPage /> },
       ],
   },
     {
@@ -151,24 +156,32 @@ const router = createBrowserRouter([
         ],
     },
     {
+        path: '/jobseeker',
         element: <CandidateFullLayout />,
+
+
         children: [
-            { path: '/job-alerts', element: <JobAlertPage /> },
-            { path: '/find-job', element: <FindJobPage /> },
-            { path: '/fing-employers', element: <FindEmployerPage />}
+            { path: 'home', element: <Home /> },
+            { path: 'find-job', element: <FindJobPage /> },
+            { path: 'find-employers', element: <FindEmployerPage /> },
+            { index: true, element: <Navigate to="/jobseeker/DashBoard/overview" replace /> },
+            { path: 'dashboard', element: <Navigate to="/jobseeker/DashBoard/overview" replace /> },
         ],
     },
     {
-        path: '/candidate',
-        element: <CandidateLayout />,
+        path: '/jobseeker/DashBoard',
+        element: <CandidateDashBoardLayout />,
         children: [
             { path: 'settings', element: <SettingsPage /> },
             { path: 'jobalerts', element: <JobAlertPage /> },
             { path: 'favorites', element: <FavoriteJobsPage /> },
             { path: 'applied', element: <AppliedJobsPage /> },
             { path: 'overview', element: <OverviewPage /> },
+            { index: true, element: <Navigate to="/jobseeker/DashBoard/overview" replace /> },
         ],
     },
+
+
 ]);
 
 export default function App() {

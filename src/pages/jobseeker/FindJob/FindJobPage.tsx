@@ -1,5 +1,5 @@
+import { useNavigate } from 'react-router-dom';
 import DashboardPagination from "../../../components/ui/DashboardPagination";
-
 import JobSearchBar from "./components/JobSearchBar";
 import FilterSortBar from "./components/FilterSortBar";
 import JobList from "./components/JobList";
@@ -8,6 +8,8 @@ import ApplyJobModal from "./components/ApplyJobModal";
 import { useFindJobs } from "./hooks/useFindJobs";
 
 export default function FindJobPage() {
+  const navigate = useNavigate();
+
   const {
     jobs,
     loading,
@@ -43,6 +45,16 @@ export default function FindJobPage() {
     handleApplyClickFromList,
     handleListApplySubmit,
   } = useFindJobs();
+
+
+  const handleProtectedListApplyClick = (jobId: string) => {
+  const user = localStorage.getItem('me');
+  if (!user) {
+    navigate('/login');
+    return;
+  }
+  handleApplyClickFromList(jobId);
+};
 
   if (selectedJobId) {
     return (
@@ -92,13 +104,13 @@ export default function FindJobPage() {
           <div className="text-center py-20 text-red-500 font-semibold">{error}</div>
         ) : (
           <JobList 
-            jobs={jobs} 
-            viewMode={viewMode} 
-            savedJobIds={savedJobIds} 
-            onToggleSave={handleToggleSave} 
-            onJobDoubleClick={(id) => setSelectedJobId(id)} 
-            onApplyClick={handleApplyClickFromList}
-          />
+          jobs={jobs} 
+          viewMode={viewMode} 
+          savedJobIds={savedJobIds} 
+          onToggleSave={handleToggleSave} 
+          onJobDoubleClick={(id) => setSelectedJobId(id)} 
+          onApplyClick={handleProtectedListApplyClick}
+        />
         )}
 
         <DashboardPagination 

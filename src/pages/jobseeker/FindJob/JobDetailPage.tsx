@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Link as LinkIcon, Phone, Mail, Bookmark, ArrowRight} from "lucide-react";
 import { FaFacebook, FaTwitter } from 'react-icons/fa';
 import JobOverviewSidebar from "./components/JobOverviewSidebar";
@@ -15,6 +16,8 @@ const MOCK_RELATED_JOBS = [
 ];
 
 export default function JobDetailPage({ jobId }: JobDetailPageProps) {
+  const navigate = useNavigate();
+
   const {
     jobData,
     loading,
@@ -25,6 +28,16 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
     handleToggleSave,
     handleApplySubmit,
   } = useJobDetail(jobId);
+
+  // Hàm chặn người dùng vãng lai khi bấm Apply trong trang chi tiết
+  const handleProtectedApplyClick = () => {
+    const user = localStorage.getItem('me');
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    setIsApplyModalOpen(true);
+  };
 
   if (loading) {
     return (
@@ -93,7 +106,7 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
               </button>
               
               <button 
-                onClick={() => setIsApplyModalOpen(true)}
+                onClick={handleProtectedApplyClick} // Sử dụng hàm đã bảo vệ
                 className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-bold px-6 py-3.5 rounded-lg shadow-sm transition-all active:scale-[0.98]"
               >
                 <span>Apply Now</span>

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { X, Bold, Italic, Underline, Strikethrough, Link, List, ListOrdered, ArrowRight } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { X, Bold, Italic, Underline, Strikethrough, Link, List, ListOrdered, ArrowRight, Loader2 } from "lucide-react";
+import { JobseekerService } from "../../../../services/jobseekerService"; 
 
 interface ApplyJobModalProps {
   isOpen: boolean;
@@ -8,9 +9,50 @@ interface ApplyJobModalProps {
   onSubmit: (data: { resumeId: string; coverLetter: string }) => void;
 }
 
+interface Resume {
+  id: string;
+  name: string;
+}
+
 export default function ApplyJobModal({ isOpen, onClose, jobTitle, onSubmit }: ApplyJobModalProps) {
   const [selectedResume, setSelectedResume] = useState("");
   const [coverLetter, setCoverLetter] = useState("");
+  
+  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [isLoadingResumes, setIsLoadingResumes] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchResumes = async () => {
+      if (!isOpen) return; 
+      
+      setIsLoadingResumes(true);
+      try {
+        const response = await JobseekerService.getMyResumes(); 
+        if (isMounted) {
+          setResumes(response);
+          if (response.length > 0) {
+            setSelectedResume(response[0].id);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch resumes:", error);
+      } finally {
+        if (isMounted) {
+          setIsLoadingResumes(false);
+        }
+      }
+    };
+
+    fetchResumes();
+
+    return () => {
+      isMounted = false;
+      setSelectedResume("");
+      setCoverLetter("");
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -42,19 +84,31 @@ export default function ApplyJobModal({ isOpen, onClose, jobTitle, onSubmit }: A
         <form onSubmit={handleSubmit} className="space-y-5">
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-gray-700">
-              Choose Resume
+            <label className="text-sm font-semibold text-gray-700 flex justify-between">
+              <span>Choose Resume</span>
+              {isLoadingResumes && <span className="text-blue-500 flex items-center gap-1"><Loader2 size={14} className="animate-spin" /> Loading...</span>}
             </label>
             <div className="relative">
               <select
                 value={selectedResume}
                 onChange={(e) => setSelectedResume(e.target.value)}
                 required
-                className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-[15px] text-gray-800 outline-none focus:border-blue-500 appearance-none cursor-pointer"
+                disabled={isLoadingResumes || resumes.length === 0}
+                className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-[15px] text-gray-800 outline-none focus:border-blue-500 appearance-none cursor-pointer disabled:bg-gray-50 disabled:cursor-not-allowed"
               >
-                <option value="" disabled>Select...</option>
-                <option value="resume_01">Nguyen_Van_A_CV_SRE.pdf</option>
-                <option value="resume_02">Nguyen_Van_A_Portfolio.pdf</option>
+                <option value="" disabled>
+                  {isLoadingResumes 
+                    ? "Đang tải danh sách CV..." 
+                    : resumes.length === 0 
+                      ? "Bạn chưa có CV nào" 
+                      : "Select..."}
+                </option>
+                
+                {resumes.map((resume) => (
+                  <option key={resume.id} value={resume.id}>
+                    {resume.name}
+                  </option>
+                ))}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-400">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,7 +155,8 @@ export default function ApplyJobModal({ isOpen, onClose, jobTitle, onSubmit }: A
             </button>
             <button
               type="submit"
-              className="flex items-center gap-2 px-6 py-3 rounded-lg text-[15px] font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/10 transition-all active:scale-[0.98]"
+              disabled={!selectedResume || resumes.length === 0}
+              className="flex items-center gap-2 px-6 py-3 rounded-lg text-[15px] font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/10 transition-all active:scale-[0.98] disabled:bg-gray-400 disabled:shadow-none disabled:cursor-not-allowed"
             >
               <span>Apply Now</span>
               <ArrowRight size={16} />
