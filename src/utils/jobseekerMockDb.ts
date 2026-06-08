@@ -246,8 +246,8 @@ export const MOCK_EMPLOYER_DETAILS: Record<string, EmployerDetail> = {
 };
 
 export const MOCK_JOB_ALERTS: JobAlertItemType[] = [
-  { id: "1", logo: "https://logo.clearbit.com/google.com", role: "Technical Support Specialist", type: "Full Time", location: "Idaho, USA", salary: "$15K-$20K", daysRemaining: "Job Expire" },
-  { id: "2", logo: "https://logo.clearbit.com/youtube.com", role: "UI/UX Designer", type: "Full Time", location: "Minnesota, USA", salary: "$10K-$15K", daysRemaining: "4 Days Remaining" },
+  { id: "1", keyword: "Technical Support Specialist", location: "Idaho, USA", category: "Full Time", createdAt: new Date().toISOString() },
+  { id: "2", keyword: "UI/UX Designer", location: "Minnesota, USA", category: "Full Time", createdAt: new Date().toISOString() },
 ];
 
 const LS_APPLIED_JOBS_KEY = "job_portal_applied_jobs";

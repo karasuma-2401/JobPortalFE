@@ -1,16 +1,15 @@
-import { useState, useEffect } from 'react';
-import { X, Upload, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { FileText, Loader2, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import type { ApiError } from '../../../../../api/api';
-
 import Input from '../../../../../components/ui/Input';
 import Button from '../../../../../components/ui/Button';
 
 interface AddResumeProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (name: string) => Promise<void>;
-    editData?: { name: string } | null;
+    onSave: (values: { fileName: string; file?: File | null }) => Promise<void>;
+    editData?: { fileName: string } | null;
 }
 
 export default function AddResume({
@@ -19,29 +18,35 @@ export default function AddResume({
     onSave,
     editData,
 }: AddResumeProps) {
-    const [resumeName, setResumeName] = useState('');
+    const [fileName, setFileName] = useState('');
+    const [file, setFile] = useState<File | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        if (editData) {
-            setResumeName(editData.name);
-        } else {
-            setResumeName('');
-        }
+        setFileName(editData?.fileName || '');
+        setFile(null);
     }, [editData, isOpen]);
 
-    if (!isOpen) return null;
+    if (!isOpen) {
+        return null;
+    }
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!resumeName.trim()) {
-            toast.error('Please enter your Cv/Resume Name.');
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+
+        if (!fileName.trim()) {
+            toast.error('Please enter your resume name.');
+            return;
+        }
+
+        if (!editData && !file) {
+            toast.error('Please upload a resume file.');
             return;
         }
 
         try {
             setIsLoading(true);
-            await onSave(resumeName);
+            await onSave({ fileName, file });
             onClose();
         } catch (error) {
             toast.error((error as ApiError).message);
@@ -52,59 +57,59 @@ export default function AddResume({
 
     return (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in'>
-            <div className='bg-bg-white w-full max-w-[640px] rounded-xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative mx-4 text-left'>
+            <div className='relative mx-4 w-full max-w-[640px] rounded-xl bg-bg-white p-8 text-left shadow-[0_20px_50px_rgba(0,0,0,0.15)]'>
                 <button
                     type='button'
                     onClick={onClose}
-                    className='absolute -top-4 -right-4 w-10 h-10 bg-bg-white border border-gray-100 text-gray-500 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors shadow-md z-10'
+                    className='absolute -right-4 -top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-gray-100 bg-bg-white text-gray-500 shadow-md transition-colors hover:bg-gray-50'
                 >
                     <X size={20} />
                 </button>
 
-                <h2 className='text-lg font-bold text-gray-900 mb-6'>
-                    {editData ? 'Edit Cv/Resume' : 'Add Cv/Resume'}
+                <h2 className='mb-6 text-lg font-bold text-gray-900'>
+                    {editData ? 'Rename Cv/Resume' : 'Add Cv/Resume'}
                 </h2>
 
                 <form onSubmit={handleSubmit} className='space-y-6'>
-                    <div className='flex flex-col gap-2'>
-                        <label className='text-sm font-medium text-gray-700'>
-                            Cv/Resume Name
-                        </label>
-                        <Input
-                            type='text'
-                            placeholder='Your resume name...'
-                            value={resumeName}
-                            onChange={(
-                                e: React.ChangeEvent<HTMLInputElement>
-                            ) => setResumeName(e.target.value)}
-                        />
-                    </div>
+                    <Input
+                        label='Cv/Resume Name'
+                        type='text'
+                        placeholder='Your resume name...'
+                        value={fileName}
+                        onChange={(event) => setFileName(event.target.value)}
+                    />
 
-                    <div className='flex flex-col gap-2'>
-                        <label className='text-sm font-medium text-gray-700'>
-                            Upload your Cv/Resume
-                        </label>
-                        <div className='border-2 border-dashed border-gray-100 rounded-xl p-8 flex flex-col items-center justify-center text-center bg-gray-50/10 hover:bg-primary-50/10 transition-colors cursor-pointer group'>
-                            <div className='w-14 h-14 bg-gray-50 group-hover:bg-bg-white rounded-full flex items-center justify-center mb-3 shadow-sm border border-gray-50 transition-colors'>
-                                <Upload className='w-6 h-6 text-gray-400 group-hover:text-primary-500 transition-colors' />
+                    {!editData && (
+                        <label className='flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-100 bg-gray-50/10 p-8 text-center transition-colors hover:bg-primary-50/10'>
+                            <div className='mb-3 flex h-14 w-14 items-center justify-center rounded-full border border-gray-50 bg-gray-50 shadow-sm'>
+                                {file ? (
+                                    <FileText className='h-6 w-6 text-primary-500' />
+                                ) : (
+                                    <Upload className='h-6 w-6 text-gray-400' />
+                                )}
                             </div>
-                            <p className='text-sm text-gray-900 font-medium'>
-                                Browse File{' '}
-                                <span className='text-gray-400 font-normal'>
-                                    or drop here
-                                </span>
+                            <p className='text-sm font-medium text-gray-900'>
+                                {file ? file.name : 'Browse File or drop here'}
                             </p>
-                            <p className='text-xs text-gray-400 mt-1.5 font-normal'>
-                                Only PDF format available. Max file size 12 MB.
+                            <p className='mt-1.5 text-xs text-gray-400'>
+                                PDF, DOC, and DOCX are supported.
                             </p>
-                        </div>
-                    </div>
+                            <input
+                                type='file'
+                                accept='.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                                className='hidden'
+                                onChange={(event) =>
+                                    setFile(event.target.files?.[0] ?? null)
+                                }
+                            />
+                        </label>
+                    )}
 
-                    <div className='flex items-center justify-between pt-2 gap-4'>
+                    <div className='flex items-center justify-between gap-4 pt-2'>
                         <Button
                             type='button'
                             variant='social'
-                            className='px-6 !bg-primary-50/40 hover:!bg-primary-50 text-primary-500 border-none font-semibold'
+                            className='border-none px-6 font-semibold text-primary-500 !bg-primary-50/40 hover:!bg-primary-50'
                             onClick={onClose}
                         >
                             Cancel
@@ -112,20 +117,15 @@ export default function AddResume({
 
                         <Button
                             variant='primary'
-                            className='px-6 min-w-[160px]'
+                            className='min-w-[160px] px-6'
                             disabled={isLoading}
                         >
                             {isLoading ? (
-                                <Loader2
-                                    className='animate-spin mx-auto'
-                                    size={20}
-                                />
+                                <Loader2 className='mx-auto animate-spin' size={20} />
+                            ) : editData ? (
+                                'Rename Resume'
                             ) : (
-                                <>
-                                    {editData
-                                        ? 'Update Cv/Resume'
-                                        : 'Add Cv/Resume'}
-                                </>
+                                'Add Cv/Resume'
                             )}
                         </Button>
                     </div>

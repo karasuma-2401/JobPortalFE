@@ -68,9 +68,16 @@ export default function JobItem({
 
                 <div className='flex-1 space-y-1.5 text-left'>
                     <div className='flex items-center gap-3 flex-wrap'>
-                        <h3 className='text-base font-bold text-gray-900 hover:text-primary-500 transition-colors'>
+                        <button
+                            type='button'
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                onDoubleClick?.();
+                            }}
+                            className='text-left text-base font-bold text-gray-900 transition-colors hover:text-primary-500'
+                        >
                             {title}
-                        </h3>
+                        </button>
 
                         <span className='text-[11px] font-extrabold px-3 py-1 rounded-full bg-blue-50 text-primary-500'>
                             {type}

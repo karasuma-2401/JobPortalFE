@@ -54,7 +54,9 @@ export const getDefaultAuthenticatedRoute = (
     }
 
     if (roles.includes('SEEKER')) {
-        return '/candidate/overview';
+        return user.hasProfile
+            ? '/jobseeker/DashBoard/overview'
+            : '/jobseeker/setup';
     }
 
     return '/';

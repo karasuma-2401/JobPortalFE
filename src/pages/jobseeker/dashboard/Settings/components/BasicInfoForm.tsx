@@ -1,31 +1,68 @@
-import { useState } from 'react';
-import { Globe, Loader2, ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Globe, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import type { ApiError } from '../../../../../api/api';
+import type { JobSeekerProfile } from '../../../../../types/jobseeker';
+import { JobseekerService } from '../../../../../services/jobseekerService';
 import Input from '../../../../../components/ui/Input';
 import Button from '../../../../../components/ui/Button';
 
-export default function BasicInfoForm() {
-    const [fullName, setFullName] = useState('');
-    const [title, setTitle] = useState('');
-    const [experience, setExperience] = useState('');
-    const [education, setEducation] = useState('');
-    const [website, setWebsite] = useState('');
+interface BasicInfoFormProps {
+    profile: JobSeekerProfile;
+    onUpdated: () => Promise<void>;
+}
+
+export default function BasicInfoForm({
+    profile,
+    onUpdated,
+}: BasicInfoFormProps) {
+    const [fullName, setFullName] = useState(profile.fullName);
+    const [professionalTitle, setProfessionalTitle] = useState(
+        profile.professionalTitle || ''
+    );
+    const [address, setAddress] = useState(profile.address);
+    const [website, setWebsite] = useState(profile.website || '');
+    const [secondaryPhone, setSecondaryPhone] = useState(
+        profile.secondaryPhone || ''
+    );
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleSaveChanges = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!fullName || !title) {
-            toast.error('Please fill in your full name and headline title.');
+    useEffect(() => {
+        setFullName(profile.fullName);
+        setProfessionalTitle(profile.professionalTitle || '');
+        setAddress(profile.address);
+        setWebsite(profile.website || '');
+        setSecondaryPhone(profile.secondaryPhone || '');
+    }, [profile]);
+
+    const handleSaveChanges = async (event: React.FormEvent) => {
+        event.preventDefault();
+
+        if (!fullName.trim() || !address.trim()) {
+            toast.error('Full name and address are required.');
             return;
+        }
+
+        const formData = new FormData();
+        formData.append('fullName', fullName.trim());
+        formData.append('address', address.trim());
+
+        if (professionalTitle.trim()) {
+            formData.append('professionalTitle', professionalTitle.trim());
+        }
+        if (website.trim()) {
+            formData.append('website', website.trim());
+        }
+        if (secondaryPhone.trim()) {
+            formData.append('secondaryPhone', secondaryPhone.trim());
         }
 
         try {
             setIsLoading(true);
-            await new Promise((resolve) => setTimeout(resolve, 1000)); // Giả lập gọi API
-            toast.success('Profile updated successfully');
+            await JobseekerService.updateProfile(formData);
+            await onUpdated();
+            toast.success('Basic profile updated successfully.');
         } catch (error) {
-            toast.error((error as ApiError).message);
+            toast.error((error as Error).message || 'Failed to update profile.');
         } finally {
             setIsLoading(false);
         }
@@ -33,69 +70,31 @@ export default function BasicInfoForm() {
 
     return (
         <form onSubmit={handleSaveChanges} className='space-y-5'>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-                <div className='flex flex-col gap-2 text-left'>
-                    <label className='text-sm font-medium text-gray-700'>
-                        Full name
-                    </label>
-                    <Input
-                        type='text'
-                        placeholder='Full name'
-                        value={fullName}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            setFullName(e.target.value)
-                        }
-                    />
-                </div>
-                <div className='flex flex-col gap-2 text-left'>
-                    <label className='text-sm font-medium text-gray-700'>
-                        Title/headline
-                    </label>
-                    <Input
-                        type='text'
-                        placeholder='Title/headline'
-                        value={title}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            setTitle(e.target.value)
-                        }
-                    />
-                </div>
-            </div>
-
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-                <div className='flex flex-col gap-2 text-left'>
-                    <label className='text-sm font-medium text-gray-700'>
-                        Experience
-                    </label>
-                    <select
-                        value={experience}
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                            setExperience(e.target.value)
-                        }
-                        className='w-full p-3 border border-gray-100 rounded-lg bg-bg-white outline-none focus:border-primary-400 text-gray-600 cursor-pointer h-[46px]'
-                    >
-                        <option value=''>Select...</option>
-                        <option value='internship'>Internship</option>
-                        <option value='junior'>Junior</option>
-                        <option value='senior'>Senior</option>
-                    </select>
-                </div>
-                <div className='flex flex-col gap-2 text-left'>
-                    <label className='text-sm font-medium text-gray-700'>
-                        Educations
-                    </label>
-                    <select
-                        value={education}
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                            setEducation(e.target.value)
-                        }
-                        className='w-full p-3 border border-gray-100 rounded-lg bg-bg-white outline-none focus:border-primary-400 text-gray-600 cursor-pointer h-[46px]'
-                    >
-                        <option value=''>Select...</option>
-                        <option value='bachelor'>Bachelor Degree</option>
-                        <option value='master'>Master Degree</option>
-                    </select>
-                </div>
+            <div className='grid grid-cols-1 gap-5 md:grid-cols-2'>
+                <Input
+                    label='Full Name'
+                    value={fullName}
+                    onChange={(event) => setFullName(event.target.value)}
+                />
+                <Input
+                    label='Professional Title'
+                    value={professionalTitle}
+                    onChange={(event) =>
+                        setProfessionalTitle(event.target.value)
+                    }
+                />
+                <Input
+                    label='Address'
+                    value={address}
+                    onChange={(event) => setAddress(event.target.value)}
+                />
+                <Input label='Primary Phone' value={profile.phone} readOnly />
+                <Input
+                    label='Secondary Phone'
+                    value={secondaryPhone}
+                    onChange={(event) => setSecondaryPhone(event.target.value)}
+                />
+                <Input label='Email' value={profile.email} readOnly />
             </div>
 
             <div className='flex flex-col gap-2 text-left'>
@@ -103,7 +102,7 @@ export default function BasicInfoForm() {
                     Personal Website
                 </label>
                 <div className='relative'>
-                    <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-primary-500 z-10'>
+                    <div className='pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3 text-primary-500'>
                         <Globe size={18} />
                     </div>
                     <Input
@@ -111,9 +110,7 @@ export default function BasicInfoForm() {
                         placeholder='Website url...'
                         className='pl-10'
                         value={website}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            setWebsite(e.target.value)
-                        }
+                        onChange={(event) => setWebsite(event.target.value)}
                     />
                 </div>
             </div>
@@ -123,9 +120,7 @@ export default function BasicInfoForm() {
                     {isLoading ? (
                         <Loader2 className='animate-spin' size={20} />
                     ) : (
-                        <>
-                            Save Changes <ArrowRight size={20} />
-                        </>
+                        'Save Changes'
                     )}
                 </Button>
             </div>

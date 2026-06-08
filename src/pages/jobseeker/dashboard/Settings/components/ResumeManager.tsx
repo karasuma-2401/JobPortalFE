@@ -1,104 +1,127 @@
-import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Loader2, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import ResumeCard from './ResumeCard';
 import AddResume from './AddResume';
-interface ResumeItem {
-    id: string;
-    name: string;
-    size: string;
-}
+import { JobseekerService } from '../../../../../services/jobseekerService';
+import type { Resume } from '../../../../../types/jobseeker';
+
 export default function ResumeManager() {
-    const [resumes, setResumes] = useState([
-        { id: '1', name: 'Professional Resume', size: '3.5 MB' },
-        { id: '2', name: 'Product Designer', size: '4.7 MB' },
-        { id: '3', name: 'Visual Designer', size: '1.3 MB' },
-    ]);
+    const [resumes, setResumes] = useState<Resume[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedResume, setSelectedResume] = useState<ResumeItem | null>(
-        null
-    );
+    const [selectedResume, setSelectedResume] = useState<Resume | null>(null);
 
-    const handleOpenAddModal = () => {
-        setSelectedResume(null);
-        setIsModalOpen(true);
-    };
-
-    const handleOpenEditModal = (id: string) => {
-        const target = resumes.find((r) => r.id === id);
-        if (target) {
-            setSelectedResume(target);
-            setIsModalOpen(true);
+    const loadResumes = async () => {
+        try {
+            setIsLoading(true);
+            const response = await JobseekerService.getMyResumes();
+            setResumes(response);
+        } catch (error) {
+            toast.error((error as Error).message || 'Failed to load resumes.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const handleSaveResume = async (newName: string) => {
-        await new Promise((resolve) => setTimeout(resolve, 1200));
+    useEffect(() => {
+        void loadResumes();
+    }, []);
 
+    const handleSaveResume = async (values: {
+        fileName: string;
+        file?: File | null;
+    }) => {
         if (selectedResume) {
-            setResumes(
-                resumes.map((r) =>
-                    r.id === selectedResume.id ? { ...r, name: newName } : r
-                )
-            );
-            toast.success('Resume updated successfully');
-        } else {
-            const newResume: ResumeItem = {
-                id: crypto.randomUUID(),
-                name: newName,
-                size: '0.0 MB (New)',
-            };
-            setResumes([...resumes, newResume]);
-            toast.success('New resume added successfully');
+            await JobseekerService.renameResume(selectedResume.id, values.fileName);
+            toast.success('Resume renamed successfully.');
+        } else if (values.file) {
+            await JobseekerService.uploadResume(values.file, values.fileName);
+            toast.success('New resume added successfully.');
+        }
+
+        await loadResumes();
+    };
+
+    const handleDeleteResume = async (id: string) => {
+        try {
+            await JobseekerService.deleteResume(id);
+            await loadResumes();
+            toast.success('Resume removed successfully.');
+        } catch (error) {
+            toast.error((error as Error).message || 'Failed to delete resume.');
         }
     };
 
-    const handleDeleteResume = (id: string) => {
-        setResumes(resumes.filter((item) => item.id !== id));
-        toast.success('Resume removed successfully');
+    const handleSetDefaultResume = async (id: string) => {
+        try {
+            await JobseekerService.setDefaultResume(id);
+            await loadResumes();
+            toast.success('Default resume updated.');
+        } catch (error) {
+            toast.error(
+                (error as Error).message || 'Failed to set default resume.'
+            );
+        }
     };
 
     return (
-        <div className='mt-16 pt-10 border-t border-gray-100 text-left'>
-            <h3 className='text-lg font-bold mb-8 text-gray-900'>
-                Your Cv/Resume
-            </h3>
+        <div className='mt-16 border-t border-gray-100 pt-10 text-left'>
+            <h3 className='mb-8 text-lg font-bold text-gray-900'>Your Cv/Resume</h3>
 
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch'>
-                {resumes.map((item) => (
-                    <ResumeCard
-                        key={item.id}
-                        resume={item}
-                        onDelete={handleDeleteResume}
-                        onEdit={() => handleOpenEditModal(item.id)}
-                    />
-                ))}
+            {isLoading ? (
+                <div className='flex justify-center py-10'>
+                    <Loader2 className='animate-spin text-primary-500' size={24} />
+                </div>
+            ) : (
+                <div className='grid grid-cols-1 items-stretch gap-6 md:grid-cols-2'>
+                    {resumes.map((resume) => (
+                        <ResumeCard
+                            key={resume.id}
+                            resume={resume}
+                            onDelete={handleDeleteResume}
+                            onEdit={() => {
+                                setSelectedResume(resume);
+                                setIsModalOpen(true);
+                            }}
+                            onSetDefault={handleSetDefaultResume}
+                        />
+                    ))}
 
-                <button
-                    type='button'
-                    onClick={handleOpenAddModal}
-                    className='flex items-center justify-start p-5 border-2 border-dashed border-primary-100 rounded-lg bg-bg-white hover:bg-primary-50 transition-all h-full group outline-none'
-                >
-                    <div className='flex items-center gap-4'>
-                        <div className='p-3 bg-primary-100 rounded-full text-primary-500 group-hover:scale-110 transition-transform'>
-                            <Plus size={24} />
+                    <button
+                        type='button'
+                        onClick={() => {
+                            setSelectedResume(null);
+                            setIsModalOpen(true);
+                        }}
+                        className='group flex h-full items-center justify-start rounded-lg border-2 border-dashed border-primary-100 bg-bg-white p-5 outline-none transition-all hover:bg-primary-50'
+                    >
+                        <div className='flex items-center gap-4'>
+                            <div className='rounded-full bg-primary-100 p-3 text-primary-500 transition-transform group-hover:scale-110'>
+                                <Plus size={24} />
+                            </div>
+                            <div className='flex flex-col text-left'>
+                                <p className='text-sm font-bold text-primary-500'>
+                                    Add Cv/Resume
+                                </p>
+                                <p className='mt-1 text-[11px] text-gray-400'>
+                                    Upload a backend-managed resume file.
+                                </p>
+                            </div>
                         </div>
-                        <div className='flex flex-col text-left'>
-                            <p className='text-sm font-bold text-primary-500'>
-                                Add Cv/Resume
-                            </p>
-                            <p className='text-[11px] text-gray-400 mt-1'>
-                                Browse file or drop here. only pdf
-                            </p>
-                        </div>
-                    </div>
-                </button>
-            </div>
+                    </button>
+                </div>
+            )}
+
             <AddResume
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={handleSaveResume}
-                editData={selectedResume}
+                editData={
+                    selectedResume
+                        ? { fileName: selectedResume.fileName }
+                        : null
+                }
             />
         </div>
     );

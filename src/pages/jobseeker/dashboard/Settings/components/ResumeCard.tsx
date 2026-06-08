@@ -1,16 +1,27 @@
-import { useState, useEffect, useRef } from 'react';
-import { FileText, MoreVertical, Trash2, Edit3 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import {
+    CheckCircle2,
+    ExternalLink,
+    FileText,
+    MoreVertical,
+    Pencil,
+    Star,
+    Trash2,
+} from 'lucide-react';
+import type { Resume } from '../../../../../types/jobseeker';
 
 interface ResumeCardProps {
-    resume: { id: string; name: string; size: string };
-    onDelete?: (id: string) => void;
-    onEdit?: () => void;
+    resume: Resume;
+    onDelete: (id: string) => void;
+    onEdit: () => void;
+    onSetDefault: (id: string) => void;
 }
 
 export default function ResumeCard({
     resume,
     onDelete,
     onEdit,
+    onSetDefault,
 }: ResumeCardProps) {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -24,62 +35,99 @@ export default function ResumeCard({
                 setIsOpen(false);
             }
         };
+
         document.addEventListener('mousedown', handleClickOutside);
         return () =>
             document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     return (
-        <div className='flex items-center justify-between p-5 border border-gray-100 rounded-lg bg-bg-white hover:border-primary-200 transition-all h-full relative'>
-            <div className='flex items-center gap-4 min-w-0'>
-                <div className='p-3 bg-primary-50 rounded-lg shrink-0'>
-                    <FileText className='w-6 h-6 text-primary-500' />
+        <div className='relative flex h-full items-center justify-between rounded-lg border border-gray-100 bg-bg-white p-5 text-left transition-all hover:border-primary-200'>
+            <div className='flex min-w-0 items-center gap-4'>
+                <div className='rounded-lg bg-primary-50 p-3 shrink-0'>
+                    <FileText className='h-6 w-6 text-primary-500' />
                 </div>
-                <div className='flex flex-col min-w-0 text-left'>
-                    <h4 className='text-sm font-semibold text-gray-900 truncate pr-2'>
-                        {resume.name}
-                    </h4>
-                    <p className='text-xs text-gray-500 mt-1'>{resume.size}</p>
+                <div className='min-w-0'>
+                    <div className='flex items-center gap-2'>
+                        <h4 className='truncate pr-2 text-sm font-semibold text-gray-900'>
+                            {resume.fileName}
+                        </h4>
+                        {resume.defaultResume && (
+                            <span className='rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-semibold text-green-600'>
+                                Default
+                            </span>
+                        )}
+                    </div>
+                    <p className='mt-1 text-xs text-gray-500'>
+                        Uploaded {new Date(resume.uploadedAt).toLocaleDateString()}
+                    </p>
+                    <a
+                        href={resume.fileUrl}
+                        target='_blank'
+                        rel='noreferrer'
+                        className='mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary-500 hover:underline'
+                    >
+                        View Resume <ExternalLink size={14} />
+                    </a>
                 </div>
             </div>
 
-            <div className='relative shrink-0 ml-2' ref={menuRef}>
+            <div className='relative ml-2 shrink-0' ref={menuRef}>
                 <button
                     type='button'
-                    onClick={() => setIsOpen(!isOpen)}
-                    className={`p-1.5 rounded-full transition-colors ${
+                    onClick={() => setIsOpen((current) => !current)}
+                    className={`rounded-full p-1.5 transition-colors ${
                         isOpen
                             ? 'bg-primary-50 text-primary-500'
-                            : 'hover:bg-gray-50 text-gray-400'
+                            : 'text-gray-400 hover:bg-gray-50'
                     }`}
                 >
                     <MoreVertical size={20} />
                 </button>
 
                 {isOpen && (
-                    <div className='absolute right-0 w-40 bg-bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 rounded-lg py-1.5 z-30 mt-2'>
+                    <div className='absolute right-0 z-30 mt-2 w-44 rounded-lg border border-gray-100 bg-bg-white py-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.12)]'>
                         <button
                             type='button'
-                            className='flex items-center gap-2 px-4 py-2.5 text-sm w-full hover:bg-gray-50 text-gray-700 transition-colors'
+                            className='flex w-full items-center gap-2 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50'
                             onClick={() => {
                                 setIsOpen(false);
-                                if (onEdit) onEdit();
+                                onEdit();
                             }}
                         >
-                            <Edit3 size={16} className='text-primary-500' />
-                            <span>Edit Resume</span>
+                            <Pencil size={16} className='text-primary-500' />
+                            Rename Resume
                         </button>
-                        <div className='h-px bg-gray-100 my-1' />
+                        {!resume.defaultResume && (
+                            <button
+                                type='button'
+                                className='flex w-full items-center gap-2 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50'
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    onSetDefault(resume.id);
+                                }}
+                            >
+                                <Star size={16} className='text-amber-500' />
+                                Set As Default
+                            </button>
+                        )}
+                        {resume.defaultResume && (
+                            <div className='flex items-center gap-2 px-4 py-2.5 text-sm text-green-600'>
+                                <CheckCircle2 size={16} />
+                                Current Default
+                            </div>
+                        )}
+                        <div className='my-1 h-px bg-gray-100' />
                         <button
                             type='button'
-                            className='flex items-center gap-2 px-4 py-2.5 text-sm w-full hover:bg-danger-50 text-danger-500 transition-colors'
+                            className='flex w-full items-center gap-2 px-4 py-2.5 text-sm text-danger-500 transition-colors hover:bg-danger-50'
                             onClick={() => {
-                                if (onDelete) onDelete(resume.id);
                                 setIsOpen(false);
+                                onDelete(resume.id);
                             }}
                         >
                             <Trash2 size={16} />
-                            <span>Delete</span>
+                            Delete
                         </button>
                     </div>
                 )}

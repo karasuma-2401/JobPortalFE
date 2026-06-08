@@ -1,170 +1,179 @@
-import React, { useState, useEffect } from "react";
-import { X, Bold, Italic, Underline, Strikethrough, Link, List, ListOrdered, ArrowRight, Loader2 } from "lucide-react";
-import { JobseekerService } from "../../../../services/jobseekerService"; 
+import { useEffect, useState } from 'react';
+import { ArrowRight, Loader2, X } from 'lucide-react';
+import { toast } from 'sonner';
+import { JobseekerService } from '../../../../services/jobseekerService';
+import type { Resume } from '../../../../types/jobseeker';
 
 interface ApplyJobModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  jobTitle: string; 
-  onSubmit: (data: { resumeId: string; coverLetter: string }) => void;
+    isOpen: boolean;
+    onClose: () => void;
+    jobTitle: string;
+    onSubmit: (data: { resumeId: string; coverLetter: string }) => Promise<void>;
 }
 
-interface Resume {
-  id: string;
-  name: string;
-}
+export default function ApplyJobModal({
+    isOpen,
+    onClose,
+    jobTitle,
+    onSubmit,
+}: ApplyJobModalProps) {
+    const [selectedResume, setSelectedResume] = useState('');
+    const [coverLetter, setCoverLetter] = useState('');
+    const [resumes, setResumes] = useState<Resume[]>([]);
+    const [isLoadingResumes, setIsLoadingResumes] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-export default function ApplyJobModal({ isOpen, onClose, jobTitle, onSubmit }: ApplyJobModalProps) {
-  const [selectedResume, setSelectedResume] = useState("");
-  const [coverLetter, setCoverLetter] = useState("");
-  
-  const [resumes, setResumes] = useState<Resume[]>([]);
-  const [isLoadingResumes, setIsLoadingResumes] = useState(false);
+    useEffect(() => {
+        let isMounted = true;
 
-  useEffect(() => {
-    let isMounted = true;
+        const fetchResumes = async () => {
+            if (!isOpen) {
+                return;
+            }
 
-    const fetchResumes = async () => {
-      if (!isOpen) return; 
-      
-      setIsLoadingResumes(true);
-      try {
-        const response = await JobseekerService.getMyResumes(); 
-        if (isMounted) {
-          setResumes(response);
-          if (response.length > 0) {
-            setSelectedResume(response[0].id);
-          }
+            setIsLoadingResumes(true);
+            try {
+                const response = await JobseekerService.getMyResumes();
+                if (!isMounted) {
+                    return;
+                }
+                setResumes(response);
+                const defaultResume = response.find((resume) => resume.defaultResume);
+                setSelectedResume(defaultResume?.id || response[0]?.id || '');
+            } catch (error) {
+                toast.error((error as Error).message || 'Failed to fetch resumes.');
+            } finally {
+                if (isMounted) {
+                    setIsLoadingResumes(false);
+                }
+            }
+        };
+
+        void fetchResumes();
+
+        return () => {
+            isMounted = false;
+            setSelectedResume('');
+            setCoverLetter('');
+        };
+    }, [isOpen]);
+
+    if (!isOpen) {
+        return null;
+    }
+
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+
+        if (!selectedResume) {
+            toast.error('Please choose a resume first.');
+            return;
         }
-      } catch (error) {
-        console.error("Failed to fetch resumes:", error);
-      } finally {
-        if (isMounted) {
-          setIsLoadingResumes(false);
+
+        try {
+            setIsSubmitting(true);
+            await onSubmit({ resumeId: selectedResume, coverLetter });
+            onClose();
+        } catch (error) {
+            toast.error((error as Error).message || 'Failed to submit application.');
+        } finally {
+            setIsSubmitting(false);
         }
-      }
     };
 
-    fetchResumes();
+    return (
+        <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
+            <div
+                className='absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity'
+                onClick={onClose}
+            />
 
-    return () => {
-      isMounted = false;
-      setSelectedResume("");
-      setCoverLetter("");
-    };
-  }, [isOpen]);
+            <div className='relative z-10 w-full max-w-xl animate-in rounded-2xl border border-gray-100 bg-white p-6 shadow-xl fade-in zoom-in-95 duration-200'>
+                <button
+                    onClick={onClose}
+                    className='absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100'
+                >
+                    <X size={18} />
+                </button>
 
-  if (!isOpen) return null;
+                <h2 className='mb-6 pr-8 text-xl font-bold text-gray-900'>
+                    Apply Job: {jobTitle}
+                </h2>
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit({ resumeId: selectedResume, coverLetter });
-  };
+                <form onSubmit={handleSubmit} className='space-y-5'>
+                    <div className='flex flex-col gap-2'>
+                        <label className='flex justify-between text-sm font-semibold text-gray-700'>
+                            <span>Choose Resume</span>
+                            {isLoadingResumes && (
+                                <span className='flex items-center gap-1 text-blue-500'>
+                                    <Loader2 size={14} className='animate-spin' />
+                                    Loading...
+                                </span>
+                            )}
+                        </label>
+                        <select
+                            value={selectedResume}
+                            onChange={(event) => setSelectedResume(event.target.value)}
+                            required
+                            disabled={isLoadingResumes || resumes.length === 0}
+                            className='w-full cursor-pointer rounded-lg border border-gray-200 bg-white px-4 py-3 text-[15px] text-gray-800 outline-none focus:border-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50'
+                        >
+                            <option value='' disabled>
+                                {isLoadingResumes
+                                    ? 'Loading resumes...'
+                                    : resumes.length === 0
+                                      ? 'You do not have a resume yet'
+                                      : 'Select a resume'}
+                            </option>
+                            {resumes.map((resume) => (
+                                <option key={resume.id} value={resume.id}>
+                                    {resume.fileName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div 
-        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      />
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-sm font-semibold text-gray-700'>
+                            Cover Letter
+                        </label>
+                        <textarea
+                            value={coverLetter}
+                            onChange={(event) => setCoverLetter(event.target.value)}
+                            placeholder='Tell the employer why you are a strong fit.'
+                            rows={6}
+                            required
+                            className='w-full resize-none rounded-lg border border-gray-200 p-4 text-[15px] text-gray-800 outline-none transition-colors focus:border-blue-500 placeholder:text-gray-400'
+                        />
+                    </div>
 
-      <div className="relative bg-white w-full max-w-xl rounded-2xl shadow-xl border border-gray-100 p-6 z-10 animate-in fade-in zoom-in-95 duration-200">
-
-        <button 
-          onClick={onClose}
-          className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
-        >
-          <X size={18} />
-        </button>
-
-        <h2 className="text-xl font-bold text-gray-900 pr-8 mb-6">
-          Apply Job: {jobTitle}
-        </h2>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-gray-700 flex justify-between">
-              <span>Choose Resume</span>
-              {isLoadingResumes && <span className="text-blue-500 flex items-center gap-1"><Loader2 size={14} className="animate-spin" /> Loading...</span>}
-            </label>
-            <div className="relative">
-              <select
-                value={selectedResume}
-                onChange={(e) => setSelectedResume(e.target.value)}
-                required
-                disabled={isLoadingResumes || resumes.length === 0}
-                className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-[15px] text-gray-800 outline-none focus:border-blue-500 appearance-none cursor-pointer disabled:bg-gray-50 disabled:cursor-not-allowed"
-              >
-                <option value="" disabled>
-                  {isLoadingResumes 
-                    ? "Đang tải danh sách CV..." 
-                    : resumes.length === 0 
-                      ? "Bạn chưa có CV nào" 
-                      : "Select..."}
-                </option>
-                
-                {resumes.map((resume) => (
-                  <option key={resume.id} value={resume.id}>
-                    {resume.name}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-400">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
+                    <div className='flex items-center justify-between pt-2'>
+                        <button
+                            type='button'
+                            onClick={onClose}
+                            className='rounded-lg bg-blue-50 px-5 py-3 text-[15px] font-bold text-blue-600 transition-all hover:bg-blue-100 active:scale-[0.98]'
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type='submit'
+                            disabled={
+                                isSubmitting || !selectedResume || resumes.length === 0
+                            }
+                            className='flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-[15px] font-bold text-white shadow-md shadow-blue-600/10 transition-all hover:bg-blue-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-gray-400 disabled:shadow-none'
+                        >
+                            {isSubmitting ? (
+                                <Loader2 className='animate-spin' size={16} />
+                            ) : (
+                                <>
+                                    <span>Apply Now</span>
+                                    <ArrowRight size={16} />
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </form>
             </div>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-gray-700">
-              Cover Letter
-            </label>
-            <div className="border border-gray-200 rounded-lg overflow-hidden focus-within:border-blue-500 transition-colors">
-              <textarea
-                value={coverLetter}
-                onChange={(e) => setCoverLetter(e.target.value)}
-                placeholder="Write down your biography here. Let the employers know who you are..."
-                rows={6}
-                required
-                className="w-full p-4 text-[15px] text-gray-800 outline-none resize-none placeholder-gray-400"
-              />
-
-              <div className="flex items-center gap-1 px-3 py-2 bg-gray-50/50 border-t border-gray-100 text-gray-400">
-                <button type="button" className="p-1.5 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"><Bold size={16} /></button>
-                <button type="button" className="p-1.5 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"><Italic size={16} /></button>
-                <button type="button" className="p-1.5 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"><Underline size={16} /></button>
-                <button type="button" className="p-1.5 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"><Strikethrough size={16} /></button>
-                <div className="w-px h-4 bg-gray-200 mx-1" />
-                <button type="button" className="p-1.5 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"><Link size={16} /></button>
-                <button type="button" className="p-1.5 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"><List size={16} /></button>
-                <button type="button" className="p-1.5 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"><ListOrdered size={16} /></button>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-3 rounded-lg text-[15px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-all active:scale-[0.98]"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!selectedResume || resumes.length === 0}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg text-[15px] font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/10 transition-all active:scale-[0.98] disabled:bg-gray-400 disabled:shadow-none disabled:cursor-not-allowed"
-            >
-              <span>Apply Now</span>
-              <ArrowRight size={16} />
-            </button>
-          </div>
-
-        </form>
-      </div>
-    </div>
-  );
+        </div>
+    );
 }

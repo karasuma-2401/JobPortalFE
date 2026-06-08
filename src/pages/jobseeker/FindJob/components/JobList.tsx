@@ -1,20 +1,9 @@
 import JobItem from "../../../../components/ui/JobItem"; 
 import JobCard from "../../../../components/ui/JobCard";
-
-interface JobData {
-  id: string;
-  title: string;
-  companyName: string;
-  type: string;
-  isFeatured: boolean;
-  logo: string;
-  location: string;
-  salary: string;
-  daysRemaining: string;
-}
+import type { Job } from "../../../../types/jobseeker";
 
 interface JobListProps {
-  jobs: JobData[];
+  jobs: Job[];
   viewMode: "list" | "grid";
   savedJobIds: string[];
   onToggleSave: (id: string | number) => void;
@@ -68,7 +57,6 @@ export default function JobList({
           isBookmarked={savedJobIds.includes(job.id)}
           onBookmarkClick={onToggleSave}
           onDoubleClick={() => onJobDoubleClick(job.id)}
-          
           onApplyClick={(id) => onApplyClick(String(id))} 
         />
       ))}

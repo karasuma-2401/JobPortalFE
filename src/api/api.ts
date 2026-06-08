@@ -35,7 +35,7 @@ const normalizeApiError = (error: AxiosApiError): ApiError => {
 };
 
 const BASE_URL =
-    import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080/api';
+    import.meta.env.VITE_BACKEND_URL;
 let refreshTokenRequest: Promise<string> | null = null;
 let isRedirectingToLogin = false;
 

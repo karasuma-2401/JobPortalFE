@@ -3,17 +3,23 @@ import { MapPin, Mail, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Button from '../../../../../components/ui/Button';
 import Input from '../../../../../components/ui/Input';
-
+import useAuth from '../../../../../contexts/auth/useAuth';
+import { useNavigate } from 'react-router';
 export default function AccountSettingsTab() {
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('example@gmail.com');
+    const navigate = useNavigate() 
+    const {logout} = useAuth() 
     const handleSave = async (section: string) => {
         setIsLoading(true);
         await new Promise((resolve) => setTimeout(resolve, 1000));
         toast.success(`${section} updated successfully!`);
         setIsLoading(false);
     };
-
+    const handleLogout = () => {
+        logout() 
+        navigate('/') 
+    }
     return (
         <div className='space-y-12 text-left animate-fade-in pb-10'>
             {/* SECTION 1: CONTACT INFO */}
@@ -204,7 +210,7 @@ export default function AccountSettingsTab() {
 
             {/* SECTION 6: DELETE ACCOUNT */}
             <section className='pt-10 border-t border-gray-100 space-y-4'>
-                <h3 className='text-lg font-bold text-gray-900'>
+                {/* <h3 className='text-lg font-bold text-gray-900'>
                     Delete Your Account
                 </h3>
                 <p className='text-sm text-gray-500 leading-relaxed max-w-2xl'>
@@ -212,9 +218,12 @@ export default function AccountSettingsTab() {
                     able to get information about the matched jobs, following
                     employers, and job alerts, shortlisted jobs and applications
                     received from the services of jobpilot.com.
-                </p>
-                <button className='flex items-center gap-2 text-danger-500 font-bold text-sm hover:underline pt-2'>
-                    <Trash2 size={18} /> Close Account
+                </p> */}
+                <button 
+                    onClick={handleLogout}
+                    className='border-danger-500 rounded-lg border-2 text-danger-500 font-bold text-base cursor-pointer px-6 py-4'>
+                    {/* <Trash2 size={18} /> Close Account */}
+                    Logout
                 </button>
             </section>
         </div>

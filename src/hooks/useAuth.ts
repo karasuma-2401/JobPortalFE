@@ -10,6 +10,10 @@ import type {
 import { type ApiError } from '../api/api';
 import { AuthSessionService } from '../services/authSessionService';
 import { getDefaultAuthenticatedRoute } from '../contexts/auth/auth-utils';
+import {
+    consumePostAuthRedirect,
+    readPostAuthRedirect,
+} from '../utils/post-auth-redirect';
 
 interface AuthFlowError extends ApiError {
     type?: 'LOGIN_ERROR' | 'PROFILE_ERROR';
@@ -55,7 +59,19 @@ export const useLogin = () => {
         },
         onSuccess: (user) => {
             toast.success('Login successful!');
-            navigate(getDefaultAuthenticatedRoute(user), { replace: true });
+            const pendingRedirect = readPostAuthRedirect();
+            const shouldUsePendingRedirect =
+                Array.isArray(user.roles) &&
+                user.roles.includes('SEEKER') &&
+                user.hasProfile &&
+                pendingRedirect;
+
+            navigate(
+                shouldUsePendingRedirect
+                    ? consumePostAuthRedirect() || getDefaultAuthenticatedRoute(user)
+                    : getDefaultAuthenticatedRoute(user),
+                { replace: true }
+            );
         },
         onError: (error: ApiError) => {
             const authError = error as AuthFlowError;

@@ -1,11 +1,17 @@
-import { Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import DashboardTopbar from '../components/ui/CandidateTopbar';
 import DashboardSidebar from '../components/ui/DashboardSidebar';
 import ProtectedRoute from '../routes/ProtectedRoute';
+import useAuth from '../contexts/auth/useAuth';
 
 export default function CandidateLayout() {
+    const { user } = useAuth();
+
     return (
         <ProtectedRoute allowedRoles={['SEEKER']}>
+            {user && user.hasProfile === false ? (
+                <Navigate to='/jobseeker/setup' replace />
+            ) : (
             <div className='flex flex-col w-full h-screen bg-gray-50/40 font-sans antialiased overflow-hidden'>
                 <DashboardTopbar />
                 <div className='flex flex-1 min-w-0 overflow-hidden'>
@@ -18,6 +24,7 @@ export default function CandidateLayout() {
                     </main>
                 </div>
             </div>
+            )}
         </ProtectedRoute>
     );
 }
