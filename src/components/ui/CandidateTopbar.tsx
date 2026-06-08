@@ -6,9 +6,13 @@ export default function CandidateTopBar() {
     const location = useLocation();
 
     const topNavItems = [
-        { label: 'Home', path: '/' },
-        { label: 'Find Job', path: '/find-job' },
-        { label: 'Find Employers', path: '/employers' },
+        { label: 'Home', path: '/jobseeker/home' },
+        { label: 'Find Job', path: '/jobseeker/find-job' },
+
+        { label: 'Find Employers', path: '/jobseeker/find-employers' },
+
+
+
         // { label: "Dashboard", path: "/candidate/overview" },
         // { label: "Job Alerts", path: "/job-alerts" },
         // { label: "Customer Supports", path: "/support" },
@@ -23,9 +27,7 @@ export default function CandidateTopBar() {
                             item.path === '/'
                                 ? location.pathname === '/' ||
                                   location.pathname === '/home'
-                                : item.label === 'Dashboard'
-                                  ? location.pathname.startsWith('/candidate') // Sáng Dashboard cho TẤT CẢ các trang có /candidate (bao gồm cả job alert của sidebar)
-                                  : location.pathname.startsWith(item.path); // Trang nào khớp URL trang đó (Ví dụ /job-alerts thì chỉ Job Alerts sáng)
+                                : location.pathname.startsWith(item.path);
 
                         return (
                             <Link
@@ -74,13 +76,13 @@ export default function CandidateTopBar() {
                         <span className='absolute top-1.5 right-2 w-2.5 h-2.5 bg-danger-500 border-2 border-white rounded-full' />
                     </button>
 
-                    <button className='rounded-full hover:ring-2 ring-primary-500/20 transition-all cursor-pointer'>
+                    <Link to='/jobseeker/DashBoard/overview' className='rounded-full hover:ring-2 ring-primary-500/20 transition-all cursor-pointer'>
                         <img
                             src='https://i.pravatar.cc/150?img=11'
                             alt='User avatar'
                             className='w-10 h-10 rounded-full object-cover border border-gray-100'
                         />
-                    </button>
+                    </Link>
                 </div>
             </div>
         </header>

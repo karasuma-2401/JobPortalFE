@@ -8,29 +8,33 @@ import {
 } from 'lucide-react';
 
 export interface FavoriteJobItemProps {
-    id: string;
-    logo: string;
-    role: string;
-    type: string;
-    location: string;
-    salary: string;
-    timeStatus: string;
-    isExpired?: boolean;
-    isSelected: boolean;
-    onSelect: () => void;
+  id: string;
+  logo: string;
+  role: string;
+  type: string;
+  location: string;
+  salary: string;
+  timeStatus: string;
+  isExpired?: boolean;
+  isSelected: boolean; 
+  onSelect: () => void; 
+  onBookmarkClick?: (id: string) => void;
+  onApplyClick?: (id: string) => void;
 }
 
 export default function FavoriteJobItem({
-    id,
-    logo,
-    role,
-    type,
-    location,
-    salary,
-    timeStatus,
-    isExpired = false,
-    isSelected,
-    onSelect,
+  id,
+  logo,
+  role,
+  type,
+  location,
+  salary,
+  timeStatus,
+  isExpired = false,
+  isSelected,
+  onSelect,
+  onBookmarkClick,
+  onApplyClick,
 }: FavoriteJobItemProps) {
     return (
         <div
@@ -88,42 +92,43 @@ export default function FavoriteJobItem({
                 </div>
             </div>
 
-            <div className='flex items-center gap-5'>
-                {/* Nút Bookmark */}
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        console.log(`Unsaved favorite job id: ${id}`);
-                    }}
-                    className='text-gray-900 hover:text-gray-600 transition-colors'
-                >
-                    <Bookmark size={20} fill='currentColor' />
-                </button>
+      <div className="flex items-center gap-5">
+        {/* Nút Bookmark */}
+        <button 
+          onClick={(e) => {
+            e.stopPropagation(); 
+            if (onBookmarkClick) onBookmarkClick(id);
+          }}
+          className="text-gray-900 hover:text-gray-600 transition-colors"
+          title="Remove from Favorite"
+        >
+          <Bookmark size={20} fill="currentColor" className="text-primary-500" />
+        </button>
 
-                {isExpired ? (
-                    <button
-                        disabled
-                        onClick={(e) => e.stopPropagation()}
-                        className='px-6 py-3.5 flex items-center justify-center text-[15px] font-bold rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed w-[160px]'
-                    >
-                        Deadline Expired
-                    </button>
-                ) : (
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            console.log(`Apply job id: ${id}`);
-                        }}
-                        className={`px-6 py-3.5 flex items-center justify-center gap-3 text-[15px] font-bold rounded-lg transition-colors w-[160px] ${
-                            isSelected
-                                ? 'bg-primary-500 text-white shadow-sm'
-                                : 'bg-blue-50 text-primary-500 hover:bg-primary-500 hover:text-white'
-                        }`}
-                    >
-                        Apply Now <ArrowRight size={18} />
-                    </button>
-                )}
-            </div>
-        </div>
-    );
+        {isExpired ? (
+          <button
+            disabled
+            onClick={(e) => e.stopPropagation()}
+            className="px-6 py-3.5 flex items-center justify-center text-[15px] font-bold rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed w-[160px]"
+          >
+            Deadline Expired
+          </button>
+        ) : (
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); 
+              if (onApplyClick) onApplyClick(id);
+            }}
+            className={`px-6 py-3.5 flex items-center justify-center gap-3 text-[15px] font-bold rounded-lg transition-colors w-[160px] ${
+              isSelected
+                ? "bg-primary-500 text-white shadow-sm"
+                : "bg-blue-50 text-primary-500 hover:bg-primary-500 hover:text-white"
+            }`}
+          >
+            Apply Now <ArrowRight size={18} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }

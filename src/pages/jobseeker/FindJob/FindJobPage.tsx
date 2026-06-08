@@ -1,111 +1,131 @@
-import { useState } from 'react';
-import DashboardPagination from '../../../components/ui/DashboardPagination';
-
-import JobSearchBar from './components/JobSearchBar';
-import FilterSortBar from './components/FilterSortBar';
-import JobList from './components/JobList';
-
-const EXPLORE_MOCK_JOBS = [
-    {
-        id: '1',
-        title: 'Marketing Manager',
-        type: 'Remote',
-        isFeatured: true,
-        logo: 'https://logo.clearbit.com/stripe.com',
-        location: 'New Mexico, USA',
-        salary: '$50k-$80k/month',
-        daysRemaining: '4 Days Remaining',
-    },
-    {
-        id: '2',
-        title: 'Project Manager',
-        type: 'Full Time',
-        isFeatured: true,
-        logo: 'https://logo.clearbit.com/shopify.com',
-        location: 'Dhaka, Bangladesh',
-        salary: '$50k-$80k/month',
-        daysRemaining: '4 Days Remaining',
-    },
-    {
-        id: '3',
-        title: 'Interaction Designer',
-        type: 'Full Time',
-        isFeatured: true,
-        logo: 'https://logo.clearbit.com/figma.com',
-        location: 'New York, USA',
-        salary: '$50k-$80k/month',
-        daysRemaining: '4 Days Remaining',
-    },
-    {
-        id: '4',
-        title: 'Networking Engineer',
-        type: 'Full Time',
-        isFeatured: false,
-        logo: 'https://logo.clearbit.com/cisco.com',
-        location: 'Washington, USA',
-        salary: '$30k-$35k/month',
-        daysRemaining: '4 Days Remaining',
-    },
-    {
-        id: '5',
-        title: 'Product Designer',
-        type: 'Full Time',
-        isFeatured: false,
-        logo: 'https://logo.clearbit.com/airbnb.com',
-        location: 'Ohio, USA',
-        salary: '$50k-$80k/month',
-        daysRemaining: '4 Days Remaining',
-    },
-];
+import { useNavigate } from 'react-router-dom';
+import DashboardPagination from "../../../components/ui/DashboardPagination";
+import JobSearchBar from "./components/JobSearchBar";
+import FilterSortBar from "./components/FilterSortBar";
+import JobList from "./components/JobList";
+import JobDetailPage from "./JobDetailPage";
+import ApplyJobModal from "./components/ApplyJobModal"; 
+import { useFindJobs } from "./hooks/useFindJobs";
 
 export default function FindJobPage() {
-    const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [savedJobIds, setSavedJobIds] = useState<string[]>([]);
-    const [searchKeyword, setSearchKeyword] = useState('');
-    const [locationKeyword, setLocationKeyword] = useState('');
+  const navigate = useNavigate();
 
-    const totalPages = 5;
+  const {
+    jobs,
+    loading,
+    error,
+    viewMode,
+    setViewMode,
+    currentPage,
+    searchKeyword,
+    setSearchKeyword,
+    locationKeyword,
+    setLocationKeyword,
+    experience,
+    setExperience,
+    salaryRange,
+    setSalaryRange,
+    jobTypes,
+    setJobTypes,
+    education,
+    setEducation,
+    jobLevel,
+    setJobLevel,
+    handleResetFilters,
+    selectedJobId,
+    setSelectedJobId,
+    savedJobIds,
+    isListApplyModalOpen,
+    setIsListApplyModalOpen,
+    applyingJobTitle,
+    totalPages,
+    handleSearch,
+    handlePageChange,
+    handleToggleSave,
+    handleApplyClickFromList,
+    handleListApplySubmit,
+  } = useFindJobs();
 
-    const handleToggleSave = (id: string | number) => {
-        const stringId = String(id);
-        setSavedJobIds((prev) =>
-            prev.includes(stringId)
-                ? prev.filter((item) => item !== stringId)
-                : [...prev, stringId]
-        );
-    };
 
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+  const handleProtectedListApplyClick = (jobId: string) => {
+  const user = localStorage.getItem('me');
+  if (!user) {
+    navigate('/login');
+    return;
+  }
+  handleApplyClickFromList(jobId);
+};
 
+  if (selectedJobId) {
     return (
-        <div className='w-full bg-white font-sans min-h-screen pb-16'>
-            <JobSearchBar
-                searchKeyword={searchKeyword}
-                setSearchKeyword={setSearchKeyword}
-                locationKeyword={locationKeyword}
-                setLocationKeyword={setLocationKeyword}
-            />
-
-            <div className='max-w-7xl mx-auto px-8 mt-8'>
-                <FilterSortBar viewMode={viewMode} setViewMode={setViewMode} />
-
-                <JobList
-                    jobs={EXPLORE_MOCK_JOBS}
-                    viewMode={viewMode}
-                    savedJobIds={savedJobIds}
-                    onToggleSave={handleToggleSave}
-                />
-
-                <DashboardPagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                />
-            </div>
+      <div className="w-full bg-white font-sans min-h-screen pb-16 animate-fadeIn">
+        <div className="max-w-7xl mx-auto px-8 pt-6">
+          <button 
+            onClick={() => setSelectedJobId(null)}
+            className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-primary-500 transition-colors"
+          >
+            ← Back to Job List
+          </button>
         </div>
+        <JobDetailPage jobId={selectedJobId} /> 
+      </div>
     );
+  }
+
+  return (
+    <div className="w-full bg-white font-sans min-h-screen pb-16">
+      <JobSearchBar 
+        searchKeyword={searchKeyword}
+        setSearchKeyword={setSearchKeyword}
+        locationKeyword={locationKeyword}
+        setLocationKeyword={setLocationKeyword}
+        onSearch={handleSearch}
+        experience={experience}
+        setExperience={setExperience}
+        salaryRange={salaryRange}
+        setSalaryRange={setSalaryRange}
+        jobTypes={jobTypes}
+        setJobTypes={setJobTypes}
+        education={education}
+        setEducation={setEducation}
+        jobLevel={jobLevel}
+        setJobLevel={setJobLevel}
+        handleResetFilters={handleResetFilters}
+      />
+
+      <div className="max-w-7xl mx-auto px-8 mt-8">
+        <FilterSortBar viewMode={viewMode} setViewMode={setViewMode} />
+
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-20 text-red-500 font-semibold">{error}</div>
+        ) : (
+          <JobList 
+          jobs={jobs} 
+          viewMode={viewMode} 
+          savedJobIds={savedJobIds} 
+          onToggleSave={handleToggleSave} 
+          onJobDoubleClick={(id) => setSelectedJobId(id)} 
+          onApplyClick={handleProtectedListApplyClick}
+        />
+        )}
+
+        <DashboardPagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
+
+      <ApplyJobModal 
+        isOpen={isListApplyModalOpen}
+        onClose={() => setIsListApplyModalOpen(false)}
+        jobTitle={applyingJobTitle}
+        onSubmit={handleListApplySubmit}
+      />
+    </div>
+  );
 }

@@ -8,59 +8,63 @@ import {
 } from 'lucide-react';
 
 export interface JobItemProps {
-    id: string | number;
-    logo: string;
-    title: string;
-    type: string;
-    location: string;
-    salary: string;
-    timeStatus: string;
-
-    isExpired?: boolean;
-    isFeatured?: boolean;
-    isBookmarked?: boolean;
-    isSelected?: boolean;
-
-    onSelect?: () => void;
-    onBookmarkClick?: (id: string | number) => void;
-    onApplyClick?: (id: string | number) => void;
+  id: string | number;
+  logo: string;
+  title: string;    
+  type: string;      
+  location: string;
+  salary: string;
+  timeStatus: string; 
+  
+  isExpired?: boolean;    
+  isFeatured?: boolean; 
+  isBookmarked?: boolean; 
+  isSelected?: boolean;   
+  
+  onSelect?: () => void;
+  onDoubleClick?: () => void; 
+  onBookmarkClick?: (id: string | number) => void;
+  onApplyClick?: (id: string | number) => void;
 }
 
 export default function JobItem({
-    id,
-    logo,
-    title,
-    type,
-    location,
-    salary,
-    timeStatus,
-    isExpired = false,
-    isFeatured = false,
-    isBookmarked = false,
-    isSelected = false,
-    onSelect,
-    onBookmarkClick,
-    onApplyClick,
+  id,
+  logo,
+  title,
+  type,
+  location,
+  salary,
+  timeStatus,
+  isExpired = false,
+  isFeatured = false,
+  isBookmarked = false,
+  isSelected = false,
+  onSelect,
+  onDoubleClick, // Nhận prop ở đây
+  onBookmarkClick,
+  onApplyClick,
 }: JobItemProps) {
-    return (
-        <div
-            onClick={onSelect}
-            className={`flex items-center justify-between p-6 border rounded-xl bg-white transition-all ${
-                onSelect ? 'cursor-pointer' : 'cursor-default'
-            } ${
-                isSelected
-                    ? 'border-primary-500 bg-blue-50/50 border-2 shadow-sm ring-1 ring-primary-500/10'
-                    : isFeatured
-                      ? 'border-amber-200 bg-amber-50/5 hover:shadow-md'
-                      : 'border-gray-100 hover:shadow-md'
-            }`}
-        >
-            <div className='flex items-center gap-6 flex-1'>
-                <img
-                    src={logo}
-                    alt={title}
-                    className='w-14 h-14 rounded-lg object-cover shrink-0 border border-gray-100'
-                />
+  
+  return (
+    <div
+      onClick={onSelect} 
+      onDoubleClick={onDoubleClick} 
+      className={`flex items-center justify-between p-6 border rounded-xl bg-white transition-all ${
+        onSelect || onDoubleClick ? "cursor-pointer" : "cursor-default"
+      } ${
+        isSelected
+          ? "border-primary-500 bg-blue-50/50 border-2 shadow-sm ring-1 ring-primary-500/10" 
+          : isFeatured 
+          ? "border-amber-200 bg-amber-50/5 hover:shadow-md" 
+          : "border-gray-100 hover:shadow-md"
+      }`}
+    >
+      <div className="flex items-center gap-6 flex-1">
+        <img
+          src={logo}
+          alt={title}
+          className="w-14 h-14 rounded-lg object-cover shrink-0 border border-gray-100"
+        />
 
                 <div className='flex-1 space-y-1.5 text-left'>
                     <div className='flex items-center gap-3 flex-wrap'>

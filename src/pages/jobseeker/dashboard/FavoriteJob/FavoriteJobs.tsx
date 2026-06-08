@@ -1,143 +1,112 @@
-import { useState } from 'react';
-import FavoriteJobItem from './FavoriteJobItem';
-import DashboardPagination from '../../../../components/ui/DashboardPagination';
-
-interface RawFavoriteJob {
-    id: string;
-    logo: string;
-    role: string;
-    type: string;
-    location: string;
-    salary: string;
-    timeStatus: string;
-    isExpired?: boolean;
-}
-
-const mockFavorites: RawFavoriteJob[] = [
-    {
-        id: '1',
-        logo: 'https://logo.clearbit.com/google.com',
-        role: 'Technical Support Specialist',
-        type: 'Full Time',
-        location: 'Idaho, USA',
-        salary: '$15K-$20K',
-        timeStatus: 'Job Expire',
-        isExpired: true,
-    },
-    {
-        id: '2',
-        logo: 'https://logo.clearbit.com/youtube.com',
-        role: 'UI/UX Designer',
-        type: 'Full Time',
-        location: 'Minnesota, USA',
-        salary: '$10K-$15K',
-        timeStatus: '4 Days Remaining',
-    },
-    {
-        id: '3',
-        logo: 'https://logo.clearbit.com/slack.com',
-        role: 'Senior UX Designer',
-        type: 'Full Time',
-        location: 'United Kingdom of Great Britain',
-        salary: '$30K-$35K',
-        timeStatus: '4 Days Remaining',
-    }, // Đã bỏ 'active: true' fix cứng
-    {
-        id: '4',
-        logo: 'https://logo.clearbit.com/facebook.com',
-        role: 'Junior Graphic Designer',
-        type: 'Full Time',
-        location: 'Mymensingh, Bangladesh',
-        salary: '$40K-$50K',
-        timeStatus: '4 Days Remaining',
-    },
-    {
-        id: '5',
-        logo: 'https://logo.clearbit.com/google.com',
-        role: 'Technical Support Specialist',
-        type: 'Full Time',
-        location: 'Idaho, USA',
-        salary: '$15K-$20K',
-        timeStatus: 'Job Expire',
-        isExpired: true,
-    },
-    {
-        id: '6',
-        logo: 'https://logo.clearbit.com/twitter.com',
-        role: 'Product Designer',
-        type: 'Full Time',
-        location: 'Sivas, Turkey',
-        salary: '$50K-$70K',
-        timeStatus: '4 Days Remaining',
-    },
-    {
-        id: '7',
-        logo: 'https://logo.clearbit.com/udemy.com',
-        role: 'Project Manager',
-        type: 'Full Time',
-        location: 'Ohio, USA',
-        salary: '$50K-$80K',
-        timeStatus: '4 Days Remaining',
-    },
-    {
-        id: '8',
-        logo: 'https://logo.clearbit.com/google.com',
-        role: 'Technical Support Specialist',
-        type: 'Full Time',
-        location: 'Idaho, USA',
-        salary: '$15K-$20K',
-        timeStatus: 'Job Expire',
-        isExpired: true,
-    },
-    {
-        id: '9',
-        logo: 'https://logo.clearbit.com/google.com',
-        role: 'Technical Support Specialist',
-        type: 'Full Time',
-        location: 'Idaho, USA',
-        salary: '$15K-$20K',
-        timeStatus: 'Job Expire',
-        isExpired: true,
-    },
-];
+import { useState } from "react";
+import FavoriteJobItem from "./FavoriteJobItem";
+import DashboardPagination from "../../../../components/ui/DashboardPagination";
+import ApplyJobModal from "../../FindJob/components/ApplyJobModal";
+import { useFavoriteJobs } from "./hooks/useFavoriteJobs";
 
 export default function FavoriteJobsPage() {
-    const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = 5;
-    const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const {
+    favoriteJobs,
+    loading,
+    error,
+    totalCount,
+    currentPage,
+    selectedJobId,
+    setSelectedJobId,
+    totalPages,
+    handlePageChange,
+    handleRemoveFavorite,
+    handleApplyJob,
+  } = useFavoriteJobs();
 
-    const handlePageChange = (pageNumber: number) => {
-        setCurrentPage(pageNumber);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [applyJobId, setApplyJobId] = useState("");
+  const [applyJobTitle, setApplyJobTitle] = useState("");
 
+  const handleApplyClick = (id: string) => {
+    const job = favoriteJobs.find((j) => j.id === id);
+    if (job) {
+      setApplyJobId(job.id);
+      setApplyJobTitle(job.role);
+      setIsApplyModalOpen(true);
+    }
+  };
+
+  const handleApplySubmit = async (data: { resumeId: string; coverLetter: string }) => {
+    try {
+      await handleApplyJob(applyJobId, data.resumeId, data.coverLetter);
+      setIsApplyModalOpen(false);
+      alert(`Ứng tuyển thành công vị trí: ${applyJobTitle}`);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(`Ứng tuyển thất bại: ${err.message}`);
+      } else {
+        alert(`Ứng tuyển thất bại: ${"An unknown error occurred"}`);
+      }
+    }
+  };
+
+  if (loading) {
     return (
-        <div className='space-y-8 text-left animate-fade-in pb-8'>
-            <div className='flex items-center gap-2 pb-4'>
-                <h1 className='text-[18px] font-bold text-gray-900'>
-                    Favorite Jobs
-                </h1>
-                <span className='text-[15px] font-medium text-gray-400'>
-                    (17)
-                </span>
-            </div>
-
-            <div className='flex flex-col gap-4'>
-                {mockFavorites.map((job) => (
-                    <FavoriteJobItem
-                        key={job.id}
-                        {...job}
-                        isSelected={selectedJobId === job.id}
-                        onSelect={() => setSelectedJobId(job.id)}
-                    />
-                ))}
-            </div>
-
-            <DashboardPagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-            />
-        </div>
+      <div className="flex justify-center items-center py-20">
+        <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin"></div>
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-20 text-red-500 font-semibold">{error}</div>
+    );
+  }
+
+  return (
+    <div className="space-y-8 text-left animate-fade-in pb-8">
+      <div className="flex items-center gap-2 pb-4">
+        <h1 className="text-[18px] font-bold text-gray-900">Favorite Jobs</h1>
+        <span className="text-[15px] font-medium text-gray-400">({totalCount})</span>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        {favoriteJobs.length === 0 ? (
+          <div className="text-center py-20 bg-white border border-gray-100 rounded-xl">
+            <p className="text-[15px] text-gray-400">You haven't saved any favorite jobs yet.</p>
+          </div>
+        ) : (
+          favoriteJobs.map((job) => (
+            <FavoriteJobItem
+              key={job.id}
+              id={job.id}
+              logo={job.logo}
+              role={job.role}
+              type={job.type}
+              location={job.location}
+              salary={job.salary}
+              timeStatus={job.timeStatus}
+              isExpired={job.isExpired}
+              isSelected={selectedJobId === job.id}
+              onSelect={() => setSelectedJobId(job.id)}
+              onBookmarkClick={handleRemoveFavorite}
+              onApplyClick={handleApplyClick}
+            />
+          ))
+        )}
+      </div>
+
+      {favoriteJobs.length > 0 && (
+        <DashboardPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      )}
+
+      <ApplyJobModal
+        isOpen={isApplyModalOpen}
+        onClose={() => setIsApplyModalOpen(false)}
+        jobTitle={applyJobTitle}
+        onSubmit={handleApplySubmit}
+      />
+    </div>
+  );
 }
