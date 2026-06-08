@@ -42,7 +42,7 @@ export default function AppliedJobItem({
         >
             <div className='flex items-center gap-5 flex-1'>
                 <img
-                    src={logo || DEFAULT_IMAGE}
+                    src={logo || DEFAULT_IMAGE || id}
                     alt={'Employer logo'}
                     className='w-12 h-12 rounded-lg object-cover shrink-0 border border-gray-100'
                 />

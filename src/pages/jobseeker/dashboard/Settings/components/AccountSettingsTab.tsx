@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MapPin, Mail, Trash2 } from 'lucide-react';
+import { MapPin, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import Button from '../../../../../components/ui/Button';
 import Input from '../../../../../components/ui/Input';
