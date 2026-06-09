@@ -11,7 +11,7 @@ export const useUpdateJob = () => {
             payload,
         }: {
             id: string;
-            payload: Record<string, any>;
+            payload: Record<string, unknown>;
         }) => {
             return await JobPostService.updateJob(id, payload);
         },
