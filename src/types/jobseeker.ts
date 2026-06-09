@@ -135,9 +135,9 @@ export interface ApplyJobRequest {
 
 export interface AppliedJobType {
     id: string;
-    role: string; 
+    role: string;
     logo: string;
-    jobPostId : string; 
+    jobPostId: string;
     type: string;
     location: string;
     salary: string;
@@ -218,7 +218,7 @@ export interface JobSeekerProfileFormValues {
     website: string;
     facebookUrl: string;
     twitterUrl: string;
-    linkedlnUrl: string;
+    linkedInUrl: string;
     secondaryPhone: string;
     avatarFile?: File | null;
 }
