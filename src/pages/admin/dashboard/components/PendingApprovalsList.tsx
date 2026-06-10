@@ -1,13 +1,19 @@
 import { Clock, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const MOCK_PENDING = [
-    { id: 'EMP-01', name: 'TechNova Solutions', time: '2 hours ago' },
-    { id: 'EMP-02', name: 'Global Finance Ltd', time: '5 hours ago' },
-    { id: 'EMP-03', name: 'HealthCare Plus', time: '1 day ago' },
-];
+interface PendingEmployerItem {
+    id: number;
+    companyName: string;
+    email: string;
+    industry: string;
+    createdAt: string;
+}
 
-export default function PendingApprovalsList() {
+interface PendingApprovalsListProps {
+    employers: PendingEmployerItem[];
+}
+
+export default function PendingApprovalsList({ employers }: PendingApprovalsListProps) {
     const navigate = useNavigate();
     return (
         <div className='bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-full'>
@@ -24,28 +30,37 @@ export default function PendingApprovalsList() {
                 </button>
             </div>
             <div className='p-2 flex-1'>
-                {MOCK_PENDING.map((item) => (
-                    <div
-                        key={item.id}
-                        className='flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors group'
-                    >
-                        <div>
-                            <p className='text-sm font-bold text-gray-900'>
-                                {item.name}
-                            </p>
-                            <p className='text-xs text-gray-500'>{item.time}</p>
-                        </div>
-                        <button
-                            onClick={() =>
-                                navigate(`/admin/employer-approvals/${item.id}`)
-                            }
-                            className='p-2 text-gray-400 group-hover:text-blue-600 transition-colors'
-                        >
-                            <ArrowRight size={18} />
-                        </button>
+                {employers.length === 0 ? (
+                    <div className='p-6 text-center text-gray-500 text-sm'>
+                        No pending approvals
                     </div>
-                ))}
+                ) : (
+                    employers.map((item) => (
+                        <div
+                            key={item.id}
+                            className='flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors group'
+                        >
+                            <div>
+                                <p className='text-sm font-bold text-gray-900'>
+                                    {item.companyName}
+                                </p>
+                                <p className='text-xs text-gray-500'>
+                                    {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Date N/A'}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() =>
+                                    navigate(`/admin/employer-approvals/${item.id}`)
+                                }
+                                className='p-2 text-gray-400 group-hover:text-blue-600 transition-colors'
+                            >
+                                <ArrowRight size={18} />
+                            </button>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );
 }
+
