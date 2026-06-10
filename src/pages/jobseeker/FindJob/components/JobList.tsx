@@ -54,7 +54,7 @@ export default function JobList({
           salary={job.salary}
           timeStatus={job.daysRemaining}
           isFeatured={job.isFeatured}
-          isBookmarked={savedJobIds.includes(job.id)}
+          isBookmarked={savedJobIds.includes(String(job.id))}
           onBookmarkClick={onToggleSave}
           onDoubleClick={() => onJobDoubleClick(job.id)}
           onApplyClick={(id) => onApplyClick(String(id))} 

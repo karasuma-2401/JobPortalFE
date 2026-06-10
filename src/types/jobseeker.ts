@@ -235,3 +235,11 @@ export interface ApiResponse<T> {
     message?: string;
     data: T;
 }
+
+export interface SpringPageResponse<T> {
+    content: T[];
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
+}
