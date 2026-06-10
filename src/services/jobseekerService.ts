@@ -78,16 +78,42 @@ export const JobseekerService = {
 
     getEmployers: async (
         params: EmployerFilterParams
-    ): Promise<{ items: Employer[]; totalCount: number }> => {
-        return publicApi.get('/employer', { params });
+    ): Promise<PagedResponse<Employer>> => {
+        const { page, limit, keyword, location, category } = params;
+
+        const query: Record<string, unknown> = {
+            offset: (page - 1) * limit,
+            limit,
+        };
+
+        if (keyword) query.keyword = keyword;
+        if (location) query.location = location;
+        if (category) query.category = category;
+
+        const res = (await publicApi.get(
+            "/employers",
+            { params: query }
+        )) as ApiResponse<PagedResponse<Employer>>;
+
+        const data = res.data;
+
+        return {
+            items: data.items,
+            totalItems: data.totalItems,
+            page: data.page + 1,
+            size: data.size,
+        };
     },
 
     getEmployerDetail: async (id: string): Promise<EmployerDetail> => {
-        return publicApi.get(`/employer/${id}`);
+        return publicApi.get(`/employers/${id}`);
     },
 
     getJobsByEmployer: async (employerId: string): Promise<Job[]> => {
-        return publicApi.get(`/employer/${employerId}/jobs`);
+        const res = (await publicApi.get(
+            `/employers/${employerId}/jobs`
+        )) as ApiResponse<Job[]>;
+        return res.data;
     },
 
     getDashboardOverview: async (): Promise<DashboardOverviewType> => {

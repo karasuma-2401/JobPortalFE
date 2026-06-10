@@ -36,7 +36,7 @@ export function useFindEmployers() {
         limit: itemsPerPage,
       });
       setEmployers(result.items);
-      setTotalCount(result.totalCount);
+      setTotalCount(result.totalItems);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || "Failed to fetch employers");
@@ -85,6 +85,7 @@ export function useFindEmployers() {
     selectedEmployerId,
     setSelectedEmployerId,
     totalPages,
+    totalCount,
     handleSearch,
     handlePageChange,
   };

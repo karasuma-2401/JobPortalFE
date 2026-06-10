@@ -22,6 +22,7 @@ export default function FindEmployerPage() {
     selectedEmployerId,
     setSelectedEmployerId,
     totalPages,
+    totalCount,
     handleSearch,
     handlePageChange,
   } = useFindEmployers();
@@ -56,7 +57,11 @@ export default function FindEmployerPage() {
       />
 
       <div className="max-w-7xl mx-auto px-8 mt-8">
-        <FilterSortBar viewMode={viewMode} setViewMode={setViewMode} />
+        <FilterSortBar 
+          viewMode={viewMode} 
+          setViewMode={setViewMode} 
+          totalCount={totalCount} 
+        />
 
         {loading ? (
           <div className="flex justify-center items-center py-20">
@@ -72,7 +77,7 @@ export default function FindEmployerPage() {
           />
         )}
 
-        {employers.length > 0 && (
+        {employers?.length > 0 && (
           <div className="mt-8">
             <DashboardPagination 
               currentPage={currentPage}
