@@ -59,9 +59,13 @@ export default function JobCard({
           </div>
         </div>
 
-        <h3 className="text-[16px] font-bold text-gray-900 mt-4 group-hover:text-primary-500 transition-colors line-clamp-2 leading-snug">
+        <button
+          type="button"
+          onClick={onDoubleClick}
+          className="mt-4 line-clamp-2 text-left text-[16px] font-bold leading-snug text-gray-900 transition-colors group-hover:text-primary-500"
+        >
           {title}
-        </h3>
+        </button>
       </div>
 
       <div className="mt-5 flex flex-col gap-2 border-t border-gray-100/70 pt-4">

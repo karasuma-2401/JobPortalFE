@@ -7,9 +7,13 @@ import type {
     RegisterRequest,
     VerifyResetPasswordRequest,
 } from '../types/auth';
-import { CookiesService } from '../services/cookieServices';
-import { TokenType } from '../bases/enums/jwt.enum';
 import { type ApiError } from '../api/api';
+import { AuthSessionService } from '../services/authSessionService';
+import { getDefaultAuthenticatedRoute } from '../contexts/auth/auth-utils';
+import {
+    consumePostAuthRedirect,
+    readPostAuthRedirect,
+} from '../utils/post-auth-redirect';
 
 interface AuthFlowError extends ApiError {
     type?: 'LOGIN_ERROR' | 'PROFILE_ERROR';
@@ -33,20 +37,15 @@ export const useLogin = () => {
                     originalError: apiError,
                 });
             }
-            console.log(tokens) 
-            localStorage.setItem(TokenType.ACCESS_TOKEN, tokens.accessToken);
+            AuthSessionService.saveAccessToken(tokens.accessToken);
 
             if (tokens.refreshToken) {
-                CookiesService.saveToken(
-                    tokens.refreshToken,
-                    TokenType.REFRESH_TOKEN
-                );
+                AuthSessionService.saveRefreshToken(tokens.refreshToken);
             }
 
             try {
                 const user = await AuthService.getMe();
-                console.log("user la: " , user) 
-                localStorage.setItem('me', JSON.stringify(user));
+                AuthSessionService.saveUser(user);
                 return user;
             } catch (err) {
                 const apiError = err as ApiError;
@@ -60,23 +59,19 @@ export const useLogin = () => {
         },
         onSuccess: (user) => {
             toast.success('Login successful!');
+            const pendingRedirect = readPostAuthRedirect();
+            const shouldUsePendingRedirect =
+                Array.isArray(user.roles) &&
+                user.roles.includes('SEEKER') &&
+                user.hasProfile &&
+                pendingRedirect;
 
-            const isEmployer = user.roles.includes('EMPLOYER');
-            console.log("OK") 
-            if (!user.hasProfile) {
-                if (isEmployer) {
-                    navigate('/employer/setup/company');
-                } else {
-                    navigate('/jobseeker/account-setup');
-                }
-            } else {
-                if (isEmployer) {
-                    navigate('/employer/dashboard');
-                } else {
-                    navigate('/jobseeker');
-
-                }
-            }
+            navigate(
+                shouldUsePendingRedirect
+                    ? consumePostAuthRedirect() || getDefaultAuthenticatedRoute(user)
+                    : getDefaultAuthenticatedRoute(user),
+                { replace: true }
+            );
         },
         onError: (error: ApiError) => {
             const authError = error as AuthFlowError;

@@ -17,7 +17,7 @@ interface ProfileSidebarProps {
     phone: string;
     socials: {
         facebook?: string;
-        youtube?: string;
+        twitter?: string;
         linkedin?: string;
     };
 }
@@ -141,13 +141,13 @@ export default function ProfileSidebar({
                             <FaFacebook size={18} strokeWidth={2} />
                         </a>
                     )}
-                    {socials.youtube && (
+                    {socials.twitter && (
                         <a
-                            href={socials.youtube}
+                            href={socials.twitter}
                             target='_blank'
                             rel='noreferrer'
                             className='w-11 h-11 rounded-xl bg-[#FF0000]/10 text-[#FF0000] flex items-center justify-center transition-all duration-300 hover:bg-[#FF0000] hover:text-white hover:-translate-y-1 hover:shadow-md'
-                            title='YouTube'
+                            title='Twitter'
                         >
                             <FaYoutube size={18} strokeWidth={2} />
                         </a>

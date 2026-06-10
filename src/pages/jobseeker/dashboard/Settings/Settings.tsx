@@ -1,13 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import ProfilePicture from './components/ProfilePicture';
 import BasicInfoForm from './components/BasicInfoForm';
 import ResumeManager from './components/ResumeManager';
 import ProfileTab from './components/ProfileTab';
 import SocialLinksTab from './components/SocialLinksTab';
 import AccountSettingsTab from './components/AccountSettingsTab';
+import { JobseekerService } from '../../../../services/jobseekerService';
+import type { JobSeekerProfile } from '../../../../types/jobseeker';
 
 export default function Settings() {
     const [activeTab, setActiveTab] = useState('Personal');
+    const [profile, setProfile] = useState<JobSeekerProfile | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     const tabs = [
         { id: 'Personal', label: 'Personal' },
@@ -16,19 +21,35 @@ export default function Settings() {
         { id: 'Account Setting', label: 'Account Setting' },
     ];
 
+    const loadProfile = async () => {
+        try {
+            setIsLoading(true);
+            const response = await JobseekerService.getProfile();
+            setProfile(response);
+        } catch (error) {
+            toast.error((error as Error).message || 'Failed to load profile.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        void loadProfile();
+    }, []);
+
     return (
-        <div className='max-w-6xl mx-auto p-8 bg-bg-white'>
-            <h1 className='text-xl font-bold mb-6 text-gray-900 text-left'>
+        <div className='mx-auto max-w-6xl bg-bg-white p-8'>
+            <h1 className='mb-6 text-left text-xl font-bold text-gray-900'>
                 Setting
             </h1>
 
-            <div className='flex border-b border-gray-100 mb-10 overflow-x-auto gap-10'>
+            <div className='mb-10 flex gap-10 overflow-x-auto border-b border-gray-100'>
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
                         type='button'
                         onClick={() => setActiveTab(tab.id)}
-                        className={`pb-4 text-sm font-medium transition-all whitespace-nowrap border-b-2 ${
+                        className={`whitespace-nowrap border-b-2 pb-4 text-sm font-medium transition-all ${
                             activeTab === tab.id
                                 ? 'border-primary-500 text-primary-500'
                                 : 'border-transparent text-gray-400 hover:text-gray-700'
@@ -39,27 +60,38 @@ export default function Settings() {
                 ))}
             </div>
 
-            <div className='animate-fade-in'>
-                {activeTab === 'Personal' && (
-                    <>
-                        <div className='grid grid-cols-1 lg:grid-cols-12 gap-12'>
-                            <div className='lg:col-span-4'>
-                                <ProfilePicture />
+            {isLoading || !profile ? (
+                <div className='flex justify-center py-20'>
+                    <div className='h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500' />
+                </div>
+            ) : (
+                <div className='animate-fade-in'>
+                    {activeTab === 'Personal' && (
+                        <>
+                            <div className='grid grid-cols-1 gap-12 lg:grid-cols-12'>
+                                <div className='lg:col-span-4'>
+                                    <ProfilePicture profile={profile} onUpdated={loadProfile} />
+                                </div>
+                                <div className='pt-10 lg:col-span-8'>
+                                    <BasicInfoForm profile={profile} onUpdated={loadProfile} />
+                                </div>
                             </div>
-                            <div className='lg:col-span-8 pt-10'>
-                                <BasicInfoForm />
-                            </div>
-                        </div>
 
-                        <ResumeManager />
-                    </>
-                )}
+                            <ResumeManager />
+                        </>
+                    )}
 
-                {activeTab === 'Profile' && <ProfileTab />}
+                    {activeTab === 'Profile' && (
+                        <ProfileTab profile={profile} onUpdated={loadProfile} />
+                    )}
 
-                {activeTab === 'Social Links' && <SocialLinksTab />}
-                {activeTab === 'Account Setting' && <AccountSettingsTab />}
-            </div>
+                    {activeTab === 'Social Links' && (
+                        <SocialLinksTab profile={profile} onUpdated={loadProfile} />
+                    )}
+
+                    {activeTab === 'Account Setting' && <AccountSettingsTab />}
+                </div>
+            )}
         </div>
     );
 }

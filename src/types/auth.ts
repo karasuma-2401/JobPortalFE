@@ -10,6 +10,10 @@ export interface LoginResponse {
     refreshToken: string;
 }
 
+export interface RefreshResponse {
+    accessToken: string;
+}
+
 export interface RegisterRequest {
     role: Role;
     email: string;

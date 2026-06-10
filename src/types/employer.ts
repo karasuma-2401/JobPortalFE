@@ -36,7 +36,7 @@ export interface EmployerProfile {
     email: string;
     phone: string;
     facebookUrl?: string;
-    youtubeUrl?: string;
+    twitterUrl?: string;
     linkedInUrl?: string;
 }
 

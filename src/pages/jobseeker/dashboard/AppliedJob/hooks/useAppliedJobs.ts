@@ -17,6 +17,7 @@ export function useAppliedJobs() {
     setError(null);
     try {
       const result = await JobseekerService.getAppliedJobs(currentPage, itemsPerPage);
+      console.log("Applied jobs: " , result.items) 
       setAppliedJobs(result.items);
       setTotalCount(result.totalCount);
     } catch (err: unknown) {

@@ -1,6 +1,9 @@
 import { ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProfileAlert() {
+    const navigate = useNavigate();
+
     return (
         <div className='flex items-center justify-between px-8 py-7 rounded-xl bg-danger-500 text-white shadow-sm'>
             <div className='flex items-center gap-5'>
@@ -18,7 +21,11 @@ export default function ProfileAlert() {
                     </p>
                 </div>
             </div>
-            <button className='flex items-center gap-2.5 bg-white text-danger-500 px-6 py-3 rounded-lg text-[15px] font-bold hover:bg-gray-50 transition-colors'>
+            <button
+                type='button'
+                onClick={() => navigate('/jobseeker/DashBoard/settings')}
+                className='flex items-center gap-2.5 bg-white text-danger-500 px-6 py-3 rounded-lg text-[15px] font-bold hover:bg-gray-50 transition-colors'
+            >
                 Edit Profile <ArrowRight size={18} strokeWidth={2.5} />
             </button>
         </div>

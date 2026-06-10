@@ -1,10 +1,12 @@
 import { MapPin, DollarSign, Check } from 'lucide-react';
+import { DEFAULT_IMAGE } from '../../../../bases/constants/app';
 
 export interface AppliedJobItemProps {
     id: string;
     logo: string;
     role: string;
     type: string;
+    jobPostId : string; 
     location: string;
     salary: string;
     dateApplied: string;
@@ -16,7 +18,7 @@ export interface AppliedJobItemProps {
 export default function AppliedJobItem({
     id,
     logo,
-    role,
+    jobPostId, 
     type,
     location,
     salary,
@@ -25,6 +27,10 @@ export default function AppliedJobItem({
     isSelected,
     onSelect,
 }: AppliedJobItemProps) {
+    const handleNavigation = () => {
+        const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL
+        window.open(FRONTEND_URL + "/job" + "/" + jobPostId , "_blank")
+    };
     return (
         <div
             onClick={onSelect}
@@ -36,15 +42,12 @@ export default function AppliedJobItem({
         >
             <div className='flex items-center gap-5 flex-1'>
                 <img
-                    src={logo}
-                    alt={role}
+                    src={logo || DEFAULT_IMAGE || id}
+                    alt={'Employer logo'}
                     className='w-12 h-12 rounded-lg object-cover shrink-0 border border-gray-100'
                 />
                 <div className='space-y-1.5 text-left'>
                     <div className='flex items-center gap-3'>
-                        <h3 className='text-[16px] font-bold text-gray-900 group-hover:text-primary-500 transition-colors'>
-                            {role}
-                        </h3>
                         <span className='text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-blue-50 text-primary-500'>
                             {type}
                         </span>
@@ -75,7 +78,7 @@ export default function AppliedJobItem({
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
-                        console.log(`View details for job id: ${id}`);
+                        handleNavigation();
                     }}
                     className={`px-5 py-2.5 text-[14px] font-bold rounded-lg transition-colors w-full text-center ${
                         isSelected

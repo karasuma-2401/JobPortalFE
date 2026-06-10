@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import avatar from '../../../assets/sulkyunggu.jpg';
 import NotificationBell from '../../../components/ui/NotificationBell';
+import useAuth from '../../../contexts/auth/useAuth';
 const globalSearchData = [
     {
         id: 1,
@@ -63,6 +64,7 @@ export default function AdminTopbar() {
     const profileRef = useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+    const { logout } = useAuth();
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -85,8 +87,9 @@ export default function AdminTopbar() {
     }, []);
 
     const handleLogout = () => {
+        logout();
         toast.success('Logged out successfully!');
-        navigate('/login');
+        navigate('/login', { replace: true });
     };
 
     const handleNavigate = (path: string) => {

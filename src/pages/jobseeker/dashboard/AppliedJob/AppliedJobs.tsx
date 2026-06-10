@@ -54,13 +54,14 @@ export default function AppliedJobsPage() {
               {appliedJobs.map((job) => (
                 <AppliedJobItem
                   key={job.id}
+                  jobPostId={job.jobPostId}
                   id={job.id}
                   logo={job.logo}
                   role={job.role}
                   type={job.type}
                   location={job.location}
                   salary={job.salary}
-                  dateApplied={job.dateApplied}
+                  dateApplied={job.appliedAt}
                   status={job.status}
                   isSelected={selectedJobId === job.id}
                   onSelect={() => setSelectedJobId(job.id)}

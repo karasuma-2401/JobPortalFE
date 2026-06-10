@@ -60,21 +60,41 @@ import JobDetailPage from './pages/employer/my-jobs/JobDetailPage';
 import EditJobPage from './pages/employer/my-jobs/components/EditJobPage';
 import FindCandidatesPage from './pages/employer/find-candidates/FindCandidatesPage';
 import FindEmployerPage from './pages/jobseeker/FindEmployer/FindEmployerPage';
+import GuestRoute from './routes/GuestRoute';
+import ProtectedRoute from './routes/ProtectedRoute';
+import JobSeekerSetupPage from './pages/jobseeker/setup/JobSeekerSetupPage';
+import JobSeekerJobDetailPage from './pages/jobseeker/FindJob/JobDetailPage';
+
 const router = createBrowserRouter([
     {
       element: <MainLayout />,
       children: [
-        { path: "/", element: <Navigate to="/home" /> }, 
+        { path: "/", element: <Home /> }, 
         { path: "/home", element: <Home /> },
         { path: "/find-job", element: <FindJobPage /> },
+        { path: "/job/:jobId", element: <JobSeekerJobDetailPage /> },
         { path: "/find-employers", element: <FindEmployerPage /> },
       ],
   },
     {
         element: <AuthLayout />,
         children: [
-            { path: '/login', element: <Login /> },
-            { path: '/register', element: <Register /> },
+            {
+                path: '/login',
+                element: (
+                    <GuestRoute>
+                        <Login />
+                    </GuestRoute>
+                ),
+            },
+            {
+                path: '/register',
+                element: (
+                    <GuestRoute>
+                        <Register />
+                    </GuestRoute>
+                ),
+            },
             { path: '/forgot-password', element: <ForgotPassword /> },
             { path: '/verify', element: <VerifyPage /> },
         ],
@@ -158,12 +178,18 @@ const router = createBrowserRouter([
     {
         path: '/jobseeker',
         element: <CandidateFullLayout />,
-
-
         children: [
             { path: 'home', element: <Home /> },
             { path: 'find-job', element: <FindJobPage /> },
             { path: 'find-employers', element: <FindEmployerPage /> },
+            {
+                path: 'setup',
+                element: (
+                    <ProtectedRoute allowedRoles={['SEEKER']}>
+                        <JobSeekerSetupPage />
+                    </ProtectedRoute>
+                ),
+            },
             { index: true, element: <Navigate to="/jobseeker/DashBoard/overview" replace /> },
             { path: 'dashboard', element: <Navigate to="/jobseeker/DashBoard/overview" replace /> },
         ],

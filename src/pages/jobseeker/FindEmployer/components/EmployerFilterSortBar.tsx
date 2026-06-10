@@ -3,14 +3,15 @@ import { Grid, List } from "lucide-react";
 interface Props {
   viewMode: "list" | "grid";
   setViewMode: (mode: "list" | "grid") => void;
+  totalCount: number;
 }
 
-export default function EmployerFilterSortBar({ viewMode, setViewMode }: Props) {
+export default function EmployerFilterSortBar({ viewMode, setViewMode, totalCount }: Props) {
   return (
     <div className="flex items-center justify-between bg-white border border-gray-150 rounded-xl px-5 py-3.5 shadow-sm">
       
       <span className="text-sm text-gray-500">
-        Showing <span className="font-bold text-gray-900">120</span> employers
+        Showing <span className="font-bold text-gray-900">{totalCount}</span> employers
       </span>
 
       <div className="flex items-center gap-3">

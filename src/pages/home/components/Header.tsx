@@ -5,6 +5,8 @@ import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import Button from '../../../components/ui/Button';
 import ComboBox, { type OptionType } from '../../../components/ui/ComboBox';
 import Logo from '../../../components/Logo';
+import useAuth from '../../../contexts/auth/useAuth';
+import { getDefaultAuthenticatedRoute } from '../../../contexts/auth/auth-utils';
 const languages = [
     { label: 'English', value: 'english' },
     { label: 'Vietnamese', value: 'vietnamese' },
@@ -22,6 +24,8 @@ export default function Header() {
     const { scrollY } = useScroll();
     const [hidden, setHidden] = useState(false);
     const [language, setLanguage] = useState<OptionType>(languages[0]);
+    const { user, isAuthenticated } = useAuth();
+    const dashboardRoute = getDefaultAuthenticatedRoute(user);
 
     useMotionValueEvent(scrollY, 'change', (latest) => {
         const previous = scrollY.getPrevious() ?? 0;
@@ -82,19 +86,14 @@ export default function Header() {
                         className='flex-1 w-full bg-transparent border-none outline-none text-sm placeholder:text-gray-400'
                     />
                 </div>
-
                 <div className='flex items-center gap-4'>
-                    <Link to='/login'>
+                    
+                    <Link to={isAuthenticated ? dashboardRoute : '/login'}>
                         <Button
                             variant='social'
                             className='px-6 py-2 border-primary-100 text-primary-500 hover:bg-primary-50'
                         >
-                            Sign In
-                        </Button>
-                    </Link>
-                    <Link to='/employer/post-job'>
-                        <Button variant='primary' className='px-6 py-2'>
-                            Post A Job
+                            {isAuthenticated ? 'Dashboard' : 'Sign In'}
                         </Button>
                     </Link>
                 </div>

@@ -1,9 +1,12 @@
 import { Bell, Search, Phone } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import Logo from '../Logo';
+import useAuth from '../../contexts/auth/useAuth';
+import { getDefaultAuthenticatedRoute } from '../../contexts/auth/auth-utils';
 
 export default function CandidateTopBar() {
     const location = useLocation();
+    const { user } = useAuth();
 
     const topNavItems = [
         { label: 'Home', path: '/jobseeker/home' },
@@ -76,7 +79,10 @@ export default function CandidateTopBar() {
                         <span className='absolute top-1.5 right-2 w-2.5 h-2.5 bg-danger-500 border-2 border-white rounded-full' />
                     </button>
 
-                    <Link to='/jobseeker/DashBoard/overview' className='rounded-full hover:ring-2 ring-primary-500/20 transition-all cursor-pointer'>
+                    <Link
+                        to={getDefaultAuthenticatedRoute(user)}
+                        className='rounded-full hover:ring-2 ring-primary-500/20 transition-all cursor-pointer'
+                    >
                         <img
                             src='https://i.pravatar.cc/150?img=11'
                             alt='User avatar'

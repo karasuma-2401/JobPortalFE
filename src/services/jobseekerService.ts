@@ -1,103 +1,206 @@
-import { privateApi } from "../api/api";
+import { privateApi, publicApi } from '../api/api';
 import type {
-  Job,
-  JobDetailType,
-  Employer,
-  EmployerDetail,
-  JobFilterParams,
-  EmployerFilterParams,
-  ApplyJobRequest,
-  AppliedJobType,
-  FavoriteJobType,
-  JobAlertItemType,
-  DashboardOverviewType,
-  Resume
-} from "../types/jobseeker";
+    ApiResponse,
+    ApplyJobRequest,
+    AppliedJobType,
+    DashboardOverviewType,
+    Employer,
+    EmployerDetail,
+    EmployerFilterParams,
+    FavoriteJobType,
+    Job,
+    JobAlertItemType,
+    JobDetailType,
+    JobFilterParams,
+    JobSeekerProfile,
+    PagedResponse,
+    Resume,
+} from '../types/jobseeker';
+
+const MULTIPART_HEADERS = {
+    'Content-Type': 'multipart/form-data',
+};
 
 export const JobseekerService = {
-  // Favorite
-  getFavoriteJobIds: async (): Promise<string[]> => {
-    return privateApi.get("/job-seeker/favorite-job-ids");
-  },
+    getProfile: async (): Promise<JobSeekerProfile> => {
+        return privateApi.get('/job-seeker');
+    },
 
-  toggleFavoriteJob: async (jobId: string): Promise<void> => {
-    return privateApi.post("/job-seeker/favorite-jobs/toggle", { jobId });
-  },
+    createProfile: async (formData: FormData): Promise<JobSeekerProfile> => {
+        return privateApi.post('/job-seeker', formData, {
+            headers: MULTIPART_HEADERS,
+        });
+    },
 
-  // Jobs
-  getJobs: async (
-    params: JobFilterParams
-  ): Promise<{ items: Job[]; totalCount: number }> => {
-    return privateApi.get("/jobpost", { params });
-  },
+    updateProfile: async (formData: FormData): Promise<JobSeekerProfile> => {
+        return privateApi.patch('/job-seeker', formData, {
+            headers: MULTIPART_HEADERS,
+        });
+    },
 
-  getJobDetail: async (id: string): Promise<JobDetailType> => {
-    return privateApi.get(`/jobpost/${id}`);
-  },
+    getFavoriteJobIds: async (): Promise<string[]> => {
+        const page = (await privateApi.get('/job-seeker/saved-jobs', {
+            params: { offset: 0, limit: 100 },
+        })) as ApiResponse<PagedResponse<FavoriteJobType>>;
 
-  applyJob: async (payload: ApplyJobRequest): Promise<void> => {
-    return privateApi.post("/job-application", payload);
-  },
+        return page.data.items.map((job) => job.id);
+    },
 
-  // Employers
-  getEmployers: async (
-    params: EmployerFilterParams
-  ): Promise<{ items: Employer[]; totalCount: number }> => {
-    return privateApi.get("/employer", { params });
-  },
+    toggleFavoriteJob: async (jobId: string): Promise<void> => {
+        await privateApi.post(`/job-seeker/saved-jobs/${jobId}/toggle`);
+    },
 
-  getEmployerDetail: async (id: string): Promise<EmployerDetail> => {
-    return privateApi.get(`/employer/${id}`);
-  },
+    getJobs: async (params: JobFilterParams): Promise<PagedResponse<Job>> => {
+        const { page, limit, ...filters } = params;
+        const offset = (page - 1) * limit;
+        const response = (await publicApi.get('/jobpost', {
+            params: {
+                ...filters,
+                offset,
+                limit,
+            },
+        })) as ApiResponse<PagedResponse<Job>>;
 
-  getJobsByEmployer: async (employerId: string): Promise<Job[]> => {
-    return privateApi.get(`/employer/${employerId}/jobs`);
-  },
+        return response.data;
+    },
 
-  // Dashboard
-  getDashboardOverview: async (): Promise<DashboardOverviewType> => {
-    return privateApi.get("/job-seeker/statistics");
-  },
+    getJobDetail: async (id: string): Promise<JobDetailType> => {
+        return publicApi.get(`/jobpost/${id}`);
+    },
 
-  // Applied Jobs
-  getAppliedJobs: async (
-    page: number,
-    limit: number
-  ): Promise<{ items: AppliedJobType[]; totalCount: number }> => {
-    const offset = (page - 1) * limit; 
-    
-    return privateApi.get("/job-application", {
-      params: { offset, limit },
-    });
-  },
+    applyJob: async (payload: ApplyJobRequest): Promise<void> => {
+        await privateApi.post('/job-seeker/apply', {
+            jobId: Number(payload.jobId),
+            resumeId: Number(payload.resumeId),
+            coverLetter: payload.coverLetter,
+        });
+    },
 
-  // Favorite Jobs
-  getFavoriteJobs: async (
-    page: number,
-    limit: number
-  ): Promise<{ items: FavoriteJobType[]; totalCount: number }> => {
-    return privateApi.get("/job-seeker/favorite-jobs", {
-      params: { page, limit },
-    });
-  },
+    getEmployers: async (
+        params: EmployerFilterParams
+    ): Promise<PagedResponse<Employer>> => {
+        const { page, limit, keyword, location, category } = params;
 
-  // Job Alerts
-  getJobAlerts: async (
-    page: number,
-    limit: number
-  ): Promise<{ items: JobAlertItemType[]; totalCount: number }> => {
-    const offset = (page - 1) * limit;
-    return privateApi.get("/jobpost", {
-      params: { offset, limit },
-    });
-  },
-  getMyResumes: async (): Promise<Resume[]> => {
-        try {
-            return privateApi.get("/job-seeker/resume")
-            
-        } catch (error) {
-            console.error("Lỗi khi lấy danh sách CV:", error);
-            throw error;
-        }
+        const query: Record<string, unknown> = {
+            offset: (page - 1) * limit,
+            limit,
+        };
+
+        if (keyword) query.keyword = keyword;
+        if (location) query.location = location;
+        if (category) query.category = category;
+
+        const res = (await publicApi.get(
+            "/employers",
+            { params: query }
+        )) as ApiResponse<PagedResponse<Employer>>;
+
+        const data = res.data;
+
+        return {
+            items: data.items,
+            totalItems: data.totalItems,
+            page: data.page + 1,
+            size: data.size,
+        };
+    },
+
+    getEmployerDetail: async (id: string): Promise<EmployerDetail> => {
+        return publicApi.get(`/employers/${id}`);
+    },
+
+    getJobsByEmployer: async (employerId: string): Promise<Job[]> => {
+        const res = (await publicApi.get(
+            `/employers/${employerId}/jobs`
+        )) as ApiResponse<Job[]>;
+        return res.data;
+    },
+
+    getDashboardOverview: async (): Promise<DashboardOverviewType> => {
+        const response = (await privateApi.get(
+            '/job-seeker/statistics'
+        )) as ApiResponse<DashboardOverviewType>;
+
+        return response.data;
+    },
+
+    getAppliedJobs: async (
+        page: number,
+        limit: number
+    ): Promise<{ items: AppliedJobType[]; totalCount: number }> => {
+        const offset = (page - 1) * limit;
+        const response = (await privateApi.get('/job-seeker/applications', {
+            params: { offset, limit },
+        })) as ApiResponse<PagedResponse<AppliedJobType>>;
+
+        return {
+            items: response.data.items,
+            totalCount: response.data.totalItems,
+        };
+    },
+
+    getFavoriteJobs: async (
+        page: number,
+        limit: number
+    ): Promise<{ items: FavoriteJobType[]; totalCount: number }> => {
+        const offset = (page - 1) * limit;
+        const response = (await privateApi.get('/job-seeker/saved-jobs', {
+            params: { offset, limit },
+        })) as ApiResponse<PagedResponse<FavoriteJobType>>;
+
+        return {
+            items: response.data.items,
+            totalCount: response.data.totalItems,
+        };
+    },
+
+    getJobAlerts: async (
+        page: number,
+        limit: number
+    ): Promise<{ items: JobAlertItemType[]; totalCount: number }> => {
+        const offset = (page - 1) * limit;
+        const response = (await privateApi.get('/job-seeker/alerts', {
+            params: { offset, limit },
+        })) as ApiResponse<PagedResponse<JobAlertItemType>>;
+
+        return {
+            items: response.data.items,
+            totalCount: response.data.totalItems,
+        };
+    },
+
+    getMyResumes: async (): Promise<Resume[]> => {
+        return privateApi.get('/resumes/me');
+    },
+
+    uploadResume: async (
+        file: File,
+        fileName: string,
+        isDefault?: boolean
+    ): Promise<Resume> => {
+        const formData = new FormData();
+
+        formData.append('file', file);
+        formData.append('fileName', fileName);
+
+        return privateApi.post('/resumes/upload', formData, {
+            params:
+                typeof isDefault === 'boolean'
+                    ? { isDefault }
+                    : undefined,
+            headers: MULTIPART_HEADERS,
+        });
+    },
+
+    renameResume: async (resumeId: string, fileName: string): Promise<void> => {
+        await privateApi.patch(`/resumes/${resumeId}/name`, { fileName });
+    },
+
+    setDefaultResume: async (resumeId: string): Promise<void> => {
+        await privateApi.patch(`/resumes/${resumeId}/default`);
+    },
+
+    deleteResume: async (resumeId: string): Promise<void> => {
+        await privateApi.delete(`/resumes/${resumeId}`);
     },
 };
