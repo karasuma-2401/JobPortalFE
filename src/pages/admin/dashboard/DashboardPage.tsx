@@ -69,21 +69,21 @@ export default function DashboardPage() {
                 />
                 <StatCard
                     title='Users'
-                    value={summary.totalUsers.toLocaleString()}
+                    value={(summary.totalUsers ?? 0).toLocaleString()}
                     icon={<Users size={24} />}
                     iconBgColor='bg-purple-50'
                     iconColor='text-purple-600'
                 />
                 <StatCard
                     title='Active Jobs'
-                    value={summary.activeJobs.toLocaleString()}
+                    value={(summary.activeJobs ?? 0).toLocaleString()}
                     icon={<Briefcase size={24} />}
                     iconBgColor='bg-green-50'
                     iconColor='text-green-600'
                 />
                 <StatCard
                     title='Pending Employers'
-                    value={summary.pendingEmployers.toLocaleString()}
+                    value={(summary.pendingEmployers ?? 0).toLocaleString()}
                     icon={<Building2 size={24} />}
                     iconBgColor='bg-orange-50'
                     iconColor='text-orange-600'
@@ -96,7 +96,7 @@ export default function DashboardPage() {
                 <div className='flex flex-col gap-6'>
                     <IndustryPieChart
                         data={summary.industryBreakdown || []}
-                        totalJobs={summary.activeJobs}
+                        totalJobs={summary.activeJobs ?? 0}
                     />
                     <PendingApprovalsList employers={summary.pendingEmployersList || []} />
                 </div>

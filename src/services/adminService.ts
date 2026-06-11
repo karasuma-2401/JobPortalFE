@@ -102,7 +102,22 @@ export interface PaymentResponse {
     payerEmail: string;
     employerName: string;
 }
+export interface BackendResponseEnvelope<T> {
+    success: boolean;
+    message?: string;
+    data: T;
+}
 
+// Định nghĩa một cấu trúc linh hoạt đại diện cho Page từ Backend
+export interface FlexiblePageData<T> {
+    items?: T[];
+    content?: T[];
+    totalItems?: number;
+    totalElements?: number;
+    page?: number;
+    number?: number;
+    size?: number;
+}
 export const AdminService = {
     // 1. Dashboard
     getDashboardSummary: async (): Promise<AdminDashboardSummary> => {
@@ -110,32 +125,42 @@ export const AdminService = {
     },
 
     // 2. Users
-    getUsers: async (params: {
-        search?: string;
-        role?: string;
-        active?: boolean;
-        offset: number;
-        limit: number;
+   getUsers: async (params: {
+    search?: string;
+    role?: string;
+    active?: boolean;
+    offset: number;
+    limit: number;
     }): Promise<PageResponse<UserResponse>> => {
-        return privateApi.get("/admin/users", { params });
+        const response = await privateApi.get("/admin/users", { params }) as unknown as BackendResponseEnvelope<FlexiblePageData<UserResponse>>;
+        
+        const pageData = response.data;
+
+        return {
+            items: pageData?.items || pageData?.content || [],
+            totalItems: pageData?.totalItems || pageData?.totalElements || 0,
+            page: pageData?.page || 0,
+            size: pageData?.size || 10
+        };
     },
 
-    toggleUserLock: async (id: number): Promise<UserResponse> => {
-        return privateApi.put(`/admin/users/${id}/lock`);
-    },
-
-    deactivateUser: async (id: number): Promise<UserResponse> => {
-        return privateApi.delete(`/admin/users/${id}`);
-    },
-
-    // 3. Employers
+// 3. Employers
     getEmployers: async (params: {
         search?: string;
         status?: string;
         limit: number;
         offset: number;
     }): Promise<PageResponse<EmployerProfileResponse>> => {
-        return privateApi.get("/admin/employers", { params });
+        const response = await privateApi.get("/admin/employers", { params }) as unknown as BackendResponseEnvelope<FlexiblePageData<EmployerProfileResponse>>;
+        
+        const pageData = response.data;
+
+        return {
+            items: pageData?.items || pageData?.content || [],
+            totalItems: pageData?.totalItems || pageData?.totalElements || 0,
+            page: pageData?.page || 0,
+            size: pageData?.size || 10
+        };
     },
 
     getEmployerById: async (id: number): Promise<EmployerProfileResponse> => {

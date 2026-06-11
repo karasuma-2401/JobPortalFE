@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Trash2, AlertTriangle } from 'lucide-react';
-import { toast } from 'sonner';
+
 import {
     type AuditLog,
     type ActionType,
@@ -9,8 +8,8 @@ import {
 import AuditLogFilterBar from './components/AuditLogFilterBar';
 import LogDetailModal from './components/LogDetailModal';
 import TablePagination from '../../../components/ui/TablePagination';
-import ConfirmModal from '../../../components/ui/ConfirmModal';
 import AuditLogTable from './components/AuditLogTable';
+
 
 const MOCK_LOGS: AuditLog[] = [
     {
@@ -70,7 +69,8 @@ const MOCK_LOGS: AuditLog[] = [
     },
 ];
 export default function AuditLogPage() {
-    const [logs, setLogs] = useState<AuditLog[]>(MOCK_LOGS);
+    const [logs] = useState<AuditLog[]>(MOCK_LOGS);
+
 
     const [searchQuery, setSearchQuery] = useState('');
     const [actionFilter, setActionFilter] = useState<ActionType | 'All'>('All');
@@ -83,8 +83,7 @@ export default function AuditLogPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
-    const [bulkDelete, setBulkDelete] = useState(false);
-    const [clearOld, setClearOld] = useState(false);
+
 
     const filteredLogs = useMemo(() => {
         return logs.filter((log) => {
@@ -121,20 +120,7 @@ export default function AuditLogPage() {
         else setSelectedIds((prev) => prev.filter((item) => item != null));
     };
 
-    const executeBulkDelete = () => {
-        setLogs((prev) => prev.filter((log) => !selectedIds.includes(log.id)));
-        setSelectedIds([]);
-        setBulkDelete(false);
-        toast.success(`${selectedIds.length} logs deleted successfully.`);
-    };
 
-    const executeClearOldLogs = () => {
-        setLogs((prev) =>
-            prev.filter((log) => !log.createdAt.startsWith('2024-01'))
-        );
-        setClearOld(false);
-        toast.success('Old logs cleared successfully');
-    };
 
     return (
         <div className='animate-in fade-in duration-500 h-full flex flex-col'>
@@ -149,24 +135,10 @@ export default function AuditLogPage() {
                 </div>
 
                 <div className='flex items-center gap-3'>
-                    {selectedIds.length > 0 && (
-                        <button
-                            onClick={() => setBulkDelete(true)}
-                            className='flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 text-sm font-bold rounded-lg hover:bg-red-100 transition-colors animate-in slide-in-from-right-4'
-                        >
-                            <Trash2 size={16} /> Delete Selected (
-                            {selectedIds.length})
-                        </button>
-                    )}
-                    <button
-                        onClick={() => setClearOld(true)}
-                        className='flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-colors shadow-sm'
-                    >
-                        <AlertTriangle size={16} className='text-yellow-500' />{' '}
-                        <p className='text-yellow-500'>Clear 30 Days</p>
-                    </button>
+                    {/* Removed audit-log deletion actions */}
                 </div>
             </div>
+
 
             <div className='bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col flex-1 overflow-hidden'>
                 <AuditLogFilterBar
@@ -208,25 +180,7 @@ export default function AuditLogPage() {
                 log={selectedLog}
             />
 
-            <ConfirmModal
-                isOpen={bulkDelete}
-                title='Delete Selected Logs'
-                message={`Are you sure you want to permanently delete ${selectedIds.length} selected log entries? This action cannot be undone.`}
-                onConfirm={executeBulkDelete}
-                onCancel={() => setBulkDelete(false)}
-                confirmText='Delete Logs'
-                isDanger={true}
-            />
 
-            <ConfirmModal
-                isOpen={clearOld}
-                title='Clear Old Logs'
-                message='Are you sure you want to delete all audit logs older than 30 days? This will permanently erase historical tracking data.'
-                onConfirm={executeClearOldLogs}
-                onCancel={() => setClearOld(false)}
-                confirmText='Clear Old Data'
-                isDanger={true}
-            />
         </div>
     );
 }

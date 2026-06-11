@@ -35,14 +35,28 @@ export default function EmployerApprovalPage() {
                 limit: itemsPerPage,
             });
 
-            const mapped: EmployerProfile[] = response.items.map((emp) => ({
+            // AdminService.getEmployers() trả theo contract PageResponse<T>
+            // nên dữ liệu nằm trực tiếp ở response.items / response.totalItems.
+            const items = response?.items ?? [];
+            const total = response?.totalItems ?? 0;
+
+            const mapped: EmployerProfile[] = items.map((emp) => ({
                 id: String(emp.id),
                 companyName: emp.companyName || 'No Name',
                 email: emp.email || 'N/A',
                 industry: emp.industry || 'N/A',
-                registrationDate: emp.createdAt ? new Date(emp.createdAt).toLocaleString() : 'N/A',
-                status: emp.approvalStatus === 'PENDING' ? 'Pending' : (emp.approvalStatus === 'APPROVED' ? 'Approved' : 'Rejected'),
-                logoUrl: emp.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.companyName || '')}&background=random`,
+                registrationDate: emp.createdAt
+                    ? new Date(emp.createdAt).toLocaleString()
+                    : 'N/A',
+                status:
+                    emp.approvalStatus === 'PENDING'
+                        ? 'Pending'
+                        : emp.approvalStatus === 'APPROVED'
+                          ? 'Approved'
+                          : 'Rejected',
+                logoUrl:
+                    emp.logo ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.companyName || '')}&background=random`,
                 bannerUrl: emp.banner || '',
                 address: emp.address || '',
                 website: emp.companyWebsite || '',
@@ -51,7 +65,9 @@ export default function EmployerApprovalPage() {
             }));
 
             setEmployers(mapped);
-            setTotalItems(response.totalItems);
+            setTotalItems(total);
+
+
         } catch (error) {
             console.error('Failed to load employers:', error);
             toast.error('Failed to load employer profiles');
