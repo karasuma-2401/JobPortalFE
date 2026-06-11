@@ -1,71 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import EmployerTable from './components/EmployerTable';
 import { type EmployerProfile, type ApprovalStatus } from './components/types';
-
-const MOCK_EMPLOYERS: EmployerProfile[] = [
-    {
-        id: 'EMP-001',
-        companyName: 'TechVision Inc.',
-        email: 'contact@techvision.com',
-        industry: 'Information Technology',
-        registrationDate: '2024-03-20 10:30',
-        status: 'Pending',
-        logoUrl:
-            'https://ui-avatars.com/api/?name=TV&background=2563eb&color=fff',
-        bannerUrl: '',
-        address: '',
-        website: '',
-        businessLicenseUrl: null,
-        description: '',
-    },
-    {
-        id: 'EMP-002',
-        companyName: 'Global Solutions',
-        email: 'hello@global.com',
-        industry: 'Finance & Banking',
-        registrationDate: '2024-03-19 14:15',
-        status: 'Approved',
-        logoUrl:
-            'https://ui-avatars.com/api/?name=GS&background=059669&color=fff',
-        bannerUrl: '',
-        address: '',
-        website: '',
-        businessLicenseUrl: null,
-        description: '',
-    },
-    {
-        id: 'EMP-003',
-        companyName: 'Alpha Startups',
-        email: 'join@alpha.co',
-        industry: 'Healthcare',
-        registrationDate: '2024-03-18 09:00',
-        status: 'Rejected',
-        logoUrl:
-            'https://ui-avatars.com/api/?name=AS&background=dc2626&color=fff',
-        bannerUrl: '',
-        address: '',
-        website: '',
-        businessLicenseUrl: null,
-        description: '',
-    },
-    {
-        id: 'EMP-004',
-        companyName: 'Omega Corp',
-        email: 'admin@omega.net',
-        industry: 'Manufacturing',
-        registrationDate: '2024-03-21 11:45',
-        status: 'Pending',
-        logoUrl:
-            'https://ui-avatars.com/api/?name=OC&background=4f46e5&color=fff',
-        bannerUrl: '',
-        address: '',
-        website: '',
-        businessLicenseUrl: null,
-        description: '',
-    },
-];
+import { AdminService } from '../../../services/adminService';
+import TablePagination from '../../../components/ui/TablePagination';
+import { toast } from 'sonner';
 
 const TABS: { label: string; value: ApprovalStatus }[] = [
     { label: 'Pending Review', value: 'Pending' },
@@ -77,25 +17,74 @@ export default function EmployerApprovalPage() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<ApprovalStatus>('Pending');
     const [searchQuery, setSearchQuery] = useState('');
+    const [employers, setEmployers] = useState<EmployerProfile[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [totalItems, setTotalItems] = useState(0);
 
-    const filteredEmployers = useMemo(() => {
-        return MOCK_EMPLOYERS.filter((employer) => {
-            const matchesTab = employer.status === activeTab;
-            const matchesSearch =
-                employer.companyName
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase()) ||
-                employer.email
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase());
+    const loadEmployers = useCallback(async () => {
+        setLoading(true);
+        try {
+            const statusParam = activeTab === 'Pending' ? 'PENDING' : (activeTab === 'Approved' ? 'APPROVED' : 'REJECTED');
+            
+            const response = await AdminService.getEmployers({
+                search: searchQuery || undefined,
+                status: statusParam,
+                offset: (currentPage - 1) * itemsPerPage,
+                limit: itemsPerPage,
+            });
 
-            return matchesTab && matchesSearch;
-        });
-    }, [activeTab, searchQuery]);
+            // AdminService.getEmployers() trả theo contract PageResponse<T>
+            // nên dữ liệu nằm trực tiếp ở response.items / response.totalItems.
+            const items = response?.items ?? [];
+            const total = response?.totalItems ?? 0;
+
+            const mapped: EmployerProfile[] = items.map((emp) => ({
+                id: String(emp.id),
+                companyName: emp.companyName || 'No Name',
+                email: emp.email || 'N/A',
+                industry: emp.industry || 'N/A',
+                registrationDate: emp.createdAt
+                    ? new Date(emp.createdAt).toLocaleString()
+                    : 'N/A',
+                status:
+                    emp.approvalStatus === 'PENDING'
+                        ? 'Pending'
+                        : emp.approvalStatus === 'APPROVED'
+                          ? 'Approved'
+                          : 'Rejected',
+                logoUrl:
+                    emp.logo ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.companyName || '')}&background=random`,
+                bannerUrl: emp.banner || '',
+                address: emp.address || '',
+                website: emp.companyWebsite || '',
+                businessLicenseUrl: emp.businessLicense || null,
+                description: emp.description || '',
+            }));
+
+            setEmployers(mapped);
+            setTotalItems(total);
+
+
+        } catch (error) {
+            console.error('Failed to load employers:', error);
+            toast.error('Failed to load employer profiles');
+        } finally {
+            setLoading(false);
+        }
+    }, [activeTab, searchQuery, currentPage, itemsPerPage]);
+
+    useEffect(() => {
+        loadEmployers();
+    }, [loadEmployers]);
 
     const handleReview = (id: string) => {
         navigate(`/admin/employer-approvals/${id}`);
     };
+
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     return (
         <div className='animate-in fade-in duration-500 h-full flex flex-col'>
@@ -116,7 +105,10 @@ export default function EmployerApprovalPage() {
                         {TABS.map((tab) => (
                             <button
                                 key={tab.value}
-                                onClick={() => setActiveTab(tab.value)}
+                                onClick={() => {
+                                    setActiveTab(tab.value);
+                                    setCurrentPage(1);
+                                }}
                                 className={`flex items-center gap-2 px-4 py-4 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${
                                     activeTab === tab.value
                                         ? 'border-blue-600 text-blue-600'
@@ -139,17 +131,38 @@ export default function EmployerApprovalPage() {
                             type='text'
                             placeholder='Search by Company Name or Email...'
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                setCurrentPage(1);
+                            }}
                             className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white'
                         />
                     </div>
                 </div>
 
-                <EmployerTable
-                    employers={filteredEmployers}
-                    onReview={handleReview}
+                {loading ? (
+                    <div className='flex-1 flex items-center justify-center p-12'>
+                        <div className='w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin'></div>
+                    </div>
+                ) : (
+                    <EmployerTable
+                        employers={employers}
+                        onReview={handleReview}
+                    />
+                )}
+
+                <TablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={setCurrentPage}
+                    onItemsPerPageChange={(items) => {
+                        setItemsPerPage(items);
+                        setCurrentPage(1);
+                    }}
                 />
             </div>
         </div>
     );
 }
+
