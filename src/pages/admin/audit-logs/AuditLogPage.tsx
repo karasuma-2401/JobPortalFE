@@ -1,77 +1,57 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
-import {
-    type AuditLog,
-    type ActionType,
-    type EntityType,
-} from './components/types';
-import AuditLogFilterBar from './components/AuditLogFilterBar';
-import LogDetailModal from './components/LogDetailModal';
+import { useAdminAuditLogs } from '../../../hooks/admin/useAdminAuditLogs';
 import TablePagination from '../../../components/ui/TablePagination';
+import AuditLogFilterBar from './components/AuditLogFilterBar';
 import AuditLogTable from './components/AuditLogTable';
+import LogDetailModal from './components/LogDetailModal';
+import type {
+    ActionType,
+    AuditLog,
+    EntityType,
+} from './components/types';
 
+const toAdminAuditActionType = (
+    action: ActionType | 'All'
+): 'All' | 'CREATE' | 'UPDATE' | 'DELETE' => {
+    switch (action) {
+        case 'All':
+            return 'All';
+        case 'Create':
+        case 'Approve':
+            return 'CREATE';
+        case 'Update':
+            return 'UPDATE';
+        case 'Delete':
+        case 'Reject':
+            return 'DELETE';
+        case 'Login':
+            return 'All';
+        default:
+            return 'All';
+    }
+};
 
-const MOCK_LOGS: AuditLog[] = [
-    {
-        id: 'LOG-9001',
-        createdAt: '2024-05-28 08:15',
-        userId: 'U-01',
-        email: 'admin@system.com',
-        action: 'Approve',
-        entityType: 'EmployerProfile',
-        entityId: 'EMP-001',
-        ipAddress: '192.168.1.1',
-        description: JSON.stringify({
-            previousStatus: 'Pending',
-            newStatus: 'Approved',
-            notes: 'Verified docs.',
-        }),
-    },
-    {
-        id: 'LOG-9002',
-        createdAt: '2024-05-27 14:20',
-        userId: 'U-02',
-        email: 'hr@techvision.com',
-        action: 'Create',
-        entityType: 'JobPost',
-        entityId: 'JOB-405',
-        ipAddress: '14.22.105.11',
-        description: JSON.stringify({
-            title: 'Senior React Dev',
-            salary: '$120k',
-            type: 'Full-time',
-        }),
-    },
-    {
-        id: 'LOG-9003',
-        createdAt: '2024-05-26 09:00',
-        userId: 'U-03',
-        email: 'candidate@gmail.com',
-        action: 'Login',
-        entityType: 'System',
-        entityId: 'SYS',
-        ipAddress: '103.11.2.99',
-        description: 'User logged in successfully via Google OAuth.',
-    },
-    {
-        id: 'LOG-9004',
-        createdAt: '2024-04-15 16:45',
-        userId: 'U-01',
-        email: 'admin@system.com',
-        action: 'Delete',
-        entityType: 'User',
-        entityId: 'U-999',
-        ipAddress: '192.168.1.1',
-        description: JSON.stringify({
-            deletedEmail: 'spammer@bad.com',
-            reason: 'Violated terms of service.',
-        }),
-    },
-];
+type AuditLogResponse = {
+    id: number | string;
+    createdAt: string;
+    actionType: 'CREATE' | 'UPDATE' | 'DELETE';
+    userId: number | string;
+    userName?: string;
+    data: string;
+    // Flexible backend fields
+    entityName?: string;
+    recordId?: number | string;
+};
+
+type AuditLogItemLike = AuditLogResponse & {
+    email?: string;
+    entityType?: string;
+    entityId?: number | string;
+    ipAddress?: string;
+};
+
 export default function AuditLogPage() {
-    const [logs] = useState<AuditLog[]>(MOCK_LOGS);
-
-
     const [searchQuery, setSearchQuery] = useState('');
     const [actionFilter, setActionFilter] = useState<ActionType | 'All'>('All');
     const [entityFilter, setEntityFilter] = useState<EntityType | 'All'>('All');
@@ -80,47 +60,60 @@ export default function AuditLogPage() {
 
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
+
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+    const { data, isLoading } = useAdminAuditLogs({
+        searchQuery,
+        actionType: toAdminAuditActionType(actionFilter),
+        entityFilter,
+        startDate,
+        endDate,
+        currentPage,
+        itemsPerPage,
+    });
 
+    const logs: AuditLog[] = useMemo(() => {
+        const items = (data?.items ?? []) as AuditLogItemLike[];
 
-    const filteredLogs = useMemo(() => {
-        return logs.filter((log) => {
-            const matchSearch =
-                log.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                log.userId.toLowerCase().includes(searchQuery.toLowerCase());
-            const matchAction =
-                actionFilter === 'All' || log.action === actionFilter;
-            const matchEntity =
-                entityFilter === 'All' || log.entityId === entityFilter;
+        return items.map((log) => {
+            const action: ActionType =
+                log.actionType === 'CREATE'
+                    ? 'Create'
+                    : log.actionType === 'UPDATE'
+                      ? 'Update'
+                      : 'Delete';
 
-            let matchDate = true;
-            if (startDate && endDate) {
-                const logDate = log.createdAt.split(' ')[0];
-                matchDate = logDate >= startDate && logDate <= endDate;
-            }
-            return matchSearch && matchAction && matchEntity && matchDate;
+            const entityType = (log.entityName ?? log.entityType ?? 'System') as EntityType;
+            const entityId = String(log.recordId ?? log.entityId ?? '');
+
+            return {
+                id: String(log.id),
+                createdAt: log.createdAt,
+                userId: String(log.userId),
+                email: log.userName ?? log.email ?? 'N/A',
+                action,
+                entityType,
+                entityId,
+                ipAddress: log.ipAddress ?? 'N/A',
+                description: log.data ? String(log.data) : '',
+            };
         });
-    }, [logs, searchQuery, actionFilter, entityFilter, startDate, endDate]);
+    }, [data]);
 
-    const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
-    const currentItems = useMemo(() => {
-        const start = (currentPage - 1) * itemsPerPage;
-        return filteredLogs.slice(start, start + itemsPerPage);
-    }, [filteredLogs, currentPage, itemsPerPage]);
+    const totalItems = data?.totalItems ?? 0;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     const handleToggleSelectAll = (checked: boolean) => {
-        if (checked) setSelectedIds(currentItems.map((log) => log.id));
+        if (checked) setSelectedIds(logs.map((l) => l.id));
         else setSelectedIds([]);
     };
 
     const handleToggleSelectRow = (id: string, checked: boolean) => {
         if (checked) setSelectedIds((prev) => [...prev, id]);
-        else setSelectedIds((prev) => prev.filter((item) => item != null));
+        else setSelectedIds((prev) => prev.filter((item) => item !== id));
     };
-
-
 
     return (
         <div className='animate-in fade-in duration-500 h-full flex flex-col'>
@@ -139,7 +132,6 @@ export default function AuditLogPage() {
                 </div>
             </div>
 
-
             <div className='bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col flex-1 overflow-hidden'>
                 <AuditLogFilterBar
                     searchQuery={searchQuery}
@@ -154,13 +146,19 @@ export default function AuditLogPage() {
                     onEndDateChange={setEndDate}
                 />
 
-                <AuditLogTable
-                    logs={currentItems}
-                    selectedIds={selectedIds}
-                    onToggleSelectAll={handleToggleSelectAll}
-                    onToggleSelectRow={handleToggleSelectRow}
-                    onViewDetail={setSelectedLog}
-                />
+                {isLoading ? (
+                    <div className='flex-1 flex items-center justify-center p-12'>
+                        <div className='w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin'></div>
+                    </div>
+                ) : (
+                    <AuditLogTable
+                        logs={logs}
+                        selectedIds={selectedIds}
+                        onToggleSelectAll={handleToggleSelectAll}
+                        onToggleSelectRow={handleToggleSelectRow}
+                        onViewDetail={setSelectedLog}
+                    />
+                )}
 
                 <TablePagination
                     currentPage={currentPage}
@@ -179,8 +177,7 @@ export default function AuditLogPage() {
                 onClose={() => setSelectedLog(null)}
                 log={selectedLog}
             />
-
-
         </div>
     );
 }
+

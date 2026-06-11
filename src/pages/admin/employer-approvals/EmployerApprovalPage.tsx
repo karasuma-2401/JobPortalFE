@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useMemo, useState } from 'react';
+
 import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import EmployerTable from './components/EmployerTable';
 import { type EmployerProfile, type ApprovalStatus } from './components/types';
-import { AdminService } from '../../../services/adminService';
 import TablePagination from '../../../components/ui/TablePagination';
-import { toast } from 'sonner';
+import { useAdminEmployers } from '../../../hooks/admin/useAdminEmployers';
 
 const TABS: { label: string; value: ApprovalStatus }[] = [
     { label: 'Pending Review', value: 'Pending' },
@@ -17,74 +17,50 @@ export default function EmployerApprovalPage() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<ApprovalStatus>('Pending');
     const [searchQuery, setSearchQuery] = useState('');
-    const [employers, setEmployers] = useState<EmployerProfile[]>([]);
-    const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [totalItems, setTotalItems] = useState(0);
 
-    const loadEmployers = useCallback(async () => {
-        setLoading(true);
-        try {
-            const statusParam = activeTab === 'Pending' ? 'PENDING' : (activeTab === 'Approved' ? 'APPROVED' : 'REJECTED');
-            
-            const response = await AdminService.getEmployers({
-                search: searchQuery || undefined,
-                status: statusParam,
-                offset: (currentPage - 1) * itemsPerPage,
-                limit: itemsPerPage,
-            });
+    const { data, isLoading } = useAdminEmployers({
+        tab: activeTab,
+        searchQuery,
+        currentPage,
+        itemsPerPage,
+    });
 
-            // AdminService.getEmployers() trả theo contract PageResponse<T>
-            // nên dữ liệu nằm trực tiếp ở response.items / response.totalItems.
-            const items = response?.items ?? [];
-            const total = response?.totalItems ?? 0;
+    const employers = useMemo<EmployerProfile[]>(() => {
+        const items = data?.items ?? [];
+        return items.map((emp) => ({
+            id: String(emp.id),
+            companyName: emp.companyName || 'No Name',
+            email: emp.email || 'N/A',
+            industry: emp.industry || 'N/A',
+            registrationDate: emp.createdAt
+                ? new Date(emp.createdAt).toLocaleString()
+                : 'N/A',
+            status:
+                emp.approvalStatus === 'PENDING'
+                    ? 'Pending'
+                    : emp.approvalStatus === 'APPROVED'
+                      ? 'Approved'
+                      : 'Rejected',
+            logoUrl:
+                emp.logo ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.companyName || '')}&background=random`,
+            bannerUrl: emp.banner || '',
+            address: emp.address || '',
+            website: emp.companyWebsite || '',
+            businessLicenseUrl: emp.businessLicense || null,
+            description: emp.description || '',
+        }));
+    }, [data]);
 
-            const mapped: EmployerProfile[] = items.map((emp) => ({
-                id: String(emp.id),
-                companyName: emp.companyName || 'No Name',
-                email: emp.email || 'N/A',
-                industry: emp.industry || 'N/A',
-                registrationDate: emp.createdAt
-                    ? new Date(emp.createdAt).toLocaleString()
-                    : 'N/A',
-                status:
-                    emp.approvalStatus === 'PENDING'
-                        ? 'Pending'
-                        : emp.approvalStatus === 'APPROVED'
-                          ? 'Approved'
-                          : 'Rejected',
-                logoUrl:
-                    emp.logo ||
-                    `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.companyName || '')}&background=random`,
-                bannerUrl: emp.banner || '',
-                address: emp.address || '',
-                website: emp.companyWebsite || '',
-                businessLicenseUrl: emp.businessLicense || null,
-                description: emp.description || '',
-            }));
+    const totalItems = data?.totalItems ?? 0;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-            setEmployers(mapped);
-            setTotalItems(total);
-
-
-        } catch (error) {
-            console.error('Failed to load employers:', error);
-            toast.error('Failed to load employer profiles');
-        } finally {
-            setLoading(false);
-        }
-    }, [activeTab, searchQuery, currentPage, itemsPerPage]);
-
-    useEffect(() => {
-        loadEmployers();
-    }, [loadEmployers]);
 
     const handleReview = (id: string) => {
         navigate(`/admin/employer-approvals/${id}`);
     };
-
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     return (
         <div className='animate-in fade-in duration-500 h-full flex flex-col'>
@@ -121,6 +97,7 @@ export default function EmployerApprovalPage() {
                     </div>
                 </div>
 
+
                 <div className='p-5 border-b border-gray-200 shrink-0'>
                     <div className='relative w-full sm:max-w-md'>
                         <Search
@@ -140,16 +117,14 @@ export default function EmployerApprovalPage() {
                     </div>
                 </div>
 
-                {loading ? (
+                {isLoading ? (
                     <div className='flex-1 flex items-center justify-center p-12'>
                         <div className='w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin'></div>
                     </div>
                 ) : (
-                    <EmployerTable
-                        employers={employers}
-                        onReview={handleReview}
-                    />
+                    <EmployerTable employers={employers} onReview={handleReview} />
                 )}
+
 
                 <TablePagination
                     currentPage={currentPage}
