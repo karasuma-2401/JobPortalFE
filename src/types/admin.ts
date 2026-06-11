@@ -74,7 +74,6 @@ export interface IndustryResponse {
     createdAt: string;
 }
 
-// 5. Audit Log Interfaces
 export interface AuditLogResponse {
     id: number;
     actionType: 'CREATE' | 'UPDATE' | 'DELETE';
@@ -83,6 +82,7 @@ export interface AuditLogResponse {
     userId: number;
     userName: string;
     data: string; // JSON data
+    ipAddress?: string;
     createdAt: string;
 }
 
