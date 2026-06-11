@@ -9,6 +9,15 @@ export const JobPostService = {
                 .data as JobPostResponse) || response.data
         );
     },
+    createJob: async (
+        payload: Record<string, unknown>
+    ): Promise<JobPostResponse> => {
+        const response = await privateApi.post('/jobpost', payload);
+        return (
+            ((response.data as Record<string, unknown>)
+                .data as JobPostResponse) || response.data
+        );
+    },
 
     updateJob: async (
         id: string,

@@ -1,5 +1,7 @@
 import { privateApi } from '../api/api';
+import { publicApi } from '../api/api';
 import type { PaymentResponse } from '../types/payment';
+import type { PlanResponse } from '../types/payment';
 
 export const PaymentService = {
     createPayment: async (payload: {
@@ -19,5 +21,10 @@ export const PaymentService = {
         );
         return (response.data as Record<string, unknown>)
             .data as PaymentResponse;
+    },
+    getPlans: async (): Promise<PlanResponse[]> => {
+        const response = await publicApi.get('/plans');
+        return (response.data as Record<string, unknown>)
+            .data as PlanResponse[];
     },
 };

@@ -7,3 +7,11 @@ export interface PaymentResponse {
     status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELED';
     note?: string;
 }
+export interface PlanResponse {
+    id: number;
+    name: string;
+    price: number;
+    priority: number;
+    duration: number;
+    maxJobPostsPerMonth: number;
+}

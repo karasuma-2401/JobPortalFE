@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import ApplyJobType from './components/ApplyJobType';
 import RichTextEditor from '../../../components/ui/RichTextEditor';
@@ -7,22 +7,24 @@ import PostSuccessModal from './components/PostSuccessModal';
 import Input from '../../../components/ui/Input';
 import CustomDropdown from '../../../components/ui/DropDown';
 import CustomDatePicker from '../../../components/ui/DatePicker';
+import { useCreateJob } from '../../../hooks/useCreateJob';
 
 const roleOptions = [
-    { label: 'Designer', value: 'designer' },
-    { label: 'Developer', value: 'developer' },
-    { label: 'Manager', value: 'manager' },
+    { label: 'Designer', value: 'DESIGNER' },
+    { label: 'Developer', value: 'DEVELOPER' },
+    { label: 'Manager', value: 'MANAGER' },
 ];
 
 const salaryTypeOptions = [
-    { label: 'Monthly', value: 'monthly' },
-    { label: 'Yearly', value: 'yearly' },
-    { label: 'Hourly', value: 'hourly' },
+    { label: 'Monthly', value: 'MONTHLY' },
+    { label: 'Yearly', value: 'YEARLY' },
+    { label: 'Hourly', value: 'HOURLY' },
 ];
 
 const educationOptions = [
-    { label: 'Bachelor Degree', value: 'bachelor' },
-    { label: 'Master Degree', value: 'master' },
+    { label: 'Bachelor Degree', value: 'BACHELOR' },
+    { label: 'Master Degree', value: 'MASTER' },
+    { label: 'Associate Degree', value: 'ASSOCIATE' },
 ];
 
 const experienceOptions = [
@@ -32,8 +34,10 @@ const experienceOptions = [
 ];
 
 const jobTypeOptions = [
-    { label: 'Full Time', value: 'fulltime' },
-    { label: 'Part Time', value: 'parttime' },
+    { label: 'Full Time', value: 'FULL_TIME' },
+    { label: 'Part Time', value: 'PART_TIME' },
+    { label: 'Internship', value: 'INTERNSHIP' },
+    { label: 'Contract', value: 'CONTRACT' },
 ];
 
 const vacanciesOptions = [
@@ -43,37 +47,39 @@ const vacanciesOptions = [
 ];
 
 const jobLevelOptions = [
-    { label: 'Junior', value: 'junior' },
-    { label: 'Senior', value: 'senior' },
+    { label: 'Intern', value: 'INTERN' },
+    { label: 'Junior', value: 'JUNIOR' },
+    { label: 'Middle', value: 'MIDDLE' },
+    { label: 'Senior', value: 'SENIOR' },
 ];
 
 export default function CreateJobForm() {
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+    const { mutate: createJob, isPending } = useCreateJob();
+
     const [formData, setFormData] = useState({
         title: '',
         tags: '',
-        role: '',
+        role: 'DEVELOPER',
         minSalary: '',
         maxSalary: '',
-        salaryType: '',
-        education: '',
-        experience: '',
-        jobType: '',
-        vacancies: '',
+        salaryType: 'MONTHLY',
+        education: 'BACHELOR',
+        experience: '1',
+        jobType: 'FULL_TIME',
+        vacancies: '1',
         expirationDate: '',
-        jobLevel: '',
+        jobLevel: 'MIDDLE',
         applyType: 'myjob',
         description: '',
         responsibilities: '',
+        location: '',
     });
 
     const parseDate = (dStr: string) => (dStr ? new Date(dStr) : null);
-    const formatDate = (date: Date | null) => {
+    const formatISO = (date: Date | null) => {
         if (!date) return '';
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const d = String(date.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
+        return date.toISOString();
     };
 
     const handleChange = (field: string, value: string) => {
@@ -82,11 +88,40 @@ export default function CreateJobForm() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.title) {
-            toast.error('Job Title is required!');
+        if (!formData.title || !formData.location || !formData.expirationDate) {
+            toast.error(
+                'Please fill in all required fields (Title, Location, Expiration Date).'
+            );
             return;
         }
-        setIsSuccessModalOpen(true);
+
+        const payload: Record<string, unknown> = {
+            title: formData.title,
+            description: formData.description,
+            location: formData.location,
+            industryIds: [1], 
+            salaryMin: Number(formData.minSalary) || 0,
+            salaryMax: Number(formData.maxSalary) || 0,
+            educationLevel: formData.education,
+            jobLevel: formData.jobLevel,
+            status: 'OPEN', 
+            experience: Number(formData.experience) || 0,
+            employmentType: formData.jobType,
+            expiresAt: formData.expirationDate,
+            tags: formData.tags,
+            isFeatured: false,
+            isHighlighted: false,
+            jobRole: formData.role,
+            responsibilities: formData.responsibilities,
+            vacancies: Number(formData.vacancies) || 1,
+            salaryType: formData.salaryType,
+        };
+
+        createJob(payload, {
+            onSuccess: () => {
+                setIsSuccessModalOpen(true);
+            },
+        });
     };
 
     return (
@@ -96,24 +131,41 @@ export default function CreateJobForm() {
             </div>
 
             <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
-                <div className='flex flex-col gap-2'>
-                    <label className='text-sm font-semibold text-gray-900'>
-                        Job Title
-                    </label>
-                    <Input
-                        type='text'
-                        placeholder='Add job title, role, vacancies etc'
-                        value={formData.title}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            handleChange('title', e.target.value)
-                        }
-                    />
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-sm font-semibold text-gray-900'>
+                            Job Title *
+                        </label>
+                        <Input
+                            type='text'
+                            required
+                            placeholder='Add job title, role, vacancies etc'
+                            value={formData.title}
+                            onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                            ) => handleChange('title', e.target.value)}
+                        />
+                    </div>
+                    <div className='flex flex-col gap-2 relative'>
+                        <label className='text-sm font-semibold text-gray-900'>
+                            Location *
+                        </label>
+                        <Input
+                            type='text'
+                            required
+                            placeholder='e.g. Ho Chi Minh City'
+                            value={formData.location}
+                            onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                            ) => handleChange('location', e.target.value)}
+                        />
+                    </div>
                 </div>
 
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                     <div className='flex flex-col gap-2 relative'>
                         <label className='text-sm font-semibold text-gray-900'>
-                            Tags
+                            Tags / Skills
                         </label>
                         <Input
                             type='text'
@@ -259,14 +311,14 @@ export default function CreateJobForm() {
                         </div>
                         <div className='flex flex-col gap-2 relative'>
                             <label className='text-sm font-medium text-gray-700'>
-                                Expiration Date
+                                Expiration Date *
                             </label>
                             <CustomDatePicker
                                 placeholder='dd/mm/yyyy'
                                 onChange={(date) => {
                                     handleChange(
                                         'expirationDate',
-                                        formatDate(date)
+                                        formatISO(date)
                                     );
                                 }}
                                 selected={parseDate(formData.expirationDate)}
@@ -325,8 +377,12 @@ export default function CreateJobForm() {
                 <div className='mt-2'>
                     <button
                         type='submit'
-                        className='flex items-center justify-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition-colors'
+                        disabled={isPending}
+                        className='flex items-center justify-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50'
                     >
+                        {isPending && (
+                            <Loader2 size={18} className='animate-spin' />
+                        )}
                         Post Job <ArrowRight size={18} />
                     </button>
                 </div>
