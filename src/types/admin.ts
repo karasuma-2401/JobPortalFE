@@ -105,7 +105,8 @@ export interface BackendResponseEnvelope<T> {
     data: T;
 }
 
-// Định nghĩa một cấu trúc linh hoạt đại diện cho Page từ Backend
+// Flexible structure representing paginated data from the backend
+export interface FlexiblePageData<T> {
 export interface FlexiblePageData<T> {
     items?: T[];
     content?: T[];
