@@ -9,11 +9,30 @@ import JobSidebar from './components/JobSidebar';
 import PromoteJobModal from './components/PromoteJobModal';
 import { useJobDetail } from '../../../hooks/useJobDetail';
 
+interface JobDetailResponse {
+    id?: string | number;
+    title?: string;
+    description?: string;
+    employmentType?: string;
+    status?: string;
+    educationLevel?: string;
+    experience?: number;
+    jobLevel?: string;
+    salaryMin?: number;
+    salaryMax?: number;
+    createdAt?: string;
+    expiresAt?: string;
+    tags?: string;
+    location?: string;
+    applicationCount?: number;
+    views?: number;
+}
+
 export default function JobDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-
-    const { data: job, isLoading, isError } = useJobDetail(id);
+    const { data, isLoading, isError } = useJobDetail(id);
+    const job = data as JobDetailResponse | undefined;
 
     const [promoteModalData, setPromoteModalData] = useState({
         isOpen: false,
@@ -22,24 +41,29 @@ export default function JobDetailPage() {
     });
 
     const handleBack = () => navigate('/employer/my-jobs');
+
     const handleShare = () => {
         navigator.clipboard.writeText(window.location.href);
         toast.success('Job link copied to clipboard!');
     };
+
     const handleEdit = () => {
         if (job?.id) navigate(`/employer/my-jobs/${job.id}/edit`);
     };
+
     const handleViewApplications = () => {
         if (job?.id) navigate(`/employer/applications?jobId=${job.id}`);
     };
+
     const handlePromote = () => {
         if (job)
             setPromoteModalData({
                 isOpen: true,
-                jobId: job.id,
-                jobTitle: job.title,
+                jobId: String(job.id),
+                jobTitle: job.title || '',
             });
     };
+
     const handleConfirmPromote = (plan: string) => {
         toast.success(`Successfully promoted job as ${plan.toUpperCase()}`);
         setPromoteModalData({ isOpen: false, jobId: '', jobTitle: '' });
@@ -72,12 +96,12 @@ export default function JobDetailPage() {
         );
     }
 
-    // Vì Component JobMainContent đang yêu cầu requirements là Array
-    // Ta tách chuỗi requirements ra thành mảng bằng ký tự xuống dòng
-    const requirementsArray =
-        typeof job.requirements === 'string' && job.requirements.trim() !== ''
-            ? job.requirements.split('\n')
-            : [];
+    const skillsArray = job.tags
+        ? job.tags
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean)
+        : [];
 
     return (
         <div className='w-full max-w-7xl mx-auto animate-in fade-in duration-500 pb-16'>
@@ -85,7 +109,7 @@ export default function JobDetailPage() {
                 title={job.title || 'Untitled Job'}
                 status={job.status || 'OPEN'}
                 location={job.location || 'Not specified'}
-                type={job.employmentType || job.type || 'Not specified'}
+                type={job.employmentType || 'Not specified'}
                 onBack={handleBack}
                 onShare={handleShare}
                 onEdit={handleEdit}
@@ -97,7 +121,7 @@ export default function JobDetailPage() {
                         salary={
                             job.salaryMin && job.salaryMax
                                 ? `$${job.salaryMin} - $${job.salaryMax}`
-                                : job.salary || 'Negotiable'
+                                : 'Negotiable'
                         }
                         experience={
                             job.experience
@@ -119,17 +143,15 @@ export default function JobDetailPage() {
                         description={
                             job.description || 'No description available.'
                         }
-                        requirements={requirementsArray}
-                        benefits={
-                            Array.isArray(job.benefits) ? job.benefits : []
-                        }
+                        requirements={[]}
+                        benefits={[]}
                     />
                 </div>
 
                 <JobSidebar
                     applications={job.applicationCount || 0}
                     views={job.views || 0}
-                    skills={Array.isArray(job.skills) ? job.skills : []}
+                    skills={skillsArray}
                     onViewApplications={handleViewApplications}
                     onPromote={handlePromote}
                 />
