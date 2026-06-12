@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import Input from '../../../components/ui/Input';
@@ -8,6 +8,10 @@ import ComboBox, { type OptionType } from '../../../components/ui/ComboBox';
 import Button from '../../../components/ui/Button';
 import RichTextEditor from '../../../components/ui/RichTextEditor';
 import CustomDatePicker from '../../../components/ui/DatePicker';
+import {
+    useEmployerProfile,
+    useUpdateEmployerProfile,
+} from '../../../hooks/useEmployer';
 
 const orgTypes = [
     { label: 'Private Company', value: 'PRIVATE_COMPANY' },
@@ -36,6 +40,10 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
     const location = useLocation();
     const previousState = location.state || {};
 
+    const { data: profile } = useEmployerProfile();
+    const { mutate: updateProfile, isPending: isUpdating } =
+        useUpdateEmployerProfile();
+
     const parseDate = (dStr: string) => (dStr ? new Date(dStr) : null);
     const formatDate = (date: Date | null) => {
         if (!date) return '';
@@ -45,28 +53,43 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
         return `${y}-${m}-${d}`;
     };
 
-    const initialOrg =
-        orgTypes.find((o) => o.value === previousState.organizationType) ||
-        null;
-    const [orgType, setOrgType] = useState<OptionType | null>(initialOrg);
-
-    const initialIndustry =
-        industryTypes.find((i) => i.value === previousState.industry) || null;
+    const [orgType, setOrgType] = useState<OptionType | null>(
+        orgTypes.find((o) => o.value === previousState.organizationType) || null
+    );
     const [industry, setIndustry] = useState<OptionType | null>(
-        initialIndustry
+        industryTypes.find((i) => i.value === previousState.industry) || null
     );
-
-    const initialTeamSize =
-        teamSizes.find((t) => t.value === previousState.teamSize) || null;
     const [teamSize, setTeamSize] = useState<OptionType | null>(
-        initialTeamSize
+        teamSizes.find((t) => t.value === previousState.teamSize) || null
     );
-
     const [establishedYear, setEstablishedYear] = useState(
         previousState.founded || ''
     );
     const [website, setWebsite] = useState(previousState.companyWebsite || '');
     const [vision, setVision] = useState(previousState.vision || '');
+
+    useEffect(() => {
+        if (mode === 'settings' && profile) {
+            const timer = setTimeout(() => {
+                setOrgType(
+                    orgTypes.find(
+                        (o) => o.value === profile.organizationType
+                    ) || null
+                );
+                setIndustry(
+                    industryTypes.find((i) => i.value === profile.industry) ||
+                        null
+                );
+                setTeamSize(
+                    teamSizes.find((t) => t.value === profile.teamSize) || null
+                );
+                setEstablishedYear(profile.founded || '');
+                setWebsite(profile.companyWebsite || '');
+                setVision(profile.vision || '');
+            }, 0);
+            return () => clearTimeout(timer);
+        }
+    }, [mode, profile]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -76,26 +99,32 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
             return;
         }
 
-        const currentData = {
-            ...previousState,
-            organizationType: orgType?.value || '',
-            industry: industry?.value || '',
-            teamSize: teamSize?.value || '',
-            founded: establishedYear,
-            companyWebsite: website,
-            vision,
-        };
-
         if (mode === 'setup') {
+            const currentData = {
+                ...previousState,
+                organizationType: orgType?.value || '',
+                industry: industry?.value || '',
+                teamSize: teamSize?.value || '',
+                founded: establishedYear,
+                companyWebsite: website,
+                vision,
+            };
             navigate('/employer/setup/social', { state: currentData });
         } else {
-            toast.success('Founding information updated successfully!');
+            const formData = new FormData();
+            if (orgType) formData.append('organizationType', orgType.value);
+            if (industry) formData.append('industry', industry.value);
+            if (teamSize) formData.append('teamSize', teamSize.value);
+            formData.append('founded', establishedYear);
+            formData.append('companyWebsite', website);
+            formData.append('vision', vision);
+
+            updateProfile(formData);
         }
     };
 
-    const handlePrevious = () => {
+    const handlePrevious = () =>
         navigate('/employer/setup/company', { state: previousState });
-    };
 
     return (
         <div className='w-full bg-white animate-in fade-in duration-500'>
@@ -109,7 +138,7 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
                             options={orgTypes}
                             value={orgType}
                             placeholder='Select...'
-                            onChange={(option) => setOrgType(option)}
+                            onChange={setOrgType}
                         />
                     </div>
                     <div className='flex flex-col gap-2 relative'>
@@ -120,7 +149,7 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
                             options={industryTypes}
                             value={industry}
                             placeholder='Select...'
-                            onChange={(option) => setIndustry(option)}
+                            onChange={setIndustry}
                         />
                     </div>
                     <div className='flex flex-col gap-2 relative'>
@@ -131,7 +160,7 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
                             options={teamSizes}
                             value={teamSize}
                             placeholder='Select...'
-                            onChange={(option) => setTeamSize(option)}
+                            onChange={setTeamSize}
                         />
                     </div>
                 </div>
@@ -142,9 +171,9 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
                         </label>
                         <CustomDatePicker
                             placeholder='dd/mm/yyyy'
-                            onChange={(date) => {
-                                setEstablishedYear(formatDate(date));
-                            }}
+                            onChange={(date) =>
+                                setEstablishedYear(formatDate(date))
+                            }
                             selected={parseDate(establishedYear)}
                         />
                     </div>
@@ -185,11 +214,17 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
                     <Button
                         variant='primary'
                         type='submit'
+                        disabled={isUpdating}
                         className={
                             mode === 'setup' ? 'flex items-center gap-2' : ''
                         }
                     >
-                        {mode === 'setup' ? (
+                        {isUpdating ? (
+                            <Loader2
+                                className='animate-spin mx-auto'
+                                size={20}
+                            />
+                        ) : mode === 'setup' ? (
                             <>
                                 Save & Next <ArrowRight size={18} />
                             </>

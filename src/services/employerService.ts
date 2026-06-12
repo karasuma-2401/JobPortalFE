@@ -9,14 +9,25 @@ export const EmployerService = {
         });
         return response;
     },
+
     getProfile: async () => {
         const response = await privateApi.get('/employer');
         return response;
     },
+    updateProfile: async (formData: FormData) => {
+        const response = await privateApi.patch('/employer', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response;
+    },
+
     getRecentJobs: async () => {
         const response = await privateApi.get('/jobpost');
         return response.data;
     },
+
     getSavedCandidates: async () => {
         const response = await privateApi.get('/saved-candidates');
         return response.data;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ArrowRight, Mail, Loader2 } from 'lucide-react';
@@ -6,7 +6,12 @@ import { ArrowRight, Mail, Loader2 } from 'lucide-react';
 import ComboBox, { type OptionType } from '../../../components/ui/ComboBox';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
+
 import { useSetupEmployer } from '../../../hooks/useEmployer';
+import {
+    useEmployerProfile,
+    useUpdateEmployerProfile,
+} from '../../../hooks/useEmployer';
 
 const CountryCodes = [
     {
@@ -29,13 +34,40 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
     const navigate = useNavigate();
     const location = useLocation();
     const previousState = location.state || {};
-    
-    const { mutate: setupEmployer, isPending } = useSetupEmployer();
+
+    const { mutate: setupEmployer, isPending: isSettingUp } =
+        useSetupEmployer();
+    const { data: profile } = useEmployerProfile();
+    const { mutate: updateProfile, isPending: isUpdating } =
+        useUpdateEmployerProfile();
+
+    const isPending = mode === 'setup' ? isSettingUp : isUpdating;
 
     const [mapLocation, setMapLocation] = useState(previousState.address || '');
     const [phone, setPhone] = useState(previousState.phone || '');
     const [email, setEmail] = useState(previousState.email || '');
     const [countryCode, setCountryCode] = useState<OptionType>(CountryCodes[0]);
+
+    useEffect(() => {
+        if (mode === 'settings' && profile) {
+            const timer = setTimeout(() => {
+                setMapLocation(profile.address || '');
+                setEmail(profile.email || '');
+                if (profile.phone) {
+                    if (profile.phone.startsWith('+1')) {
+                        setCountryCode(CountryCodes[1]);
+                        setPhone(profile.phone.slice(2));
+                    } else if (profile.phone.startsWith('+84')) {
+                        setCountryCode(CountryCodes[0]);
+                        setPhone(profile.phone.slice(3));
+                    } else {
+                        setPhone(profile.phone);
+                    }
+                }
+            }, 0);
+            return () => clearTimeout(timer);
+        }
+    }, [mode, profile]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -45,10 +77,11 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
             return;
         }
 
-        if (mode === 'setup') {
-            const fullPhoneNumber = `${countryCode.value}${phone}`;
-            const formData = new FormData();
+        const rawPhone = phone.replace(/^\+\d+\s*/, '');
+        const fullPhoneNumber = `${countryCode.value}${rawPhone}`;
 
+        if (mode === 'setup') {
+            const formData = new FormData();
             formData.append('companyName', previousState.companyName || '');
             formData.append('description', previousState.description || '');
             formData.append(
@@ -87,22 +120,21 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
             if (previousState.logo) formData.append('logo', previousState.logo);
             if (previousState.banner)
                 formData.append('banner', previousState.banner);
-            // console.log(formData.get('founded')) 
+
             setupEmployer(formData);
         } else {
-            toast.success('Contact information updated successfully!');
+            const formData = new FormData();
+            formData.append('address', mapLocation);
+            formData.append('phone', fullPhoneNumber);
+            formData.append('email', email);
+            updateProfile(formData);
         }
     };
 
-    const handlePrevious = () => {
-        const currentData = {
-            ...previousState,
-            address: mapLocation,
-            phone,
-            email,
-        };
-        navigate('/employer/setup/social', { state: currentData });
-    };
+    const handlePrevious = () =>
+        navigate('/employer/setup/social', {
+            state: { ...previousState, address: mapLocation, phone, email },
+        });
 
     return (
         <div className='w-full bg-white animate-in fade-in duration-500'>
@@ -116,7 +148,9 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
                             type='text'
                             placeholder='Enter your location'
                             value={mapLocation}
-                            onChange={(e) => setMapLocation(e.target.value)}
+                            onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                            ) => setMapLocation(e.target.value)}
                         />
                     </div>
                     <div className='flex flex-col gap-2'>
@@ -128,20 +162,19 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
                                 <ComboBox
                                     options={CountryCodes}
                                     value={countryCode}
-                                    onChange={(option) =>
-                                        setCountryCode(option)
-                                    }
+                                    onChange={setCountryCode}
                                 />
                             </div>
                             <Input
                                 type='tel'
                                 placeholder='Phone number...'
                                 value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
+                                onChange={(
+                                    e: React.ChangeEvent<HTMLInputElement>
+                                ) => setPhone(e.target.value)}
                             />
                         </div>
                     </div>
-
                     <div className='flex flex-col gap-2'>
                         <label className='font-medium text-sm text-gray-900'>
                             Email
@@ -154,7 +187,9 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
                                 type='email'
                                 placeholder='Email address'
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={(
+                                    e: React.ChangeEvent<HTMLInputElement>
+                                ) => setEmail(e.target.value)}
                             />
                         </div>
                     </div>
@@ -166,7 +201,7 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
                             type='button'
                             onClick={handlePrevious}
                             disabled={isPending}
-                            className='px-6 py-3 font-semibold rounded-md bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors disabled:opacity-50'
+                            className='px-6 py-3 font-semibold rounded-md bg-gray-100 text-gray-900 hover:bg-gray-200 disabled:opacity-50'
                         >
                             Previous
                         </button>
