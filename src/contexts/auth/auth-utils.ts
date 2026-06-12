@@ -7,11 +7,15 @@ type AuthenticatedUserLike = {
 };
 
 export interface AuthUser {
-    roles?: Role[];
-    name?: string;
+    id?: number;
+    displayName?: string;
     email?: string;
+
+    active?: boolean;
+    banned?: boolean;
+
+    roles?: Role[];
     hasProfile?: boolean;
-    [key: string]: unknown;
 }
 
 export interface AuthState {
@@ -50,7 +54,9 @@ export const getDefaultAuthenticatedRoute = (
     }
 
     if (roles.includes('EMPLOYER')) {
-        return user.hasProfile ? '/employer/dashboard' : '/employer/setup/company';
+        return user.hasProfile
+            ? '/employer/dashboard'
+            : '/employer/setup/company';
     }
 
     if (roles.includes('SEEKER')) {

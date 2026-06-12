@@ -1,8 +1,8 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, ChevronDown } from 'lucide-react';
+import { Search, ChevronDown, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 
 import KanbanColumn, { type ColumnData } from './components/KanbanColumn';
 import CandidateProfileModal from '../components/CandidateProfileModal';
@@ -27,7 +27,10 @@ const FIXED_COLUMNS: ColumnData[] = [
 
 export default function ApplicationsPage() {
     const queryClient = useQueryClient();
-    const { data: apiApplications, isLoading } = useApplications();
+    const [searchParams] = useSearchParams();
+    const currentJobId = searchParams.get('jobId');
+
+    const { data: apiApplications, isLoading } = useApplications(currentJobId);
     const { mutate: updateStatus } = useUpdateApplicationStatus();
     const { mutate: deleteApplication } = useDeleteApplication();
 
@@ -55,30 +58,33 @@ export default function ApplicationsPage() {
     }, []);
 
     const candidates: Candidate[] = useMemo(() => {
-        if (!apiApplications) return [];
+        if (!apiApplications || !Array.isArray(apiApplications)) return [];
 
-        return apiApplications.map((app: JobApplication) => ({
-            id: app.id.toString(),
-            columnId: app.status,
-            name: app.jobSeekerProfile?.fullName || 'Unknown Applicant',
-            avatar: null,
-            role: 'Applied Candidate',
-            experience: 'Not specified',
-            education: 'Not specified',
-            appliedDate: app.appliedAt || new Date().toISOString(),
-            biography: 'No biography available.',
-            coverLetter: app.coverLetter || 'No cover letter provided.',
-            dateOfBirth: 'Unknown',
-            nationality: 'Unknown',
-            maritalStatus: 'Unknown',
-            gender: 'Unknown',
-            website: '',
-            location: app.jobSeekerProfile?.address || 'Unknown Location',
-            phone: app.jobSeekerProfile?.phone || 'No Phone',
-            secondaryPhone: '',
-            email: 'Unknown Email',
-            social: {},
-        }));
+        return apiApplications.map((app: JobApplication) => {
+            const seeker = app.jobSeekerProfile;
+            return {
+                id: String(app.id),
+                columnId: app.status,
+                name: seeker?.fullName || 'Unknown Applicant',
+                avatar: seeker?.avatar || null,
+                role: seeker?.professionalTitle || 'Applicant',
+                experience: seeker?.experienceSummary || 'N/A',
+                education: seeker?.educationSummary || 'N/A',
+                appliedDate: app.appliedAt || new Date().toISOString(),
+                biography: 'View profile for details.',
+                coverLetter: app.coverLetter || 'No cover letter provided.',
+                dateOfBirth: 'Unknown',
+                nationality: 'Unknown',
+                maritalStatus: 'Unknown',
+                gender: 'Unknown',
+                website: '',
+                location: seeker?.address || 'Unknown Location',
+                phone: seeker?.phone || 'No Phone',
+                secondaryPhone: '',
+                email: seeker?.email || 'Unknown Email',
+                social: {},
+            };
+        });
     }, [apiApplications]);
 
     const filteredAndSortedCandidates = useMemo(() => {
@@ -117,9 +123,8 @@ export default function ApplicationsPage() {
             id: Number(candidateId),
             status: targetColumnId as ApplicationStatus,
         });
-
         queryClient.setQueryData(
-            ['jobApplications'],
+            ['jobApplications', currentJobId],
             (oldData: JobApplication[] | undefined) => {
                 if (!oldData) return oldData;
                 return oldData.map((app) =>
@@ -135,7 +140,12 @@ export default function ApplicationsPage() {
     };
 
     const handleDeleteCandidate = (candidateId: string) => {
-        deleteApplication(Number(candidateId));
+        const confirm = window.confirm(
+            'Are you sure you want to delete this application?'
+        );
+        if (confirm) {
+            deleteApplication(Number(candidateId));
+        }
     };
 
     if (isLoading) {
@@ -148,10 +158,15 @@ export default function ApplicationsPage() {
 
     return (
         <div className='w-full h-[calc(100vh-100px)] flex flex-col animate-in fade-in duration-500'>
-            <div className='flex items-center justify-between mb-8 shrink-0'>
+            <div className='flex flex-col sm:flex-row sm:items-center justify-between mb-8 shrink-0 gap-4'>
                 <div>
-                    <h1 className='text-xl font-bold text-gray-900'>
+                    <h1 className='text-xl font-bold text-gray-900 flex items-center gap-2'>
                         Job Applications
+                        {currentJobId && (
+                            <span className='text-sm px-2 py-1 bg-blue-50 text-blue-600 rounded-md font-medium'>
+                                Filtered by Job #{currentJobId}
+                            </span>
+                        )}
                     </h1>
                 </div>
 

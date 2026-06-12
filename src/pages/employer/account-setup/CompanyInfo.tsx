@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import ImageUpload from '../../../components/ui/ImageUpload';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import RichTextEditor from '../../../components/ui/RichTextEditor';
+
+import {
+    useEmployerProfile,
+    useUpdateEmployerProfile,
+} from '../../../hooks/useEmployer';
 
 interface CompanyInfoProps {
     mode?: 'setup' | 'settings';
@@ -23,6 +28,10 @@ export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
         banner?: File | null;
     } | null;
 
+    const { data: profile } = useEmployerProfile();
+    const { mutate: updateProfile, isPending: isUpdating } =
+        useUpdateEmployerProfile();
+
     const [companyName, setCompanyName] = useState(
         previousState?.companyName || ''
     );
@@ -33,6 +42,15 @@ export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
     const [bannerFile, setBannerfile] = useState<File | null>(
         previousState?.banner || null
     );
+    useEffect(() => {
+        if (mode === 'settings' && profile) {
+            const timer = setTimeout(() => {
+                setCompanyName(profile.companyName || '');
+                setAboutUs(profile.description || '');
+            }, 0);
+            return () => clearTimeout(timer);
+        }
+    }, [mode, profile]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -42,18 +60,23 @@ export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
             return;
         }
 
-        const currentData = {
-            ...previousState,
-            companyName,
-            description: aboutUs,
-            logo: logoFile,
-            banner: bannerFile,
-        };
-
         if (mode === 'setup') {
+            const currentData = {
+                ...previousState,
+                companyName,
+                description: aboutUs,
+                logo: logoFile,
+                banner: bannerFile,
+            };
             navigate('/employer/setup/founding', { state: currentData });
         } else {
-            toast.success('Company information updated successfully!');
+            const formData = new FormData();
+            formData.append('companyName', companyName);
+            formData.append('description', aboutUs);
+            if (logoFile) formData.append('logo', logoFile);
+            if (bannerFile) formData.append('banner', bannerFile);
+
+            updateProfile(formData);
         }
     };
 
@@ -120,11 +143,17 @@ export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
                     <Button
                         variant='primary'
                         type='submit'
+                        disabled={isUpdating}
                         className={
                             mode === 'setup' ? 'flex items-center gap-2' : ''
                         }
                     >
-                        {mode === 'setup' ? (
+                        {isUpdating ? (
+                            <Loader2
+                                className='animate-spin mx-auto'
+                                size={20}
+                            />
+                        ) : mode === 'setup' ? (
                             <>
                                 Save & Next <ArrowRight size={18} />
                             </>

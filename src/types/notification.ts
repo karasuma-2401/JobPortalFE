@@ -1,14 +1,17 @@
 export interface NotificationItem {
-    id: string;
+    id: number;
     title: string;
-    body: string;
+    message: string;
     isRead: boolean;
-    createdAt: Date;
+    targetUrl?: string;
+    createdAt: string;
 }
 
 export interface NotificationContextType {
     notifications: NotificationItem[];
     unreadCount: number;
-    markAsRead: (id: string) => void;
+    markAsRead: (id: number) => void;
     markAllAsRead: () => void;
+    deleteNotification: (id: number) => void;
+    deleteAllNotifications: () => void;
 }

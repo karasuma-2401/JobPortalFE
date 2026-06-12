@@ -1,14 +1,25 @@
-export interface JobDetail {
-    id?: string | number;
-    title?: string;
+export interface JobPostResponse {
+    id: string | number;
+    title: string;
+    description?: string;
     employmentType?: string;
-    location?: string;
+    status?: string;
+    educationLevel?: string;
+    experience?: number;
+    jobLevel?: string;
     salaryMin?: number;
     salaryMax?: number;
-    experience?: number;
-    description?: string;
-    requirements?: string;
-    benefits?: string[];
-    skills?: string[];
-    status?: string;
+    tags?: string;
+    location?: string;
+    createdAt?: string;
+    expiresAt?: string;
+    isFeatured?: boolean;
+    isHighlighted?: boolean;
+    applicationCount?: number;
+    views?: number;
+}
+
+export interface PagedJobResponse {
+    items: JobPostResponse[];
+    totalItems: number;
 }

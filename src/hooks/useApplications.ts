@@ -2,14 +2,21 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { type ApiError } from '../api/api';
 import { ApplicationService } from '../services/applicationService';
-import type { ApplicationStatus } from '../types/application';
+import type { ApplicationStatus, JobApplication } from '../types/application';
 
-export const useApplications = () => {
+export const useApplications = (jobId: string | null) => {
     return useQuery({
-        queryKey: ['jobApplications'],
+        queryKey: ['jobApplications', jobId],
         queryFn: async () => {
-            const response = await ApplicationService.getApplications();
-            return response.data;
+            const numericJobId = jobId ? Number(jobId) : undefined;
+            const response =
+                await ApplicationService.getApplications(numericJobId);
+            const safeResponse = response as unknown as Record<string, unknown>;
+            return (
+                (safeResponse.data as JobApplication[]) ||
+                (response as unknown as JobApplication[]) ||
+                []
+            );
         },
     });
 };
@@ -29,7 +36,9 @@ export const useUpdateApplicationStatus = () => {
             queryClient.invalidateQueries({ queryKey: ['jobApplications'] });
         },
         onError: (error: ApiError) => {
-            toast.error(error.message);
+            toast.error(
+                error.message || 'Failed to update application status.'
+            );
         },
     });
 };
@@ -44,7 +53,7 @@ export const useDeleteApplication = () => {
             queryClient.invalidateQueries({ queryKey: ['jobApplications'] });
         },
         onError: (error: ApiError) => {
-            toast.error(error.message);
+            toast.error(error.message || 'Failed to delete application.');
         },
     });
 };

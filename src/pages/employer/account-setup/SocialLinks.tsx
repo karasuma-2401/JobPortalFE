@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ArrowRight, Plus, X } from 'lucide-react';
+import { ArrowRight, Plus, X, Loader2 } from 'lucide-react';
 import { FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa';
 
 import ComboBox, { type OptionType } from '../../../components/ui/ComboBox';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
+
+import {
+    useEmployerProfile,
+    useUpdateEmployerProfile,
+} from '../../../hooks/useEmployer';
 
 const socialNetworks: OptionType[] = [
     {
@@ -41,26 +46,69 @@ export default function SocialLinks({ mode = 'setup' }: SocialLinksProps) {
     const location = useLocation();
     const previousState = location.state || {};
 
-    const initialLinks = previousState.socialLinks
-        ? previousState.socialLinks.map(
-              (link: { id: string; networkValue: string; url: string }) => ({
-                  id: link.id,
-                  network:
-                      socialNetworks.find(
-                          (n) => n.value === link.networkValue
-                      ) || socialNetworks[0],
-                  url: link.url,
-              })
-          )
-        : [
-              {
-                  id: new Date().getTime().toString(),
-                  network: socialNetworks[0],
-                  url: '',
-              },
-          ];
+    const { data: profile } = useEmployerProfile();
+    const { mutate: updateProfile, isPending: isUpdating } =
+        useUpdateEmployerProfile();
 
-    const [links, setLinks] = useState<SocialLinkItem[]>(initialLinks);
+    const [links, setLinks] = useState<SocialLinkItem[]>(() => {
+        return previousState.socialLinks
+            ? previousState.socialLinks.map(
+                  (link: {
+                      id: string;
+                      networkValue: string;
+                      url: string;
+                  }) => ({
+                      id: link.id,
+                      network:
+                          socialNetworks.find(
+                              (n) => n.value === link.networkValue
+                          ) || socialNetworks[0],
+                      url: link.url,
+                  })
+              )
+            : [
+                  {
+                      id: Date.now().toString(),
+                      network: socialNetworks[0],
+                      url: '',
+                  },
+              ];
+    });
+
+    useEffect(() => {
+        if (mode === 'settings' && profile) {
+            const timer = setTimeout(() => {
+                const initialLinks: SocialLinkItem[] = [];
+                if (profile.facebookUrl)
+                    initialLinks.push({
+                        id: 'fb',
+                        network: socialNetworks[1],
+                        url: profile.facebookUrl,
+                    });
+                if (profile.twitterUrl)
+                    initialLinks.push({
+                        id: 'tw',
+                        network: socialNetworks[2],
+                        url: profile.twitterUrl,
+                    });
+                if (profile.linkedInUrl)
+                    initialLinks.push({
+                        id: 'li',
+                        network: socialNetworks[0],
+                        url: profile.linkedInUrl,
+                    });
+
+                if (initialLinks.length === 0)
+                    initialLinks.push({
+                        id: Date.now().toString(),
+                        network: socialNetworks[0],
+                        url: '',
+                    });
+                setLinks(initialLinks);
+            }, 0);
+            return () => clearTimeout(timer);
+        }
+    }, [mode, profile]);
 
     const getAvailableNetworks = (currentLinkId: string) => {
         const selectedValues = links
@@ -73,12 +121,7 @@ export default function SocialLinks({ mode = 'setup' }: SocialLinksProps) {
 
     const handleAddLink = () => {
         if (links.length >= 3) return;
-
-        const selectedValues = links.map((link) => link.network.value);
-        const availableNetworks = socialNetworks.filter(
-            (network) => !selectedValues.includes(network.value)
-        );
-
+        const availableNetworks = getAvailableNetworks('');
         if (availableNetworks.length > 0) {
             setLinks([
                 ...links,
@@ -118,27 +161,37 @@ export default function SocialLinks({ mode = 'setup' }: SocialLinksProps) {
             );
             return;
         }
-        const cleanLinks = links.map((link) => ({
-            id: link.id,
-            networkValue: link.network.value,
-            url: link.url,
-        }));
-
-        const currentData = {
-            ...previousState,
-            socialLinks: cleanLinks,
-        };
 
         if (mode === 'setup') {
-            navigate('/employer/setup/contact', { state: currentData });
+            const cleanLinks = links.map((link) => ({
+                id: link.id,
+                networkValue: link.network.value,
+                url: link.url,
+            }));
+            navigate('/employer/setup/contact', {
+                state: { ...previousState, socialLinks: cleanLinks },
+            });
         } else {
-            toast.success('Social links updated successfully!');
+            const formData = new FormData();
+            formData.append('facebookUrl', '');
+            formData.append('twitterUrl', '');
+            formData.append('linkedInUrl', '');
+
+            links.forEach((link) => {
+                if (link.network.value === 'facebook')
+                    formData.set('facebookUrl', link.url);
+                if (link.network.value === 'twitter')
+                    formData.set('twitterUrl', link.url);
+                if (link.network.value === 'linkedin')
+                    formData.set('linkedInUrl', link.url);
+            });
+
+            updateProfile(formData);
         }
     };
 
-    const handlePrevious = () => {
+    const handlePrevious = () =>
         navigate('/employer/setup/founding', { state: previousState });
-    };
 
     return (
         <div className='w-full bg-white animate-in fade-in duration-500'>
@@ -146,13 +199,11 @@ export default function SocialLinks({ mode = 'setup' }: SocialLinksProps) {
                 <div className='flex flex-col gap-4'>
                     {links.map((link, index) => {
                         const availableOptions = getAvailableNetworks(link.id);
-
                         return (
                             <div key={link.id} className='flex flex-col gap-2'>
                                 <label className='text-sm font-medium text-gray-900'>
                                     Social Link {index + 1}
                                 </label>
-
                                 <div className='flex items-center gap-3'>
                                     <div className='w-1/3 min-w-37.5'>
                                         <ComboBox
@@ -170,7 +221,7 @@ export default function SocialLinks({ mode = 'setup' }: SocialLinksProps) {
                                     <div className='flex-1'>
                                         <Input
                                             type='text'
-                                            placeholder='Profile link (e.g., https://linkedin.com/...)'
+                                            placeholder='Profile link'
                                             value={link.url}
                                             className='h-11.5'
                                             onChange={(
@@ -190,12 +241,7 @@ export default function SocialLinks({ mode = 'setup' }: SocialLinksProps) {
                                             handleRemoveLink(link.id)
                                         }
                                         disabled={links.length === 1}
-                                        className={`font-extrabold w-10 h-10 p-3 rounded-full border border-gray-200 transition-colors flex items-center justify-center
-                      ${
-                          links.length === 1
-                              ? 'bg-gray-50 text-gray-300 cursor-not-allowed'
-                              : 'bg-gray-50 text-gray-900 hover:bg-red-50 hover:text-red-500 hover:border-red-200'
-                      }`}
+                                        className={`font-extrabold w-10 h-10 p-3 rounded-full border border-gray-200 flex items-center justify-center ${links.length === 1 ? 'bg-gray-50 text-gray-300 cursor-not-allowed' : 'bg-gray-50 text-gray-900 hover:bg-red-50 hover:text-red-500'}`}
                                     >
                                         <X size={20} />
                                     </button>
@@ -209,7 +255,7 @@ export default function SocialLinks({ mode = 'setup' }: SocialLinksProps) {
                     <button
                         type='button'
                         onClick={handleAddLink}
-                        className='w-full py-3 mt-2 flex items-center justify-center gap-2 font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-md hover:bg-gray-100 transition-colors'
+                        className='w-full py-3 mt-2 flex items-center justify-center gap-2 font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-md hover:bg-gray-100'
                     >
                         <Plus size={18} /> Add New Social Link
                     </button>
@@ -220,7 +266,7 @@ export default function SocialLinks({ mode = 'setup' }: SocialLinksProps) {
                         <button
                             type='button'
                             onClick={handlePrevious}
-                            className='px-6 py-3 font-semibold rounded-md bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors'
+                            className='px-6 py-3 font-semibold rounded-md bg-gray-100 text-gray-900 hover:bg-gray-200'
                         >
                             Previous
                         </button>
@@ -228,11 +274,17 @@ export default function SocialLinks({ mode = 'setup' }: SocialLinksProps) {
                     <Button
                         variant='primary'
                         type='submit'
+                        disabled={isUpdating}
                         className={
                             mode === 'setup' ? 'flex items-center gap-2' : ''
                         }
                     >
-                        {mode === 'setup' ? (
+                        {isUpdating ? (
+                            <Loader2
+                                className='animate-spin mx-auto'
+                                size={20}
+                            />
+                        ) : mode === 'setup' ? (
                             <>
                                 Save & Next <ArrowRight size={18} />
                             </>

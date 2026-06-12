@@ -1,34 +1,58 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import PaymentQRSection from './components/PaymentQRSection';
 import OrderSummarySection from './components/OrderSummarySection';
-
-const planDetails: Record<string, { title: string; price: number }> = {
-    basic: { title: 'BASIC', price: 19 },
-    standard: { title: 'STANDARD', price: 39 },
-    premium: { title: 'PREMIUM', price: 59 },
-};
+import {
+    useCreatePayment,
+    usePaymentStatus,
+    usePlans,
+} from '../../../hooks/usePayment';
 
 export default function CheckoutPage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const planId = searchParams.get('plan') || 'standard';
-    const selectedPlan = planDetails[planId] || planDetails.standard;
+    const planId = searchParams.get('plan');
 
-    const [paymentStatus, setPaymentStatus] = useState<'pending' | 'success'>(
-        'pending'
-    );
+    const [transactionRef, setTransactionRef] = useState<string | null>(null);
+    const isInitiated = useRef(false);
+    const { data: plans, isLoading: isPlansLoading } = usePlans();
+
+    const selectedPlan = plans?.find((p) => String(p.id) === planId);
+
+    const { mutate: createPayment } = useCreatePayment();
+    const { data: paymentData } = usePaymentStatus(transactionRef);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setPaymentStatus('success');
-            toast.success('Payment confirmed successfully!');
-        }, 5000);
+        if (!isInitiated.current && selectedPlan) {
+            isInitiated.current = true;
+            createPayment(
+                {
+                    cost: selectedPlan.price,
+                    planName: selectedPlan.name,
+                    note: 'Job Posting Plan Subscription',
+                },
+                {
+                    onSuccess: (data) => {
+                        setTransactionRef(data.transactionRef);
+                    },
+                    onError: () => {
+                        toast.error('Failed to initialize payment gateway.');
+                    },
+                }
+            );
+        }
+    }, [createPayment, selectedPlan]);
 
-        return () => clearTimeout(timer);
-    }, []);
+    const paymentStatus =
+        paymentData?.status === 'COMPLETED' ? 'success' : 'pending';
+
+    useEffect(() => {
+        if (paymentStatus === 'success') {
+            toast.success('Payment confirmed successfully!');
+        }
+    }, [paymentStatus]);
 
     const handleCancel = () => {
         navigate('/employer/post-job');
@@ -37,6 +61,24 @@ export default function CheckoutPage() {
     const handleSuccessRedirect = () => {
         navigate('/employer/post-job/create');
     };
+    if (isPlansLoading || !selectedPlan) {
+        return (
+            <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4'>
+                <div className='bg-white p-8 rounded-2xl flex flex-col items-center shadow-xl'>
+                    <Loader2 className='w-10 h-10 animate-spin text-blue-600 mb-4' />
+                    <p className='font-medium text-gray-700'>
+                        Loading checkout details...
+                    </p>
+                    <button
+                        onClick={handleCancel}
+                        className='mt-4 text-sm text-gray-500 hover:underline'
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200'>
@@ -54,7 +96,7 @@ export default function CheckoutPage() {
                 />
 
                 <OrderSummarySection
-                    planTitle={selectedPlan.title}
+                    planTitle={selectedPlan.name}
                     planPrice={selectedPlan.price}
                     paymentStatus={paymentStatus}
                     onCancel={handleCancel}

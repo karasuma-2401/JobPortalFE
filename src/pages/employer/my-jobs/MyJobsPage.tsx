@@ -1,95 +1,15 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 import MyJobsTable, { type JobItem } from './components/MyJobsTable';
 import Pagination from '../../../components/ui/Pagination';
 import PromoteJobModal from './components/PromoteJobModal';
 import CustomDropdown from '../../../components/ui/DropDown';
 
-const mockJobs: JobItem[] = [
-    {
-        id: '1',
-        title: 'UI/UX Designer',
-        type: 'Full Time',
-        dateInfo: '27 days remaining',
-        status: 'Active',
-        applications: 798,
-        isFeatured: true,
-    },
-    {
-        id: '2',
-        title: 'Senior UX Designer',
-        type: 'Internship',
-        dateInfo: '8 days remaining',
-        status: 'Active',
-        applications: 185,
-    },
-    {
-        id: '3',
-        title: 'Junior Graphic Designer',
-        type: 'Full Time',
-        dateInfo: '24 days remaining',
-        status: 'Active',
-        applications: 583,
-        isHighlighted: true,
-    },
-    {
-        id: '4',
-        title: 'Front End Developer',
-        type: 'Full Time',
-        dateInfo: 'Dec 7, 2019',
-        status: 'Expire',
-        applications: 740,
-    },
-    {
-        id: '5',
-        title: 'Technical Support Specialist',
-        type: 'Part Time',
-        dateInfo: '4 days remaining',
-        status: 'Active',
-        applications: 556,
-    },
-    {
-        id: '6',
-        title: 'Interaction Designer',
-        type: 'Contract Base',
-        dateInfo: 'Feb 2, 2019',
-        status: 'Expire',
-        applications: 426,
-    },
-    {
-        id: '7',
-        title: 'Software Engineer',
-        type: 'Temporary',
-        dateInfo: '9 days remaining',
-        status: 'Active',
-        applications: 922,
-    },
-    {
-        id: '8',
-        title: 'Product Designer',
-        type: 'Full Time',
-        dateInfo: '7 days remaining',
-        status: 'Active',
-        applications: 994,
-    },
-    {
-        id: '9',
-        title: 'Project Manager',
-        type: 'Full Time',
-        dateInfo: 'Dec 4, 2019',
-        status: 'Expire',
-        applications: 196,
-    },
-    {
-        id: '10',
-        title: 'Marketing Manager',
-        type: 'Full Time',
-        dateInfo: '4 days remaining',
-        status: 'Active',
-        applications: 492,
-    },
-];
+// SỬA: Import trực tiếp các Hook từ thư mục hooks
+import { useEmployerJobs } from '../../../hooks/useEmployerJobs';
+import { useJobActions } from '../../../hooks/useJobActions';
+import type { JobPostResponse } from '../../../types/jobpost';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -101,7 +21,6 @@ const filterOptions = [
 
 export default function MyJobsPage() {
     const navigate = useNavigate();
-    const [jobs, setJobs] = useState<JobItem[]>(mockJobs);
     const [filter, setFilter] = useState<string>('All Jobs');
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -114,17 +33,39 @@ export default function MyJobsPage() {
         jobId: '',
         jobTitle: '',
     });
-
-    const filteredJobs = useMemo(() => {
-        if (filter === 'All Jobs') return jobs;
-        return jobs.filter((job) => job.status === filter);
-    }, [jobs, filter]);
-
-    const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
-    const currentJobs = filteredJobs.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+    const { data: jobData, isLoading } = useEmployerJobs(
+        filter,
+        currentPage,
+        ITEMS_PER_PAGE
     );
+    const { promoteJob, expireJob } = useJobActions();
+
+    const mappedJobs: JobItem[] = useMemo(() => {
+        if (!jobData?.items) return [];
+        return jobData.items.map((job: JobPostResponse) => {
+            let dateInfo = 'N/A';
+            if (job.expiresAt) {
+                const diffTime =
+                    new Date(job.expiresAt).getTime() - new Date().getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                dateInfo =
+                    diffDays > 0 ? `${diffDays} days remaining` : 'Expired';
+            }
+
+            return {
+                id: String(job.id),
+                title: job.title || 'Untitled',
+                type: job.employmentType || 'N/A',
+                dateInfo,
+                status: job.status === 'EXPIRED' ? 'Expire' : 'Active',
+                applications: job.applicationCount || 0,
+                isFeatured: job.isFeatured,
+                isHighlighted: job.isHighlighted,
+            };
+        });
+    }, [jobData]);
+
+    const totalPages = Math.ceil((jobData?.totalItems || 0) / ITEMS_PER_PAGE);
 
     const handleFilterChange = (val: string) => {
         setFilter(val);
@@ -135,8 +76,12 @@ export default function MyJobsPage() {
         navigate(`/employer/applications?jobId=${id}`);
     };
 
+    const handleViewDetail = (id: string) => {
+        navigate(`/employer/my-jobs/${id}`);
+    };
+
     const handlePromoteClick = (id: string) => {
-        const job = jobs.find((j) => j.id === id);
+        const job = mappedJobs.find((j) => j.id === id);
         if (job) {
             setPromoteModalData({
                 isOpen: true,
@@ -147,34 +92,14 @@ export default function MyJobsPage() {
     };
 
     const handleConfirmPromote = (plan: string) => {
-        setJobs((prev) =>
-            prev.map((job) => {
-                if (job.id === promoteModalData.jobId) {
-                    return {
-                        ...job,
-                        isFeatured: plan === 'featured',
-                        isHighlighted: plan === 'highlight',
-                    };
-                }
-                return job;
-            })
-        );
-
+        promoteJob({
+            id: promoteModalData.jobId,
+            plan: plan as 'featured' | 'highlight',
+        });
         setPromoteModalData((prev) => ({ ...prev, isOpen: false }));
-        toast.success(`Successfully promoted job as ${plan.toUpperCase()}`);
     };
-
-    const handleViewDetail = (id: string) => {
-        navigate(`/employer/my-jobs/${id}`);
-    };
-
     const handleMarkExpired = (id: string) => {
-        setJobs((prev) =>
-            prev.map((job) =>
-                job.id === id ? { ...job, status: 'Expire' } : job
-            )
-        );
-        toast.success('Job marked as expired!');
+        expireJob(id);
     };
 
     return (
@@ -183,7 +108,7 @@ export default function MyJobsPage() {
                 <h1 className='text-xl font-bold text-gray-900'>
                     My Jobs{' '}
                     <span className='text-gray-400 font-medium'>
-                        ({filteredJobs.length})
+                        ({jobData?.totalItems || 0})
                     </span>
                 </h1>
                 <div className='flex items-center gap-3'>
@@ -201,20 +126,31 @@ export default function MyJobsPage() {
                 </div>
             </div>
 
-            <MyJobsTable
-                jobs={currentJobs}
-                onViewApplications={handleViewApplications}
-                onPromote={handlePromoteClick}
-                onViewDetail={handleViewDetail}
-                onMarkExpired={handleMarkExpired}
-            />
+            {isLoading ? (
+                <div className='flex flex-col items-center justify-center min-h-75 bg-white rounded-xl border border-gray-200'>
+                    <Loader2 className='w-10 h-10 animate-spin text-blue-600 mb-4' />
+                    <p className='text-gray-500 font-medium'>
+                        Loading your jobs...
+                    </p>
+                </div>
+            ) : (
+                <>
+                    <MyJobsTable
+                        jobs={mappedJobs}
+                        onViewApplications={handleViewApplications}
+                        onPromote={handlePromoteClick}
+                        onViewDetail={handleViewDetail}
+                        onMarkExpired={handleMarkExpired}
+                    />
 
-            {totalPages > 1 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    )}
+                </>
             )}
 
             <PromoteJobModal

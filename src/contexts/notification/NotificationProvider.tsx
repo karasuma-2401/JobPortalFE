@@ -1,14 +1,31 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { getToken, onMessage } from 'firebase/messaging';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { messaging } from '../../firebase/firebase.ts';
+import { messaging } from '../../firebase/firebase';
 import { NotificationContext } from './NotificationContext';
+import {
+    useNotificationsData,
+    useSaveDeviceToken,
+    useMarkAsRead,
+    useMarkAllAsRead,
+    useDeleteNotification,
+    useDeleteAllNotifications,
+} from '../../hooks/useNotifications';
 
-import type { NotificationItem } from '../../types/notification.ts';
+import type { NotificationItem } from '../../types/notification';
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
-    const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+    const queryClient = useQueryClient();
+
+    const { data: notifications = [] } = useNotificationsData();
+
+    const { mutate: saveToken } = useSaveDeviceToken();
+    const { mutate: markAsReadMutation } = useMarkAsRead();
+    const { mutate: markAllAsReadMutation } = useMarkAllAsRead();
+    const { mutate: deleteMutation } = useDeleteNotification();
+    const { mutate: deleteAllMutation } = useDeleteAllNotifications();
 
     useEffect(() => {
         const requestPermission = async () => {
@@ -26,10 +43,12 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
                         serviceWorkerRegistration: registration,
                     });
 
-                    console.log('FCM Token:', token);
+                    if (token) {
+                        saveToken(token);
+                    }
                 }
             } catch (error) {
-                console.error(error);
+                console.error('FCM Token generation failed:', error);
             }
         };
 
@@ -37,40 +56,71 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
         const unsubscribe = onMessage(messaging, (payload) => {
             const newNotification: NotificationItem = {
-                id: payload.messageId ?? crypto.randomUUID(),
+                id: Date.now(),
                 title: payload.notification?.title ?? 'New Notification',
-                body: payload.notification?.body ?? '',
+                message: payload.notification?.body ?? '',
                 isRead: false,
-                createdAt: new Date(),
+                createdAt: new Date().toISOString(),
             };
 
-            setNotifications((prev) => [newNotification, ...prev]);
+            queryClient.setQueryData(
+                ['notifications'],
+                (oldData: NotificationItem[] | undefined) => {
+                    return [newNotification, ...(oldData || [])];
+                }
+            );
 
             toast.info(newNotification.title, {
-                description: newNotification.body,
+                description: newNotification.message,
                 duration: 5000,
                 position: 'top-right',
             });
         });
 
         return () => unsubscribe();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-    const markAsRead = (id: string) => {
-        setNotifications((prev) =>
-            prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+    const markAsRead = (id: number) => {
+        queryClient.setQueryData(
+            ['notifications'],
+            (oldData: NotificationItem[] | undefined) => {
+                if (!oldData) return [];
+                return oldData.map((n) =>
+                    n.id === id ? { ...n, isRead: true } : n
+                );
+            }
         );
+        markAsReadMutation(id);
     };
 
     const markAllAsRead = () => {
-        setNotifications((prev) =>
-            prev.map((n) => ({
-                ...n,
-                isRead: true,
-            }))
+        queryClient.setQueryData(
+            ['notifications'],
+            (oldData: NotificationItem[] | undefined) => {
+                if (!oldData) return [];
+                return oldData.map((n) => ({ ...n, isRead: true }));
+            }
         );
+        markAllAsReadMutation();
+    };
+
+    const deleteNotification = (id: number) => {
+        queryClient.setQueryData(
+            ['notifications'],
+            (oldData: NotificationItem[] | undefined) => {
+                if (!oldData) return [];
+                return oldData.filter((n) => n.id !== id);
+            }
+        );
+        deleteMutation(id);
+    };
+
+    const deleteAllNotifications = () => {
+        queryClient.setQueryData(['notifications'], () => []);
+        deleteAllMutation();
     };
 
     return (
@@ -80,6 +130,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
                 unreadCount,
                 markAsRead,
                 markAllAsRead,
+                deleteNotification,
+                deleteAllNotifications,
             }}
         >
             {children}
