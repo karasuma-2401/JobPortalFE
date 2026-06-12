@@ -32,4 +32,8 @@ export const EmployerService = {
         const response = await privateApi.get('/saved-candidates');
         return response.data;
     },
+    getStatistics: async () => {
+        const response = await privateApi.get('/employer/statistics');
+        return response.data;
+    },
 };

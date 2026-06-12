@@ -1,10 +1,7 @@
 import type { JobSeekerProfile } from './jobseeker';
-
 export type ApplicationStatus =
     | 'PENDING'
     | 'REVIEWING'
-    | 'INTERVIEW'
-    | 'OFFER'
     | 'REJECTED'
     | 'ACCEPTED';
 
@@ -13,6 +10,11 @@ export interface JobSeekerProfileBrief {
     fullName: string;
     address: string;
     phone: string;
+    professionalTitle?: string;
+    experienceSummary?: string;
+    educationSummary?: string;
+    avatar?: string;
+    email?: string;
 }
 
 export interface JobApplication {
@@ -28,6 +30,7 @@ export interface JobApplicationResponse {
     message: string;
     data: JobApplication[];
 }
+
 export interface JobApplicationDetail {
     id: number;
     coverLetter: string;

@@ -1,28 +1,61 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Briefcase, BookmarkCheck } from 'lucide-react';
-import { toast } from 'sonner';
+import { Briefcase, BookmarkCheck, Users } from 'lucide-react';
 import StatCard from './components/StatCard';
 import RecentJobsTable from './components/RecentJobsTable';
+
 import { useEmployerDashboard } from '../../../hooks/useDashboard';
+import { useJobActions } from '../../../hooks/useJobActions';
+import PromoteJobModal from '../my-jobs/components/PromoteJobModal';
 
 export default function Overview() {
     const navigate = useNavigate();
     const { data, isLoading } = useEmployerDashboard();
+    const { promoteJob, expireJob } = useJobActions();
+    const [promoteModalData, setPromoteModalData] = useState<{
+        isOpen: boolean;
+        jobId: number | string;
+        jobTitle: string;
+    }>({
+        isOpen: false,
+        jobId: '',
+        jobTitle: '',
+    });
 
     const handleViewApplications = (jobId: number) => {
         navigate(`/employer/applications?jobId=${jobId}`);
     };
 
-    const handlePromote = (jobId: number) => {
-        toast.success(`Redirecting to Promote Job page for ID: ${jobId}`);
+    const handleViewDetail = (jobId: number) => {
+        navigate(`/employer/my-jobs/${jobId}`);
     };
 
-    const handleViewDetail = (jobId: number) => {
-        toast.info(`Viewing job details for ID: ${jobId}`);
+    const handlePromote = (jobId: number) => {
+        const job = data?.jobs?.find((j) => j.id === jobId);
+        if (job) {
+            setPromoteModalData({
+                isOpen: true,
+                jobId: job.id,
+                jobTitle: job.title,
+            });
+        }
+    };
+
+    const handleConfirmPromote = (plan: string) => {
+        promoteJob({
+            id: String(promoteModalData.jobId),
+            plan: plan as 'featured' | 'highlight',
+        });
+        setPromoteModalData((prev) => ({ ...prev, isOpen: false }));
     };
 
     const handleMarkExpired = (jobId: number) => {
-        toast.success(`Job ID ${jobId} marked as expired!`);
+        const confirm = window.confirm(
+            'Are you sure you want to mark this job as expired?'
+        );
+        if (confirm) {
+            expireJob(String(jobId));
+        }
     };
 
     if (isLoading) {
@@ -46,11 +79,18 @@ export default function Overview() {
 
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
                 <StatCard
-                    title='Open Jobs'
-                    count={data?.jobs?.length || 0}
+                    title='Total Jobs'
+                    count={data?.statistics?.totalJobs || 0}
                     icon={<Briefcase size={24} />}
                     bgColorClass='bg-primary-50'
                     textColorClass='text-primary-500'
+                />
+                <StatCard
+                    title='Total Applicants'
+                    count={data?.statistics?.totalApplicants || 0}
+                    icon={<Users size={24} />}
+                    bgColorClass='bg-blue-50'
+                    textColorClass='text-blue-600'
                 />
                 <StatCard
                     title='Saved Candidates'
@@ -67,6 +107,15 @@ export default function Overview() {
                 onPromote={handlePromote}
                 onViewDetail={handleViewDetail}
                 onMarkExpired={handleMarkExpired}
+            />
+
+            <PromoteJobModal
+                isOpen={promoteModalData.isOpen}
+                jobTitle={promoteModalData.jobTitle}
+                onClose={() =>
+                    setPromoteModalData((prev) => ({ ...prev, isOpen: false }))
+                }
+                onConfirm={handleConfirmPromote}
             />
         </div>
     );
