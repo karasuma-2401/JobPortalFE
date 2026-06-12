@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { NotificationService } from '../services/notificationService';
 import type { NotificationItem } from '../types/notification';
 
-export const useNotificationsData = () => {
+export const useNotificationsData = (enabled = true) => {
     return useQuery({
         queryKey: ['notifications'],
         queryFn: async () => {
@@ -12,6 +12,7 @@ export const useNotificationsData = () => {
             return (safeResponse.data as NotificationItem[]) || [];
         },
         staleTime: 1000 * 60 * 5,
+        enabled,
     });
 };
 

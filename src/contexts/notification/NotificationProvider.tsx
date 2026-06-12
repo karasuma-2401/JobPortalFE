@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { messaging } from '../../firebase/firebase';
 import { NotificationContext } from './NotificationContext';
+import useAuth from '../auth/useAuth';
 import {
     useNotificationsData,
     useSaveDeviceToken,
@@ -18,8 +19,8 @@ import type { NotificationItem } from '../../types/notification';
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
     const queryClient = useQueryClient();
-
-    const { data: notifications = [] } = useNotificationsData();
+    const { user } = useAuth();
+    const { data: notifications = [] } = useNotificationsData(!!user);
 
     const { mutate: saveToken } = useSaveDeviceToken();
     const { mutate: markAsReadMutation } = useMarkAsRead();
@@ -28,6 +29,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     const { mutate: deleteAllMutation } = useDeleteAllNotifications();
 
     useEffect(() => {
+        if (!user) return;
+
         const requestPermission = async () => {
             try {
                 const permission = await Notification.requestPermission();
@@ -42,6 +45,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
                             'BC55ci3KpI1JNkfzS7BJvzADUS2mGa1L4iOrOKjLPHA_UIpyRZf3ammewT-Pjy6fk2ZQ4kg1K569DOtu3I0-tbo',
                         serviceWorkerRegistration: registration,
                     });
+                    console.log(token);
 
                     if (token) {
                         saveToken(token);
@@ -79,7 +83,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
         return () => unsubscribe();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [user]);
 
     const unreadCount = notifications.filter((n) => !n.isRead).length;
 

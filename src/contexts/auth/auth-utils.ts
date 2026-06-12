@@ -7,15 +7,11 @@ type AuthenticatedUserLike = {
 };
 
 export interface AuthUser {
-    id?: number;
-    displayName?: string;
-    email?: string;
-
-    active?: boolean;
-    banned?: boolean;
-
     roles?: Role[];
+    name?: string;
+    email?: string;
     hasProfile?: boolean;
+    [key: string]: unknown;
 }
 
 export interface AuthState {
