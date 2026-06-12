@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Phone, Briefcase, User, Settings, LogOut } from 'lucide-react';
+import { Briefcase, User, Settings, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
-import sulkyunggu from '../../../assets/sulkyunggu.jpg';
-import ComboBox, { type OptionType } from '../../../components/ui/ComboBox';
+
 import NotificationBell from '../../../components/ui/NotificationBell';
 import useAuth from '../../../contexts/auth/useAuth';
 
@@ -15,17 +14,12 @@ const navLinks = [
     { name: 'Applications', path: '/employer/applications' },
 ];
 
-const languages = [
-    { label: 'English', value: 'english' },
-    { label: 'Vietnamese', value: 'vietnamese' },
-];
-
 export default function EmployerHeader() {
-    const [language, setLanguage] = useState<OptionType>(languages[0]);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const profileRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
-    const { logout } = useAuth();
+
+    const { user, logout } = useAuth();
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -46,6 +40,7 @@ export default function EmployerHeader() {
         toast.success('Logged out successfully!');
         navigate('/login', { replace: true });
     };
+    const defaultAvatar = `https://ui-avatars.com/api/?name=${user?.displayName || 'Employer'}&background=eff6ff&color=2563eb`;
 
     return (
         <header className='h-20 bg-white border-b border-gray-100 flex items-center justify-between px-8 shrink-0'>
@@ -78,20 +73,6 @@ export default function EmployerHeader() {
             </nav>
 
             <div className='flex items-center gap-6'>
-                <div className='hidden xl:flex items-center gap-6 text-sm text-gray-600 border-r border-gray-200 pr-6'>
-                    <div className='flex items-center gap-2'>
-                        <Phone size={16} />
-                        <span>+1-202-555-0178</span>
-                    </div>
-                    <div className='w-36'>
-                        <ComboBox
-                            options={languages}
-                            value={language}
-                            onChange={setLanguage}
-                        />
-                    </div>
-                </div>
-
                 <div className='flex items-center gap-5'>
                     <NotificationBell />
 
@@ -108,20 +89,30 @@ export default function EmployerHeader() {
                             className='w-10 h-10 rounded-full overflow-hidden border border-gray-200 bg-white hover:ring-2 hover:ring-primary-100 transition-all focus:outline-none'
                         >
                             <img
-                                src={sulkyunggu}
+                                src={defaultAvatar}
                                 alt='Avatar'
                                 className='w-full h-full object-cover'
                             />
                         </button>
 
                         {isProfileOpen && (
-                            <div className='absolute right-0 top-12 z-50 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 animate-in fade-in zoom-in-95'>
+                            <div className='absolute right-0 top-12 z-50 w-56 bg-white border border-gray-200 rounded-xl shadow-lg py-2 animate-in fade-in zoom-in-95'>
+                                <div className='px-4 py-2 border-b border-gray-100 mb-2'>
+                                    <p className='text-sm font-bold text-gray-900 truncate'>
+                                        {user?.displayName ||
+                                            'Employer Profile'}
+                                    </p>
+                                    <p className='text-xs text-gray-500 truncate mt-0.5'>
+                                        {user?.email || 'No email provided'}
+                                    </p>
+                                </div>
+
                                 <button
                                     onClick={() => {
                                         setIsProfileOpen(false);
                                         navigate('/employer/profile');
                                     }}
-                                    className='w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors'
+                                    className='w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors'
                                 >
                                     <User size={16} /> Profile
                                 </button>
@@ -130,14 +121,14 @@ export default function EmployerHeader() {
                                         setIsProfileOpen(false);
                                         navigate('/employer/settings');
                                     }}
-                                    className='w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors'
+                                    className='w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors'
                                 >
                                     <Settings size={16} /> Settings
                                 </button>
-                                <div className='border-t border-gray-100 my-1'></div>
+                                <div className='border-t border-gray-100 my-2'></div>
                                 <button
                                     onClick={handleLogout}
-                                    className='w-full flex items-center gap-3 px-4 py-2 text-sm text-danger-600 hover:bg-danger-50 transition-colors'
+                                    className='w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors'
                                 >
                                     <LogOut size={16} /> Log out
                                 </button>
