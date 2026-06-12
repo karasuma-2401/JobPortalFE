@@ -99,8 +99,7 @@ export default function EmployerHeader() {
                             <div className='absolute right-0 top-12 z-50 w-56 bg-white border border-gray-200 rounded-xl shadow-lg py-2 animate-in fade-in zoom-in-95'>
                                 <div className='px-4 py-2 border-b border-gray-100 mb-2'>
                                     <p className='text-sm font-bold text-gray-900 truncate'>
-                                        {user?.displayName ||
-                                            'Employer Profile'}
+                                        {user?.name || 'Employer Profile'}
                                     </p>
                                     <p className='text-xs text-gray-500 truncate mt-0.5'>
                                         {user?.email || 'No email provided'}
