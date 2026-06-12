@@ -99,6 +99,9 @@ export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
                             subLabel='A photo larger than 400 pixels work best. Max photo size 5 MB.'
                             className='aspect-square max-w-70'
                             onChange={(file: File | null) => setLogoFile(file)}
+                            value={
+                                mode === 'settings' ? profile?.logo : undefined
+                            }
                         />
                     </div>
 
@@ -112,6 +115,11 @@ export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
                             className='h-70'
                             onChange={(file: File | null) =>
                                 setBannerfile(file)
+                            }
+                            value={
+                                mode === 'settings'
+                                    ? profile?.banner
+                                    : undefined
                             }
                         />
                     </div>

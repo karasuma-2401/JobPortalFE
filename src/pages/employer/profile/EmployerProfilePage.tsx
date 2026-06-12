@@ -6,6 +6,15 @@ import ProfileSidebar from './components/ProfileSidebar';
 import OpenJobsList from './components/OpenJobsList';
 import { useEmployerProfilePageData } from '../../../hooks/useEmployer';
 
+interface JobData {
+    id: number | string;
+    title: string;
+    employmentType: string;
+    salaryMin: number;
+    salaryMax: number;
+    salaryType?: string;
+}
+
 export default function EmployerProfilePage() {
     const navigate = useNavigate();
     const { data, isLoading } = useEmployerProfilePageData();
@@ -27,8 +36,9 @@ export default function EmployerProfilePage() {
     }
 
     const { profile, jobs } = data;
+    const safeJobs: JobData[] = Array.isArray(jobs) ? jobs : [];
 
-    const mappedJobs = jobs.map((job) => {
+    const mappedJobs = safeJobs.map((job) => {
         let salaryText = 'Negotiable';
         if (job.salaryMin > 0 && job.salaryMax > 0) {
             salaryText = `$${job.salaryMin} - $${job.salaryMax} / ${job.salaryType?.toLowerCase() || 'month'}`;

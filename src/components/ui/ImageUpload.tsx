@@ -6,6 +6,7 @@ interface ImageUploadProps {
     label: string;
     subLabel?: string;
     className?: string;
+    value?: string;
     onChange?: (file: File | null) => void;
 }
 
@@ -13,11 +14,21 @@ export default function ImageUpload({
     label,
     subLabel,
     className,
+    value,
     onChange,
 }: ImageUploadProps) {
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(value || null);
+    const [prevValue, setPrevValue] = useState<string | undefined>(value);
     const inputRef = useRef<HTMLInputElement>(null);
 
+    if (value !== prevValue) {
+        setPrevValue(value);
+        if (value && !previewUrl?.startsWith('blob:')) {
+            setPreviewUrl(value);
+        } else if (!value) {
+            setPreviewUrl(null);
+        }
+    }
     useEffect(() => {
         return () => {
             if (previewUrl && previewUrl.startsWith('blob:')) {
@@ -26,7 +37,6 @@ export default function ImageUpload({
         };
     }, [previewUrl]);
 
-    // handle choose file to upload
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
@@ -45,6 +55,7 @@ export default function ImageUpload({
             onChange?.(file);
         }
     };
+
     // handle remove image
     const handleRemoveImage = (e: React.MouseEvent) => {
         e.stopPropagation();
