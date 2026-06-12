@@ -107,7 +107,6 @@ export interface BackendResponseEnvelope<T> {
 
 // Flexible structure representing paginated data from the backend
 export interface FlexiblePageData<T> {
-export interface FlexiblePageData<T> {
     items?: T[];
     content?: T[];
     totalItems?: number;
