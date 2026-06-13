@@ -36,4 +36,8 @@ export const EmployerService = {
         const response = await privateApi.get('/employer/statistics');
         return response.data;
     },
+    discoverCandidates: async (params: Record<string, unknown>) => {
+        const response = await privateApi.get('/job-seeker/discover', { params });
+        return response;
+    },
 };

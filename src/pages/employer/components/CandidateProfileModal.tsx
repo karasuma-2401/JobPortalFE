@@ -13,6 +13,7 @@ interface CandidateProfileModalProps {
     onClose: () => void;
     candidate: Candidate | null;
     onHire: (id: string) => void;
+    isGeneralSeeker?: boolean;
 }
 
 export default function CandidateProfileModal({
@@ -20,12 +21,13 @@ export default function CandidateProfileModal({
     onClose,
     candidate,
     onHire,
+    isGeneralSeeker,
 }: CandidateProfileModalProps) {
     const [isSaved, setIsSaved] = useState(true);
 
     // Gọi hook truyền vào ID của lượt ứng tuyển (ép về kiểu number)
     const { data: profile, isLoading } = useCandidateProfile(
-        isOpen && candidate ? Number(candidate.id) : null
+        isOpen && candidate && !isGeneralSeeker ? Number(candidate.id) : null
     );
 
     useEffect(() => {
