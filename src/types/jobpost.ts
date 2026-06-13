@@ -9,7 +9,7 @@ export interface JobPostResponse {
     jobLevel?: string;
     salaryMin?: number;
     salaryMax?: number;
-    tags?: string;
+    tags?: string[];
     location?: string;
     createdAt?: string;
     expiresAt?: string;

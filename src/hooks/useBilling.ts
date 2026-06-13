@@ -1,47 +1,30 @@
 import { useQuery } from '@tanstack/react-query';
-import { privateApi } from '../api/api';
-import type { InvoicesResponse } from '../types/invoice';
-
-export interface BillingOverview {
-    planName: string;
-    description: string;
-    isCanceled: boolean;
-    amount: string;
-    dueDate: string;
-    packageStarted: string;
-    maxJobPosts: number;
-    activeJobsCount: number;
-    remainingJobPosts: number;
-}
-
-interface ApiResponse<T> {
-    success: boolean;
-    message: string;
-    data: T;
-}
+import { BillingService } from '../services/billingService';
 
 export const useBillingOverviewData = () => {
     return useQuery({
         queryKey: ['billing-overview'],
-        queryFn: async (): Promise<BillingOverview> => {
-            const response = (await privateApi.get(
-                '/payments/me/billing-overview'
-            )) as unknown as ApiResponse<BillingOverview>;
-
-            return response.data;
-        },
+        queryFn: () => BillingService.getBillingOverview(),
     });
 };
 
-export const useInvoicesData = (limit: number, offset: number) => {
+export const useInvoicesData = (
+    page: number,
+    size: number,
+    startDate?: string,
+    endDate?: string
+) => {
     return useQuery({
-        queryKey: ['invoices', limit, offset],
-        queryFn: async (): Promise<InvoicesResponse> => {
-            const response = (await privateApi.get('/payments/me/invoices', {
-                params: { limit, offset },
-            })) as unknown as ApiResponse<InvoicesResponse>;
-
-            return response.data;
-        },
+        queryKey: ['invoices', page, size, startDate, endDate],
+        queryFn: () =>
+            BillingService.getInvoices(page - 1, size, startDate, endDate),
+    });
+};
+export const useTransactionDetails = (transactionRef: string | null) => {
+    return useQuery({
+        queryKey: ['transaction', transactionRef],
+        queryFn: () =>
+            BillingService.getTransactionDetails(transactionRef as string),
+        enabled: !!transactionRef,
     });
 };

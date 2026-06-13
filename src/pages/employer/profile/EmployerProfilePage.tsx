@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import ProfileHeader from './components/ProfileHeader';
 import ProfileAbout from './components/ProfileAbout';
 import ProfileSidebar from './components/ProfileSidebar';
 import OpenJobsList from './components/OpenJobsList';
 import { useEmployerProfilePageData } from '../../../hooks/useEmployer';
+import EmployerProfileSkeleton from './components/EmployerProfileSkeleton';
 
 interface JobData {
     id: number | string;
@@ -28,11 +28,7 @@ export default function EmployerProfilePage() {
     };
 
     if (isLoading || !data) {
-        return (
-            <div className='w-full h-full flex items-center justify-center min-h-[60vh]'>
-                <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-            </div>
-        );
+        return <EmployerProfileSkeleton />;
     }
 
     const { profile, jobs } = data;

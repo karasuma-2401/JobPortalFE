@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { messaging } from '../../firebase/firebase';
 import { NotificationContext } from './NotificationContext';
 import useAuth from '../auth/useAuth';
+import { NotificationService } from '../../services/notificationService';
 import {
     useNotificationsData,
     useSaveDeviceToken,
@@ -16,6 +17,9 @@ import {
 } from '../../hooks/useNotifications';
 
 import type { NotificationItem } from '../../types/notification';
+
+const VAPID_KEY =
+    'BC55ci3KpI1JNkfzS7BJvzADUS2mGa1L4iOrOKjLPHA_UIpyRZf3ammewT-Pjy6fk2ZQ4kg1K569DOtu3I0-tbo';
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
     const queryClient = useQueryClient();
@@ -29,41 +33,63 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     const { mutate: deleteAllMutation } = useDeleteAllNotifications();
 
     useEffect(() => {
+        if (!user) {
+            NotificationService.cleanupOnLogout()
+                .then(() => {
+                    console.log('Device tokens cleaned up on logout');
+                })
+                .catch((error) => {
+                    console.warn('Error during logout cleanup:', error);
+                });
+            queryClient.setQueryData(['notifications'], []);
+        }
+    }, [user, queryClient]);
+
+    useEffect(() => {
         if (!user) return;
 
-        const requestPermission = async () => {
+        const setupFCM = async () => {
             try {
                 const permission = await Notification.requestPermission();
 
                 if (permission === 'granted') {
-                    const registration = await navigator.serviceWorker.register(
-                        '/firebase-messaging-sw.js'
-                    );
+                    try {
+                        const registration =
+                            await navigator.serviceWorker.register(
+                                '/firebase-messaging-sw.js'
+                            );
 
-                    const token = await getToken(messaging, {
-                        vapidKey:
-                            'BC55ci3KpI1JNkfzS7BJvzADUS2mGa1L4iOrOKjLPHA_UIpyRZf3ammewT-Pjy6fk2ZQ4kg1K569DOtu3I0-tbo',
-                        serviceWorkerRegistration: registration,
-                    });
-                    console.log(token);
+                        const token = await getToken(messaging, {
+                            vapidKey: VAPID_KEY,
+                            serviceWorkerRegistration: registration,
+                        });
 
-                    if (token) {
-                        saveToken(token);
+                        if (token) {
+                            console.log('FCM Token generated successfully');
+                            saveToken(token);
+                        }
+                    } catch (serviceWorkerError) {
+                        console.warn(
+                            'Service Worker registration failed:',
+                            serviceWorkerError
+                        );
                     }
+                } else if (permission === 'denied') {
+                    console.log('Notification permission denied by user');
                 }
             } catch (error) {
-                console.error('FCM Token generation failed:', error);
+                console.error('FCM setup failed:', error);
             }
         };
 
-        requestPermission();
-
+        setupFCM();
         const unsubscribe = onMessage(messaging, (payload) => {
             const newNotification: NotificationItem = {
                 id: Date.now(),
                 title: payload.notification?.title ?? 'New Notification',
                 message: payload.notification?.body ?? '',
                 icon: payload.notification?.icon || payload.notification?.image,
+                targetUrl: (payload.data?.url as string) || undefined,
                 isRead: false,
                 createdAt: new Date().toISOString(),
             };
@@ -79,12 +105,19 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
                 description: newNotification.message,
                 duration: 5000,
                 position: 'top-right',
+                action: newNotification.targetUrl
+                    ? {
+                          label: 'Open',
+                          onClick: () =>
+                              window.open(newNotification.targetUrl, '_self'),
+                      }
+                    : undefined,
             });
         });
 
         return () => unsubscribe();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user]);
+    }, [user, saveToken]);
 
     const unreadCount = notifications.filter((n) => !n.isRead).length;
 

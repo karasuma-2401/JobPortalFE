@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import PricingCard from './components/PricingCard';
 import PricingIllustration from '../../../assets/PricingIllustration.svg';
+import PricingCardsSkeleton from './components/PricingCardsSkeleton';
 import { usePlans } from '../../../hooks/usePayment';
 
 export default function PostJobPricing() {
@@ -11,27 +11,6 @@ export default function PostJobPricing() {
     const handleChoosePlan = (planId: string | number) => {
         navigate(`/employer/checkout?plan=${planId}`);
     };
-
-    if (isLoading) {
-        return (
-            <div className='flex flex-col items-center justify-center min-h-100'>
-                <Loader2 className='w-10 h-10 animate-spin text-blue-600 mb-4' />
-                <p className='text-gray-500 font-medium'>
-                    Loading pricing plans...
-                </p>
-            </div>
-        );
-    }
-
-    if (isError || !plans) {
-        return (
-            <div className='flex flex-col items-center justify-center min-h-100'>
-                <p className='text-red-500 font-medium'>
-                    Failed to load pricing plans.
-                </p>
-            </div>
-        );
-    }
 
     return (
         <div className='w-full max-w-7xl mx-auto animate-in fade-in duration-500 pb-12 pt-4'>
@@ -72,27 +51,36 @@ export default function PostJobPricing() {
                     />
                 </div>
             </div>
-
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-8 items-start px-4 md:px-0'>
-                {plans.map((plan) => (
-                    <PricingCard
-                        key={plan.id}
-                        title={plan.name}
-                        description={`Valid for ${plan.duration} days. Post up to ${plan.maxJobPostsPerMonth} jobs.`}
-                        price={plan.price}
-                        isRecommended={plan.priority === 1}
-                        features={[
-                            `Post up to ${plan.maxJobPostsPerMonth} Jobs`,
-                            'Urgents & Featured Jobs',
-                            'Highlights Job with Colors',
-                            'Access & Saved Candidates',
-                            `${plan.duration} Days Resume Visibility`,
-                            '24/7 Critical Support',
-                        ]}
-                        onChoose={() => handleChoosePlan(plan.id)}
-                    />
-                ))}
-            </div>
+            {isLoading ? (
+                <PricingCardsSkeleton />
+            ) : isError || !plans ? (
+                <div className='flex flex-col items-center justify-center min-h-75'>
+                    <p className='text-red-500 font-medium'>
+                        Failed to load pricing plans.
+                    </p>
+                </div>
+            ) : (
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-8 items-start px-4 md:px-0'>
+                    {plans.map((plan) => (
+                        <PricingCard
+                            key={plan.id}
+                            title={plan.name}
+                            description={`Valid for ${plan.duration} days. Post up to ${plan.maxJobPostsPerMonth} jobs.`}
+                            price={plan.price}
+                            isRecommended={plan.priority === 1}
+                            features={[
+                                `Post up to ${plan.maxJobPostsPerMonth} Jobs`,
+                                'Urgents & Featured Jobs',
+                                'Highlights Job with Colors',
+                                'Access & Saved Candidates',
+                                `${plan.duration} Days Resume Visibility`,
+                                '24/7 Critical Support',
+                            ]}
+                            onChoose={() => handleChoosePlan(plan.id)}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

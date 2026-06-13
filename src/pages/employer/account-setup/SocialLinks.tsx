@@ -12,6 +12,7 @@ import {
     useEmployerProfile,
     useUpdateEmployerProfile,
 } from '../../../hooks/useEmployer';
+import SettingsFormSkeleton from '../settings/components/SettingsFormSkeleton';
 
 const socialNetworks: OptionType[] = [
     {
@@ -46,7 +47,7 @@ export default function SocialLinks({ mode = 'setup' }: SocialLinksProps) {
     const location = useLocation();
     const previousState = location.state || {};
 
-    const { data: profile } = useEmployerProfile();
+    const { data: profile, isLoading } = useEmployerProfile();
     const { mutate: updateProfile, isPending: isUpdating } =
         useUpdateEmployerProfile();
 
@@ -150,7 +151,9 @@ export default function SocialLinks({ mode = 'setup' }: SocialLinksProps) {
             )
         );
     };
-
+    if (mode === 'settings' && isLoading) {
+        return <SettingsFormSkeleton />;
+    }
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 

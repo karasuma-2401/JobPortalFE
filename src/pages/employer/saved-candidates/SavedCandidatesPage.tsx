@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
-import { Info, FolderOpen, Loader2 } from 'lucide-react';
+import { Info, FolderOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import SavedCandidateItem from './components/SavedCandidateItem';
-import CandidateProfileModal, {
-    type Candidate,
-} from '../components/CandidateProfileModal';
+import CandidateProfileModal from '../components/CandidateProfileModal';
+import type { Candidate } from '../../../types/candidate';
+import SavedCandidatesSkeleton from './components/SavedCandidatesSkeleton';
+import { Skeleton } from '../../../components/ui/Skeleton';
 import {
     useSavedCandidates,
     useRemoveSavedCandidate,
@@ -23,6 +24,8 @@ export default function SavedCandidatesPage() {
 
         return apiSavedCandidates.map((saved) => ({
             id: saved.jobSeekerId.toString(),
+            columnId: 'saved',
+            appliedDate: saved.savedAt,
             name: saved.jobSeekerName,
             email: saved.jobSeekerEmail,
             role: 'Candidate',
@@ -66,33 +69,30 @@ export default function SavedCandidatesPage() {
         }).format(date);
     }, []);
 
-    if (isLoading) {
-        return (
-            <div className='w-full h-[70vh] flex items-center justify-center'>
-                <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-            </div>
-        );
-    }
-
     return (
         <div className='w-full max-w-5xl mx-auto animate-in fade-in duration-500 pb-16 min-h-[70vh] flex flex-col'>
             <div className='flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 border-b border-gray-100 pb-4 shrink-0'>
-                <h1 className='text-xl font-bold text-gray-900'>
+                <h1 className='text-xl font-bold text-gray-900 flex items-center gap-2'>
                     Saved Candidates{' '}
-                    <span className='text-gray-400 font-medium'>
-                        ({candidates.length})
-                    </span>
+                    {isLoading ? (
+                        <Skeleton className='h-6 w-12 rounded-md' />
+                    ) : (
+                        <span className='text-gray-400 font-medium'>
+                            ({candidates.length})
+                        </span>
+                    )}
                 </h1>
                 <div className='flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg border border-gray-100'>
-                    <Info size={16} className='text-blue-500' />
+                    <Info size={16} className='text-blue-500 shrink-0' />
                     <span>
                         All of the candidates are visible until{' '}
                         {formattedExpirationDate}
                     </span>
                 </div>
             </div>
-
-            {candidates.length === 0 ? (
+            {isLoading ? (
+                <SavedCandidatesSkeleton />
+            ) : candidates.length === 0 ? (
                 <div className='flex-1 flex flex-col items-center justify-center text-center p-10 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-200'>
                     <div className='w-20 h-20 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-4'>
                         <FolderOpen size={40} strokeWidth={1.5} />
