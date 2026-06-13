@@ -7,9 +7,9 @@ export const useIndustries = () => {
         queryKey: ['industries'],
         queryFn: async (): Promise<Industry[]> => {
             const response = (await publicApi.get(
-                '/industries'
+                '/industry?limit=100'
             )) as unknown as IndustryResponse;
-            return response.data || [];
+            return response.data?.items || [];
         },
         staleTime: 1000 * 60 * 60,
     });

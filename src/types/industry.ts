@@ -8,5 +8,10 @@ export interface Industry {
 export interface IndustryResponse {
     success: boolean;
     message: string;
-    data: Industry[];
+    data: {
+        items: Industry[];
+        totalItems: number;
+        page: number;
+        size: number;
+    };
 }
