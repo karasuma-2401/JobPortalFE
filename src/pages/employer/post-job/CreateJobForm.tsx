@@ -10,6 +10,7 @@ import CustomDatePicker from '../../../components/ui/DatePicker';
 import { useCreateJob } from '../../../hooks/useCreateJob';
 import { useBillingOverviewData } from '../../../hooks/useBilling';
 import { useIndustries } from '../../../hooks/useIndustries';
+import TagsInput from '../../../components/ui/TagsInput';
 
 const roleOptions = [
     { label: 'Designer', value: 'DESIGNER' },
@@ -95,7 +96,7 @@ export default function CreateJobForm() {
 
     const [formData, setFormData] = useState({
         title: '',
-        tags: '',
+        tags: [] as string[],
         industry: '',
         role: 'DEVELOPER',
         minSalary: '',
@@ -119,7 +120,7 @@ export default function CreateJobForm() {
         return date.toISOString();
     };
 
-    const handleChange = (field: string, value: string) => {
+    const handleChange = (field: string, value: string | string[]) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
@@ -229,14 +230,12 @@ export default function CreateJobForm() {
                         <label className='text-sm font-semibold text-gray-900'>
                             Tags / Skills *
                         </label>
-                        <Input
-                            type='text'
-                            required
-                            placeholder='Job keyword, tags etc...'
+                        <TagsInput
                             value={formData.tags}
-                            onChange={(
-                                e: React.ChangeEvent<HTMLInputElement>
-                            ) => handleChange('tags', e.target.value)}
+                            onChange={(newTags) =>
+                                handleChange('tags', newTags)
+                            }
+                            placeholder='e.g. React, Nodejs, TypeScript (Press Enter)'
                         />
                     </div>
                     <div className='flex flex-col gap-2 relative'>
