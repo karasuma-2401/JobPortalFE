@@ -4,14 +4,8 @@ export interface Industry {
     jobCount: number;
     createdAt: string;
 }
-
 export interface IndustryResponse {
     success: boolean;
     message: string;
-    data: {
-        items: Industry[];
-        totalItems: number;
-        page: number;
-        size: number;
-    };
+    data: Industry[];
 }

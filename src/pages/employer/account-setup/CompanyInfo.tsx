@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useOutletContext } from 'react-router-dom';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+
+import type { SetupFileContext } from '../../../layouts/EmployerSetupLayout';
 
 import ImageUpload from '../../../components/ui/ImageUpload';
 import Input from '../../../components/ui/Input';
@@ -22,13 +24,11 @@ interface CompanyInfoProps {
 export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
     const navigate = useNavigate();
     const location = useLocation();
-
     const previousState = location.state as {
         companyName?: string;
         description?: string;
-        logo?: File | null;
-        banner?: File | null;
     } | null;
+    const context = useOutletContext<SetupFileContext | null>();
 
     const { data: profile, isLoading } = useEmployerProfile();
     const { mutate: updateProfile, isPending: isUpdating } =
@@ -38,12 +38,14 @@ export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
         previousState?.companyName || ''
     );
     const [aboutUs, setAboutUs] = useState(previousState?.description || '');
+
     const [logoFile, setLogoFile] = useState<File | null>(
-        previousState?.logo || null
+        context?.setupFiles?.logo || null
     );
-    const [bannerFile, setBannerfile] = useState<File | null>(
-        previousState?.banner || null
+    const [bannerFile, setBannerFile] = useState<File | null>(
+        context?.setupFiles?.banner || null
     );
+
     useEffect(() => {
         if (mode === 'settings' && profile) {
             const timer = setTimeout(() => {
@@ -57,6 +59,7 @@ export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
     if (mode === 'settings' && isLoading) {
         return <SettingsFormSkeleton />;
     }
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -66,12 +69,16 @@ export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
         }
 
         if (mode === 'setup') {
+            if (context?.setSetupFiles) {
+                context.setSetupFiles({
+                    logo: logoFile,
+                    banner: bannerFile,
+                });
+            }
             const currentData = {
                 ...previousState,
                 companyName,
                 description: aboutUs,
-                logo: logoFile,
-                banner: bannerFile,
             };
             navigate('/employer/setup/founding', { state: currentData });
         } else {
@@ -105,7 +112,11 @@ export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
                             className='aspect-square max-w-70'
                             onChange={(file: File | null) => setLogoFile(file)}
                             value={
-                                mode === 'settings' ? profile?.logo : undefined
+                                logoFile
+                                    ? URL.createObjectURL(logoFile)
+                                    : mode === 'settings'
+                                      ? profile?.logo
+                                      : undefined
                             }
                         />
                     </div>
@@ -119,12 +130,14 @@ export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
                             subLabel='Banner images optimal dimension 1520x400. Supported format JPEG, PNG. Max photo size 5 MB.'
                             className='h-70'
                             onChange={(file: File | null) =>
-                                setBannerfile(file)
+                                setBannerFile(file)
                             }
                             value={
-                                mode === 'settings'
-                                    ? profile?.banner
-                                    : undefined
+                                bannerFile
+                                    ? URL.createObjectURL(bannerFile)
+                                    : mode === 'settings'
+                                      ? profile?.banner
+                                      : undefined
                             }
                         />
                     </div>
