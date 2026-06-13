@@ -80,27 +80,40 @@ export default function ProfilePicture({
                         setSelectedFile(event.target.files?.[0] ?? null)
                     }
                 />
-                <div className='mt-5 flex gap-3'>
-                    <Button
-                        variant='social'
-                        className='flex-1'
-                        onClick={() => inputRef.current?.click()}
-                    >
-                        <Upload size={16} />
-                        Choose Photo
-                    </Button>
-                    <Button
-                        variant='primary'
-                        className='flex-1'
-                        onClick={handleUpload}
-                        disabled={isLoading || !selectedFile}
-                    >
-                        {isLoading ? (
-                            <Loader2 className='animate-spin' size={18} />
-                        ) : (
-                            'Save Photo'
-                        )}
-                    </Button>
+                <div className='mt-5 flex gap-2.5 w-full items-stretch justify-center'>
+                    <div className='flex-1 min-w-0'>
+                        <Button
+                            variant='social'
+                            className='w-full py-2 px-1 h-full min-h-[54px] flex items-center justify-center'
+                            onClick={() => inputRef.current?.click()}
+                        >
+                            <div className='flex flex-col items-center justify-center gap-0.5 text-center w-full'>
+                                <Upload size={14} className='shrink-0 text-gray-500 mb-0.5' />
+                                <span className='text-[11px] font-bold leading-tight text-gray-700 block'>
+                                    Choose<br />Photo
+                                </span>
+                            </div>
+                        </Button>
+                    </div>
+                    
+                    <div className='flex-1 min-w-0'>
+                        <Button
+                            variant='primary'
+                            className='w-full py-2 px-1 h-full min-h-[54px] flex items-center justify-center'
+                            onClick={handleUpload}
+                            disabled={isLoading || !selectedFile}
+                        >
+                            <div className='flex flex-col items-center justify-center text-center w-full'>
+                                {isLoading ? (
+                                    <Loader2 className='animate-spin' size={14} />
+                                ) : (
+                                    <span className='text-[11px] font-bold leading-tight text-white block'>
+                                        Save<br />Photo
+                                    </span>
+                                )}
+                            </div>
+                        </Button>
+                    </div>
                 </div>
             </div>
         </>
