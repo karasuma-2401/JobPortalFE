@@ -22,6 +22,8 @@ export default function FindJobPage() {
         setSearchKeyword,
         locationKeyword,
         setLocationKeyword,
+        category,
+        setCategory,
         experience,
         setExperience,
         salaryRange,
@@ -65,6 +67,8 @@ export default function FindJobPage() {
                 setSearchKeyword={setSearchKeyword}
                 locationKeyword={locationKeyword}
                 setLocationKeyword={setLocationKeyword}
+                category={category}
+                setCategory={setCategory}
                 onSearch={handleSearch}
                 experience={experience}
                 setExperience={setExperience}

@@ -57,6 +57,23 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
     const { jobData, loading, error, isSaved, handleToggleSave, handleApplySubmit } =
         useJobDetail(resolvedJobId);
 
+    const descriptionParagraphs = useMemo(() => {
+        if (!jobData?.description) return [];
+        if (typeof jobData.description === 'string') {
+            return jobData.description.split('\n').filter((p) => p.trim() !== '');
+        }
+        return Array.isArray(jobData.description) ? jobData.description : [];
+    }, [jobData?.description]);
+
+    const requirementsItems = useMemo(() => {
+        const rawRequirements = jobData?.requirements || (jobData as any)?.responsibilities;
+        if (!rawRequirements) return [];
+        if (typeof rawRequirements === 'string') {
+            return rawRequirements.split('\n').filter((p) => p.trim() !== '');
+        }
+        return Array.isArray(rawRequirements) ? rawRequirements : [];
+    }, [jobData]);
+
     const shouldAutoOpenApply = useMemo(
         () => searchParams.get('apply') === 'true',
         [searchParams]
@@ -232,7 +249,7 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
                             <h3 className='mb-3.5 text-[18px] font-bold text-gray-900'>
                                 Job Description
                             </h3>
-                            {jobData.description.map((paragraph, index) => (
+                            {descriptionParagraphs.map((paragraph, index) => (
                                 <p key={index} className='mb-4'>
                                     {paragraph}
                                 </p>
@@ -241,10 +258,10 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
 
                         <div className='mt-2'>
                             <h3 className='mb-3.5 text-[18px] font-bold text-gray-900'>
-                                Responsibilities
+                                Responsibilities & Requirements
                             </h3>
                             <ul className='flex list-disc flex-col gap-2.5 pl-5 text-gray-600'>
-                                {jobData.responsibilities.map((item, index) => (
+                                {requirementsItems.map((item, index) => (
                                     <li key={index}>{item}</li>
                                 ))}
                             </ul>

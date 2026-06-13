@@ -12,6 +12,7 @@ export function useFindJobs() {
     const [itemsPerPage] = useState(10);
     const [searchKeyword, setSearchKeyword] = useState('');
     const [locationKeyword, setLocationKeyword] = useState('');
+    const [category, setCategory] = useState('');
     const [experience, setExperience] = useState('');
     const [salaryRange, setSalaryRange] = useState('');
     const [jobTypes, setJobTypes] = useState<string[]>([]);
@@ -20,6 +21,7 @@ export function useFindJobs() {
     const [filterParams, setFilterParams] = useState({
         keyword: '',
         location: '',
+        category: '',
         experience: '',
         salaryRange: '',
         jobTypes: [] as string[],
@@ -35,6 +37,7 @@ export function useFindJobs() {
             const data = await JobseekerService.getJobs({
                 keyword: filterParams.keyword,
                 location: filterParams.location,
+                category: filterParams.category,
                 experience: filterParams.experience,
                 salaryRange: filterParams.salaryRange,
                 jobTypes: filterParams.jobTypes,
@@ -81,6 +84,7 @@ export function useFindJobs() {
             setFilterParams({
                 keyword: searchKeyword,
                 location: locationKeyword,
+                category,
                 experience,
                 salaryRange,
                 jobTypes,
@@ -89,6 +93,7 @@ export function useFindJobs() {
             });
         },
         [
+            category,
             education,
             experience,
             jobLevel,
@@ -102,6 +107,7 @@ export function useFindJobs() {
     const handleResetFilters = useCallback(() => {
         setSearchKeyword('');
         setLocationKeyword('');
+        setCategory('');
         setExperience('');
         setSalaryRange('');
         setJobTypes([]);
@@ -111,6 +117,7 @@ export function useFindJobs() {
         setFilterParams({
             keyword: '',
             location: '',
+            category: '',
             experience: '',
             salaryRange: '',
             jobTypes: [],
@@ -143,6 +150,8 @@ export function useFindJobs() {
         setSearchKeyword,
         locationKeyword,
         setLocationKeyword,
+        category,
+        setCategory,
         experience,
         setExperience,
         salaryRange,
