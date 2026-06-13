@@ -1,18 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import ApplyJobType from './components/ApplyJobType';
 import RichTextEditor from '../../../components/ui/RichTextEditor';
 import PostSuccessModal from './components/PostSuccessModal';
 import Input from '../../../components/ui/Input';
 import CustomDropdown from '../../../components/ui/DropDown';
 import CustomDatePicker from '../../../components/ui/DatePicker';
 import { useCreateJob } from '../../../hooks/useCreateJob';
+import { useBillingOverviewData } from '../../../hooks/useBilling';
+import { useIndustries } from '../../../hooks/useIndustries';
 
 const roleOptions = [
     { label: 'Designer', value: 'DESIGNER' },
     { label: 'Developer', value: 'DEVELOPER' },
     { label: 'Manager', value: 'MANAGER' },
+    { label: 'Marketing', value: 'MARKETING' },
 ];
 
 const salaryTypeOptions = [
@@ -22,12 +25,15 @@ const salaryTypeOptions = [
 ];
 
 const educationOptions = [
+    { label: 'High School', value: 'HIGH_SCHOOL' },
+    { label: 'Associate Degree', value: 'ASSOCIATE' },
     { label: 'Bachelor Degree', value: 'BACHELOR' },
     { label: 'Master Degree', value: 'MASTER' },
-    { label: 'Associate Degree', value: 'ASSOCIATE' },
+    { label: 'Doctorate', value: 'DOCTORATE' },
 ];
 
 const experienceOptions = [
+    { label: 'No Experience', value: '0' },
     { label: '1 Year', value: '1' },
     { label: '2 Years', value: '2' },
     { label: '5+ Years', value: '5' },
@@ -38,28 +44,59 @@ const jobTypeOptions = [
     { label: 'Part Time', value: 'PART_TIME' },
     { label: 'Internship', value: 'INTERNSHIP' },
     { label: 'Contract', value: 'CONTRACT' },
+    { label: 'Temporary', value: 'TEMPORARY' },
 ];
 
 const vacanciesOptions = [
     { label: '1', value: '1' },
     { label: '2', value: '2' },
-    { label: '5+', value: '5' },
+    { label: '5', value: '5' },
+    { label: '10+', value: '10' },
 ];
 
 const jobLevelOptions = [
     { label: 'Intern', value: 'INTERN' },
+    { label: 'Fresher', value: 'FRESHER' },
     { label: 'Junior', value: 'JUNIOR' },
     { label: 'Middle', value: 'MIDDLE' },
     { label: 'Senior', value: 'SENIOR' },
 ];
 
 export default function CreateJobForm() {
+    const navigate = useNavigate();
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+
     const { mutate: createJob, isPending } = useCreateJob();
+    const { data: billing, isLoading: isLoadingBilling } =
+        useBillingOverviewData();
+
+    const { data: industries = [] } = useIndustries();
+    const industryOptions = industries.map((ind) => ({
+        label: ind.name,
+        value: String(ind.id),
+    }));
+
+    useEffect(() => {
+        if (!isLoadingBilling) {
+            if (!billing) {
+                toast.error('You need to buy a premium plan to post a job!');
+                navigate('/employer/pricing', { replace: true });
+                return;
+            }
+
+            if (billing.remainingJobPosts <= 0 || billing.isCanceled) {
+                toast.error(
+                    'You have reached your job post limit. Please upgrade your plan!'
+                );
+                navigate('/employer/pricing', { replace: true });
+            }
+        }
+    }, [isLoadingBilling, billing, navigate]);
 
     const [formData, setFormData] = useState({
         title: '',
         tags: '',
+        industry: '',
         role: 'DEVELOPER',
         minSalary: '',
         maxSalary: '',
@@ -72,7 +109,7 @@ export default function CreateJobForm() {
         jobLevel: 'MIDDLE',
         applyType: 'myjob',
         description: '',
-        responsibilities: '',
+        requirements: '',
         location: '',
     });
 
@@ -88,23 +125,30 @@ export default function CreateJobForm() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.title || !formData.location || !formData.expirationDate) {
+
+        if (
+            !formData.title ||
+            !formData.location ||
+            !formData.expirationDate ||
+            !formData.description ||
+            !formData.tags ||
+            !formData.industry
+        ) {
             toast.error(
-                'Please fill in all required fields (Title, Location, Expiration Date).'
+                'Please fill in all required fields (Title, Location, Industry, Tags, Description, Expiration Date).'
             );
             return;
         }
-
         const payload: Record<string, unknown> = {
             title: formData.title,
             description: formData.description,
             location: formData.location,
-            industryIds: [1], 
+            industryIds: [Number(formData.industry)],
             salaryMin: Number(formData.minSalary) || 0,
             salaryMax: Number(formData.maxSalary) || 0,
             educationLevel: formData.education,
             jobLevel: formData.jobLevel,
-            status: 'OPEN', 
+            status: 'OPEN',
             experience: Number(formData.experience) || 0,
             employmentType: formData.jobType,
             expiresAt: formData.expirationDate,
@@ -112,7 +156,7 @@ export default function CreateJobForm() {
             isFeatured: false,
             isHighlighted: false,
             jobRole: formData.role,
-            responsibilities: formData.responsibilities,
+            requirements: formData.requirements,
             vacancies: Number(formData.vacancies) || 1,
             salaryType: formData.salaryType,
         };
@@ -121,8 +165,26 @@ export default function CreateJobForm() {
             onSuccess: () => {
                 setIsSuccessModalOpen(true);
             },
+            onError: () => {
+                toast.error('Failed to create job. Please check your inputs.');
+            },
         });
     };
+
+    if (isLoadingBilling) {
+        return (
+            <div className='flex flex-col items-center justify-center min-h-[60vh]'>
+                <Loader2 className='w-10 h-10 animate-spin text-blue-600 mb-4' />
+                <p className='text-gray-500 font-medium'>
+                    Checking your plan limits...
+                </p>
+            </div>
+        );
+    }
+
+    if (!billing || billing.remainingJobPosts <= 0 || billing.isCanceled) {
+        return null;
+    }
 
     return (
         <div className='w-full max-w-5xl mx-auto animate-in fade-in duration-500 pb-16'>
@@ -165,10 +227,11 @@ export default function CreateJobForm() {
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                     <div className='flex flex-col gap-2 relative'>
                         <label className='text-sm font-semibold text-gray-900'>
-                            Tags / Skills
+                            Tags / Skills *
                         </label>
                         <Input
                             type='text'
+                            required
                             placeholder='Job keyword, tags etc...'
                             value={formData.tags}
                             onChange={(
@@ -263,7 +326,7 @@ export default function CreateJobForm() {
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-6 gap-y-6'>
                         <div className='flex flex-col gap-2 relative'>
                             <label className='text-sm font-medium text-gray-700'>
-                                Education
+                                Education Level
                             </label>
                             <CustomDropdown
                                 options={educationOptions}
@@ -287,13 +350,25 @@ export default function CreateJobForm() {
                         </div>
                         <div className='flex flex-col gap-2 relative'>
                             <label className='text-sm font-medium text-gray-700'>
-                                Job Type
+                                Employment Type
                             </label>
                             <CustomDropdown
                                 options={jobTypeOptions}
                                 value={formData.jobType}
                                 onChange={(val: string) =>
                                     handleChange('jobType', val)
+                                }
+                            />
+                        </div>
+                        <div className='flex flex-col gap-2 relative'>
+                            <label className='text-sm font-medium text-gray-700'>
+                                Industry *
+                            </label>
+                            <CustomDropdown
+                                options={industryOptions}
+                                value={formData.industry}
+                                onChange={(val: string) =>
+                                    handleChange('industry', val)
                                 }
                             />
                         </div>
@@ -339,19 +414,14 @@ export default function CreateJobForm() {
                     </div>
                 </div>
 
-                <ApplyJobType
-                    value={formData.applyType}
-                    onChange={(val) => handleChange('applyType', val)}
-                />
-
                 <div className='mt-4 pt-6 border-t border-gray-100'>
                     <h3 className='text-sm font-bold text-gray-900 mb-4'>
-                        Description & Responsibility
+                        Description & Requirements
                     </h3>
 
                     <div className='mb-6 flex flex-col gap-2'>
                         <label className='text-sm font-semibold text-gray-900'>
-                            Description
+                            Job Description *
                         </label>
                         <RichTextEditor
                             placeholder='Add your job description...'
@@ -362,13 +432,13 @@ export default function CreateJobForm() {
 
                     <div className='flex flex-col gap-2'>
                         <label className='text-sm font-semibold text-gray-900'>
-                            Responsibilities
+                            Job Requirements
                         </label>
                         <RichTextEditor
-                            placeholder='Add your job responsibilities...'
-                            value={formData.responsibilities}
+                            placeholder='Add your job requirements...'
+                            value={formData.requirements}
                             onChange={(val) =>
-                                handleChange('responsibilities', val)
+                                handleChange('requirements', val)
                             }
                         />
                     </div>
@@ -391,7 +461,7 @@ export default function CreateJobForm() {
             <PostSuccessModal
                 isOpen={isSuccessModalOpen}
                 onClose={() => setIsSuccessModalOpen(false)}
-                jobTitle={formData.title || 'UI/UX Designer'}
+                jobTitle={formData.title || 'New Job'}
             />
         </div>
     );
