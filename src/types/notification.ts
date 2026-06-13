@@ -4,6 +4,7 @@ export interface NotificationItem {
     message: string;
     isRead: boolean;
     targetUrl?: string;
+    icon?: string;
     createdAt: string;
 }
 

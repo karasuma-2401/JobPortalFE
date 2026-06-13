@@ -1,151 +1,48 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Loader2, Sparkles } from 'lucide-react';
 import CurrentPlanCard from './components/CurrentPlanCard';
 import NextInvoiceCard from './components/NextInvoiceCard';
 import PlanBenefitsCard from './components/PlanBenefitsCard';
-import InvoicesTable, { type Invoice } from './components/InvoicesTable';
-
-const mockInvoices: Invoice[] = [
-    {
-        id: '#487441',
-        date: 'Dec 7, 2019 23:26',
-        plan: 'Premium',
-        amount: '$999 USD',
-    },
-    {
-        id: '#653518',
-        date: 'Dec 7, 2019 23:26',
-        plan: 'Standard',
-        amount: '$999 USD',
-    },
-    {
-        id: '#267400',
-        date: 'Dec 7, 2019 23:26',
-        plan: 'Premium',
-        amount: '$999 USD',
-    },
-    {
-        id: '#651535',
-        date: 'Dec 7, 2019 23:26',
-        plan: 'Premium',
-        amount: '$999 USD',
-    },
-    {
-        id: '#449003',
-        date: 'Dec 7, 2019 23:26',
-        plan: 'Premium',
-        amount: '$999 USD',
-    },
-    {
-        id: '#558612',
-        date: 'Dec 7, 2019 23:26',
-        plan: 'Premium',
-        amount: '$999 USD',
-    },
-    {
-        id: '#112233',
-        date: 'Nov 7, 2019 23:26',
-        plan: 'Premium',
-        amount: '$999 USD',
-    },
-    {
-        id: '#445566',
-        date: 'Oct 7, 2019 23:26',
-        plan: 'Standard',
-        amount: '$599 USD',
-    },
-];
+import InvoicesTable from './components/InvoicesTable';
+import {
+    useBillingOverviewData,
+    useInvoicesData,
+} from '../../../hooks/useBilling';
 
 const ITEMS_PER_PAGE = 6;
 
 export default function PlansBillingPage() {
+    const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
-    const [isProcessing, setIsProcessing] = useState(false);
 
-    const [currentPlan, setCurrentPlan] = useState({
-        isActive: true,
-        name: 'Premium',
-        description:
-            'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere.',
-        amount: '$59.00 USD',
-        dueDate: 'Nov 28, 2021',
-        packageStarted: 'Jan 28, 2021',
-    });
+    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-    const totalPages = Math.ceil(mockInvoices.length / ITEMS_PER_PAGE);
+    const { data: billingOverview, isLoading: isLoadingBilling } =
+        useBillingOverviewData();
+    const { data: invoicesData, isLoading: isLoadingInvoices } =
+        useInvoicesData(ITEMS_PER_PAGE, offset);
 
-    const currentInvoices = useMemo(() => {
-        return mockInvoices.slice(
-            (currentPage - 1) * ITEMS_PER_PAGE,
-            currentPage * ITEMS_PER_PAGE
-        );
-    }, [currentPage]);
-
-    const handleChangePlan = () => toast.info('Redirecting to Pricing page...');
-
-    const handleCancelPlan = () => {
-        if (!currentPlan.isActive) {
-            toast.info('Your plan is already canceled.');
-            return;
-        }
-
-        const confirmCancel = window.confirm(
-            'Are you sure you want to cancel your Premium plan? You will lose access to premium features at the end of your billing cycle.'
-        );
-        if (confirmCancel) {
-            setCurrentPlan((prev) => ({
-                ...prev,
-                isActive: false,
-                name: 'Canceled (Pending Downgrade)',
-                description:
-                    'Your plan has been canceled and will be downgraded to Free at the end of the current billing cycle.',
-            }));
-            toast.success('Your plan has been canceled successfully.');
-        }
-    };
-
-    const handlePayNow = () => {
-        if (!currentPlan.isActive) {
-            toast.error('Cannot process payment for a canceled plan.');
-            return;
-        }
-
-        if (isProcessing) return;
-
-        setIsProcessing(true);
-        toast.loading('Processing your payment...', { id: 'payment-toast' });
-
-        setTimeout(() => {
-            setIsProcessing(false);
-            toast.success('Payment successful! Thank you.', {
-                id: 'payment-toast',
-            });
-        }, 2000);
+    const handleUpdatePlan = () => {
+        navigate('/employer/pricing');
     };
 
     const handleDownloadInvoice = (id: string) => {
-        const invoice = mockInvoices.find((inv) => inv.id === id);
-        if (!invoice) return;
-
-        const dummyContent = `INVOICE RECEIPT\n\nInvoice ID: ${invoice.id}\nDate: ${invoice.date}\nPlan: ${invoice.plan}\nAmount Paid: ${invoice.amount}\n\nThank you for choosing our service!`;
-
-        const blob = new Blob([dummyContent], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute(
-            'download',
-            `Invoice_${invoice.id.replace('#', '')}.pdf`
-        );
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-
-        toast.success(`Invoice ${id} downloaded successfully.`);
+        toast.info(`Downloading invoice ${id}... (Waiting for BE API)`);
     };
+
+    if (isLoadingBilling || isLoadingInvoices) {
+        return (
+            <div className='w-full h-[60vh] flex items-center justify-center'>
+                <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
+            </div>
+        );
+    }
+    const hasActivePlan =
+        billingOverview &&
+        billingOverview.planName &&
+        !billingOverview.isCanceled;
 
     return (
         <div className='w-full max-w-360 mx-auto animate-in fade-in duration-500 pb-16'>
@@ -153,33 +50,69 @@ export default function PlansBillingPage() {
                 <div className='xl:col-span-4 flex flex-col gap-8'>
                     <div className='flex-1'>
                         <CurrentPlanCard
-                            planName={currentPlan.name}
-                            description={currentPlan.description}
-                            onChangePlan={handleChangePlan}
-                            onCancelPlan={handleCancelPlan}
+                            planName={
+                                hasActivePlan
+                                    ? billingOverview.planName
+                                    : 'Free Plan'
+                            }
+                            description={
+                                hasActivePlan
+                                    ? billingOverview.description
+                                    : 'You currently do not have any active premium plan. Upgrade to unlock all features.'
+                            }
+                            onUpdatePlan={handleUpdatePlan}
                         />
                     </div>
                     <div className='flex-1'>
-                        <NextInvoiceCard
-                            amount={currentPlan.amount}
-                            dueDate={currentPlan.dueDate}
-                            packageStarted={currentPlan.packageStarted}
-                            onPayNow={handlePayNow}
-                        />
+                        {hasActivePlan ? (
+                            <NextInvoiceCard
+                                amount={billingOverview.amount || '$0.00'}
+                                dueDate={billingOverview.dueDate || 'N/A'}
+                                packageStarted={
+                                    billingOverview.packageStarted || 'N/A'
+                                }
+                            />
+                        ) : (
+                            <div className='bg-linear-to-br from-blue-600 to-blue-800 rounded-xl p-6 shadow-sm flex flex-col h-full text-white relative overflow-hidden'>
+                                <div className='absolute -top-10 -right-10 opacity-10'>
+                                    <Sparkles size={120} />
+                                </div>
+                                <h3 className='text-sm font-bold text-blue-100 mb-6'>
+                                    Unlock Premium
+                                </h3>
+                                <div className='mb-6 relative z-10'>
+                                    <h2 className='text-2xl font-bold mb-2'>
+                                        Find top talents faster
+                                    </h2>
+                                    <p className='text-sm text-blue-100/80 leading-relaxed'>
+                                        Get unlimited resume access, priority
+                                        job posting, and 24/7 dedicated support.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 <div className='xl:col-span-8 flex flex-col gap-8'>
                     <div className='flex-1'>
-                        <PlanBenefitsCard />
+                        <PlanBenefitsCard
+                            maxJobPosts={billingOverview?.maxJobPosts || 0}
+                            activeJobsCount={
+                                billingOverview?.activeJobsCount || 0
+                            }
+                            remainingJobPosts={
+                                billingOverview?.remainingJobPosts || 0
+                            }
+                        />
                     </div>
                 </div>
 
                 <div className='xl:col-span-12 mt-4'>
                     <InvoicesTable
-                        invoices={currentInvoices}
+                        invoices={invoicesData?.content || []}
                         currentPage={currentPage}
-                        totalPages={totalPages}
+                        totalPages={invoicesData?.totalPages || 1}
                         onPageChange={setCurrentPage}
                         onDownload={handleDownloadInvoice}
                     />

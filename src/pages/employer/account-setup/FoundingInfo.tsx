@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -12,17 +12,12 @@ import {
     useEmployerProfile,
     useUpdateEmployerProfile,
 } from '../../../hooks/useEmployer';
+import { useIndustries } from '../../../hooks/useIndustries';
 
 const orgTypes = [
     { label: 'Private Company', value: 'PRIVATE_COMPANY' },
     { label: 'Public Company', value: 'PUBLIC_COMPANY' },
     { label: 'Non-profit', value: 'NON_PROFIT' },
-];
-
-const industryTypes = [
-    { label: 'Information Technology', value: 'Information Technology' },
-    { label: 'Finance & Banking', value: 'Finance & Banking' },
-    { label: 'Healthcare', value: 'Healthcare' },
 ];
 
 const teamSizes = [
@@ -44,6 +39,15 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
     const { mutate: updateProfile, isPending: isUpdating } =
         useUpdateEmployerProfile();
 
+    const { data: industriesData = [] } = useIndustries();
+
+    const dynamicIndustryTypes = useMemo(() => {
+        return industriesData.map((ind) => ({
+            label: ind.name,
+            value: ind.name,
+        }));
+    }, [industriesData]);
+
     const parseDate = (dStr: string) => (dStr ? new Date(dStr) : null);
     const formatDate = (date: Date | null) => {
         if (!date) return '';
@@ -52,21 +56,37 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
         const d = String(date.getDate()).padStart(2, '0');
         return `${y}-${m}-${d}`;
     };
-
     const [orgType, setOrgType] = useState<OptionType | null>(
-        orgTypes.find((o) => o.value === previousState.organizationType) || null
+        mode === 'setup'
+            ? orgTypes.find(
+                  (o) => o.value === previousState.organizationType
+              ) || null
+            : null
     );
+
     const [industry, setIndustry] = useState<OptionType | null>(
-        industryTypes.find((i) => i.value === previousState.industry) || null
+        mode === 'setup' && previousState.industry
+            ? { label: previousState.industry, value: previousState.industry }
+            : null
     );
+
     const [teamSize, setTeamSize] = useState<OptionType | null>(
-        teamSizes.find((t) => t.value === previousState.teamSize) || null
+        mode === 'setup'
+            ? teamSizes.find((t) => t.value === previousState.teamSize) || null
+            : null
     );
+
     const [establishedYear, setEstablishedYear] = useState(
-        previousState.founded || ''
+        mode === 'setup' ? previousState.founded || '' : ''
     );
-    const [website, setWebsite] = useState(previousState.companyWebsite || '');
-    const [vision, setVision] = useState(previousState.vision || '');
+
+    const [website, setWebsite] = useState(
+        mode === 'setup' ? previousState.companyWebsite || '' : ''
+    );
+
+    const [vision, setVision] = useState(
+        mode === 'setup' ? previousState.vision || '' : ''
+    );
 
     useEffect(() => {
         if (mode === 'settings' && profile) {
@@ -76,20 +96,24 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
                         (o) => o.value === profile.organizationType
                     ) || null
                 );
-                setIndustry(
-                    industryTypes.find((i) => i.value === profile.industry) ||
-                        null
-                );
                 setTeamSize(
                     teamSizes.find((t) => t.value === profile.teamSize) || null
                 );
                 setEstablishedYear(profile.founded || '');
                 setWebsite(profile.companyWebsite || '');
                 setVision(profile.vision || '');
+
+                if (dynamicIndustryTypes.length > 0) {
+                    setIndustry(
+                        dynamicIndustryTypes.find(
+                            (i) => i.value === profile.industry
+                        ) || null
+                    );
+                }
             }, 0);
             return () => clearTimeout(timer);
         }
-    }, [mode, profile]);
+    }, [mode, profile, dynamicIndustryTypes]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -146,7 +170,7 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
                             Industry Types
                         </label>
                         <ComboBox
-                            options={industryTypes}
+                            options={dynamicIndustryTypes}
                             value={industry}
                             placeholder='Select...'
                             onChange={setIndustry}

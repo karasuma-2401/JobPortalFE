@@ -6,7 +6,13 @@ export interface PaymentResponse {
     method: string;
     status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELED';
     note?: string;
+    qrCode?: string;
+    checkoutUrl?: string;
+    accountNumber?: string;
+    accountName?: string;
+    bin?: string;
 }
+
 export interface PlanResponse {
     id: number;
     name: string;
