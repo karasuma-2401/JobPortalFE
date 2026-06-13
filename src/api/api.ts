@@ -34,8 +34,7 @@ const normalizeApiError = (error: AxiosApiError): ApiError => {
     };
 };
 
-const BASE_URL =
-    import.meta.env.VITE_BACKEND_URL;
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 let refreshTokenRequest: Promise<string> | null = null;
 let isRedirectingToLogin = false;
 
@@ -50,7 +49,10 @@ const redirectToLogin = (message?: string) => {
 
     isRedirectingToLogin = true;
     AuthSessionService.clear();
-    window.location.replace('/login');
+
+    if (window.location.pathname !== '/login') {
+        window.location.replace('/login');
+    }
 };
 
 const refreshAccessToken = async () => {
