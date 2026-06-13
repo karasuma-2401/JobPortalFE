@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import CurrentPlanCard from './components/CurrentPlanCard';
 import NextInvoiceCard from './components/NextInvoiceCard';
 import PlanBenefitsCard from './components/PlanBenefitsCard';
@@ -10,7 +10,7 @@ import {
     useBillingOverviewData,
     useInvoicesData,
 } from '../../../hooks/useBilling';
-
+import PlansBillingSkeleton from './components/PlansBillingSkeleton';
 const ITEMS_PER_PAGE = 6;
 
 export default function PlansBillingPage() {
@@ -33,11 +33,7 @@ export default function PlansBillingPage() {
     };
 
     if (isLoadingBilling || isLoadingInvoices) {
-        return (
-            <div className='w-full h-[60vh] flex items-center justify-center'>
-                <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-            </div>
-        );
+        return <PlansBillingSkeleton />;
     }
     const hasActivePlan =
         billingOverview &&

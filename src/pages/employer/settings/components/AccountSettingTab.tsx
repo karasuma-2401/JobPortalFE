@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EyeOff, Eye, XCircle } from 'lucide-react';
+import { EyeOff, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 
 import Contact from '../../account-setup/Contact';
@@ -26,14 +26,14 @@ export default function AccountSettingTab() {
         setConfirmPassword('');
     };
 
-    const handleDeleteAccount = () => {
-        const confirm = window.confirm(
-            'Are you sure you want to permanently delete your account? This action cannot be undone.'
-        );
-        if (confirm) {
-            toast.success('Account deletion requested.');
-        }
-    };
+    // const handleDeleteAccount = () => {
+    //     const confirm = window.confirm(
+    //         'Are you sure you want to permanently delete your account? This action cannot be undone.'
+    //     );
+    //     if (confirm) {
+    //         toast.success('Account deletion requested.');
+    //     }
+    // };
 
     return (
         <div className='flex flex-col gap-10 animate-in fade-in duration-500'>
@@ -143,24 +143,6 @@ export default function AccountSettingTab() {
             </section>
 
             <div className='h-px w-full bg-gray-200'></div>
-
-            <section className='pb-4'>
-                <h3 className='text-lg font-bold text-gray-900 mb-4'>
-                    Delete Your Company
-                </h3>
-                <p className='text-sm text-gray-500 mb-6 max-w-3xl leading-relaxed'>
-                    If you delete your Job pilot account, you will no longer be
-                    able to get information about the matched jobs, following
-                    employers, and job alert, shortlisted jobs and more. You
-                    will be abandoned from all the services of Jobpilot.com.
-                </p>
-                <button
-                    onClick={handleDeleteAccount}
-                    className='flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors'
-                >
-                    <XCircle size={18} /> Close Account
-                </button>
-            </section>
         </div>
     );
 }

@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
 import JobDetailHeader from './components/JobDetailHeader';
 import JobQuickStats from './components/JobQuickStats';
 import JobMainContent from './components/JobContent';
 import JobSidebar from './components/JobSidebar';
 import PromoteJobModal from './components/PromoteJobModal';
 import { useJobDetail } from '../../../hooks/useJobDetail';
-
+import JobDetailSkeleton from './components/JobDetailSkeleton';
 interface JobDetailResponse {
     id?: string | number;
     title?: string;
@@ -70,14 +69,7 @@ export default function JobDetailPage() {
     };
 
     if (isLoading) {
-        return (
-            <div className='flex flex-col items-center justify-center min-h-100'>
-                <Loader2 className='w-10 h-10 animate-spin text-blue-600 mb-4' />
-                <p className='text-gray-500 font-medium'>
-                    Loading job details...
-                </p>
-            </div>
-        );
+        return <JobDetailSkeleton />;
     }
 
     if (isError || !job) {

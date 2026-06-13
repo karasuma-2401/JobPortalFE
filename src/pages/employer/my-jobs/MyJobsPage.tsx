@@ -1,16 +1,15 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import MyJobsTable, { type JobItem } from './components/MyJobsTable';
 import Pagination from '../../../components/ui/Pagination';
 import PromoteJobModal from './components/PromoteJobModal';
 import CustomDropdown from '../../../components/ui/DropDown';
 
-// SỬA: Import trực tiếp các Hook từ thư mục hooks
 import { useEmployerJobs } from '../../../hooks/useEmployerJobs';
 import { useJobActions } from '../../../hooks/useJobActions';
 import type { JobPostResponse } from '../../../types/jobpost';
 
+import MyJobsTableSkeleton from './components/MyJobsTableSkeleton';
 const ITEMS_PER_PAGE = 6;
 
 const filterOptions = [
@@ -127,12 +126,7 @@ export default function MyJobsPage() {
             </div>
 
             {isLoading ? (
-                <div className='flex flex-col items-center justify-center min-h-75 bg-white rounded-xl border border-gray-200'>
-                    <Loader2 className='w-10 h-10 animate-spin text-blue-600 mb-4' />
-                    <p className='text-gray-500 font-medium'>
-                        Loading your jobs...
-                    </p>
-                </div>
+                <MyJobsTableSkeleton />
             ) : (
                 <>
                     <MyJobsTable
