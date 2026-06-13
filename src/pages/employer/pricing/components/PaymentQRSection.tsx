@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Loader2, CheckCircle2, Clock } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface PaymentQRSectionProps {
     planPrice: number;
     paymentStatus: 'pending' | 'success';
+    qrCodeString: string | null;
 }
 
 export default function PaymentQRSection({
-    planPrice,
     paymentStatus,
+    qrCodeString,
 }: PaymentQRSectionProps) {
     const [timeLeft, setTimeLeft] = useState(300);
 
@@ -45,12 +47,22 @@ export default function PaymentQRSection({
                                 Payment Successful!
                             </p>
                         </div>
+                    ) : !qrCodeString ? (
+                        <div className='flex flex-col items-center justify-center text-gray-400'>
+                            <Loader2 size={32} className='animate-spin mb-2' />
+                            <p className='text-xs font-medium'>
+                                Generating QR...
+                            </p>
+                        </div>
                     ) : (
-                        <img
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://myjob.com/payment/invoice?amount=${planPrice}`}
-                            alt='Payment QR Code'
-                            className='w-full h-full object-contain'
-                        />
+                        <div className='w-full h-full flex items-center justify-center'>
+                            <QRCodeSVG
+                                value={qrCodeString}
+                                size={200}
+                                level='M'
+                                includeMargin={false}
+                            />
+                        </div>
                     )}
                 </div>
 

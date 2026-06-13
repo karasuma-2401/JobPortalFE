@@ -24,13 +24,13 @@ import Contact from './pages/employer/account-setup/Contact';
 import SetupSuccess from './pages/employer/account-setup/SetupSuccess';
 
 import Overview from './pages/employer/dashboard/Overview';
-import PostJobPricing from './pages/employer/post-job/PostJobPricing';
-import CheckoutPage from './pages/employer/post-job/Checkout';
+import PostJobPricing from './pages/employer/pricing/PostJobPricing';
+import CheckoutPage from './pages/employer/pricing/Checkout';
+import PlansBillingPage from './pages/employer/plans-billing/PlansBillingPage';
 import CreateJobForm from './pages/employer/post-job/CreateJobForm';
 import MyJobsPage from './pages/employer/my-jobs/MyJobsPage';
 import ApplicationsPage from './pages/employer/applications/ApplicationsPage';
 import SavedCandidatesPage from './pages/employer/saved-candidates/SavedCandidatesPage';
-import PlansBillingPage from './pages/employer/plans-billing/PlansBillingPage';
 import EmployerSettingsPage from './pages/employer/settings/SettingsPage';
 import EmployerProfilePage from './pages/employer/profile/EmployerProfilePage';
 
@@ -47,7 +47,6 @@ import { NotificationProvider } from './contexts/notification/NotificationProvid
 
 import CandidateDashBoardLayout from './layouts/CandidateDashBoardLayout';
 import CandidateFullLayout from './layouts/CandidateFullLayout';
-
 
 import SettingsPage from './pages/jobseeker/dashboard/Settings/Settings';
 import JobAlertPage from './pages/jobseeker/dashboard/JobAlert/JobAlert';
@@ -67,15 +66,15 @@ import JobSeekerJobDetailPage from './pages/jobseeker/FindJob/JobDetailPage';
 
 const router = createBrowserRouter([
     {
-      element: <MainLayout />,
-      children: [
-        { path: "/", element: <Home /> }, 
-        { path: "/home", element: <Home /> },
-        { path: "/find-job", element: <FindJobPage /> },
-        { path: "/job/:jobId", element: <JobSeekerJobDetailPage /> },
-        { path: "/find-employers", element: <FindEmployerPage /> },
-      ],
-  },
+        element: <MainLayout />,
+        children: [
+            { path: '/', element: <Home /> },
+            { path: '/home', element: <Home /> },
+            { path: '/find-job', element: <FindJobPage /> },
+            { path: '/job/:jobId', element: <JobSeekerJobDetailPage /> },
+            { path: '/find-employers', element: <FindEmployerPage /> },
+        ],
+    },
     {
         element: <AuthLayout />,
         children: [
@@ -101,7 +100,7 @@ const router = createBrowserRouter([
     },
     {
         path: '/employer/setup',
-        element: <EmployerSetupLayout />, //Phai dang nhap thi moi cho vao cai route nay
+        element: <EmployerSetupLayout />,
         children: [
             { index: true, element: <CompanyInfo /> },
             { path: 'company', element: <CompanyInfo /> },
@@ -113,7 +112,7 @@ const router = createBrowserRouter([
     },
     {
         path: '/employer',
-        element: <EmployerDashboardLayout />, //Phai dang nhap thi moi cho vao cai route nay dcm
+        element: <EmployerDashboardLayout />,
         children: [
             { index: true, element: <Navigate to='dashboard' replace /> },
             { path: 'dashboard', element: <Overview /> },
@@ -132,9 +131,13 @@ const router = createBrowserRouter([
             {
                 path: 'post-job',
                 children: [
-                    { index: true, element: <PostJobPricing /> },
+                    { index: true, element: <Navigate to='create' replace /> },
                     { path: 'create', element: <CreateJobForm /> },
                 ],
+            },
+            {
+                path: 'pricing',
+                children: [{ index: true, element: <PostJobPricing /> }],
             },
             {
                 path: 'applications',
@@ -190,8 +193,18 @@ const router = createBrowserRouter([
                     </ProtectedRoute>
                 ),
             },
-            { index: true, element: <Navigate to="/jobseeker/DashBoard/overview" replace /> },
-            { path: 'dashboard', element: <Navigate to="/jobseeker/DashBoard/overview" replace /> },
+            {
+                index: true,
+                element: (
+                    <Navigate to='/jobseeker/DashBoard/overview' replace />
+                ),
+            },
+            {
+                path: 'dashboard',
+                element: (
+                    <Navigate to='/jobseeker/DashBoard/overview' replace />
+                ),
+            },
         ],
     },
     {
@@ -203,11 +216,14 @@ const router = createBrowserRouter([
             { path: 'favorites', element: <FavoriteJobsPage /> },
             { path: 'applied', element: <AppliedJobsPage /> },
             { path: 'overview', element: <OverviewPage /> },
-            { index: true, element: <Navigate to="/jobseeker/DashBoard/overview" replace /> },
+            {
+                index: true,
+                element: (
+                    <Navigate to='/jobseeker/DashBoard/overview' replace />
+                ),
+            },
         ],
     },
-
-
 ]);
 
 export default function App() {

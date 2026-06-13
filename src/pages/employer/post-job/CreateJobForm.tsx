@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import ApplyJobType from './components/ApplyJobType';
@@ -8,6 +9,7 @@ import Input from '../../../components/ui/Input';
 import CustomDropdown from '../../../components/ui/DropDown';
 import CustomDatePicker from '../../../components/ui/DatePicker';
 import { useCreateJob } from '../../../hooks/useCreateJob';
+import { useBillingOverviewData } from '../../../hooks/useBilling';
 
 const roleOptions = [
     { label: 'Designer', value: 'DESIGNER' },
@@ -54,8 +56,23 @@ const jobLevelOptions = [
 ];
 
 export default function CreateJobForm() {
+    const navigate = useNavigate();
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+
     const { mutate: createJob, isPending } = useCreateJob();
+    const { data: billing, isLoading: isLoadingBilling } =
+        useBillingOverviewData();
+
+    useEffect(() => {
+        if (!isLoadingBilling && billing) {
+            if (billing.remainingJobPosts <= 0 || billing.isCanceled) {
+                toast.error(
+                    'You need an active plan with remaining posts to create a job!'
+                );
+                navigate('/employer/pricing', { replace: true });
+            }
+        }
+    }, [isLoadingBilling, billing, navigate]);
 
     const [formData, setFormData] = useState({
         title: '',
@@ -99,12 +116,12 @@ export default function CreateJobForm() {
             title: formData.title,
             description: formData.description,
             location: formData.location,
-            industryIds: [1], 
+            industryIds: [1],
             salaryMin: Number(formData.minSalary) || 0,
             salaryMax: Number(formData.maxSalary) || 0,
             educationLevel: formData.education,
             jobLevel: formData.jobLevel,
-            status: 'OPEN', 
+            status: 'OPEN',
             experience: Number(formData.experience) || 0,
             employmentType: formData.jobType,
             expiresAt: formData.expirationDate,
@@ -123,6 +140,19 @@ export default function CreateJobForm() {
             },
         });
     };
+    if (isLoadingBilling) {
+        return (
+            <div className='flex flex-col items-center justify-center min-h-[60vh]'>
+                <Loader2 className='w-10 h-10 animate-spin text-blue-600 mb-4' />
+                <p className='text-gray-500 font-medium'>
+                    Checking your plan limits...
+                </p>
+            </div>
+        );
+    }
+    if (billing && (billing.remainingJobPosts <= 0 || billing.isCanceled)) {
+        return null;
+    }
 
     return (
         <div className='w-full max-w-5xl mx-auto animate-in fade-in duration-500 pb-16'>

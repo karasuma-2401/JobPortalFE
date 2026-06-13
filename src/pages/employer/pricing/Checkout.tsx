@@ -16,6 +16,7 @@ export default function CheckoutPage() {
     const planId = searchParams.get('plan');
 
     const [transactionRef, setTransactionRef] = useState<string | null>(null);
+    const [qrCodeString, setQrCodeString] = useState<string | null>(null);
     const isInitiated = useRef(false);
     const { data: plans, isLoading: isPlansLoading } = usePlans();
 
@@ -36,6 +37,7 @@ export default function CheckoutPage() {
                 {
                     onSuccess: (data) => {
                         setTransactionRef(data.transactionRef);
+                        setQrCodeString(data.qrCode || null);
                     },
                     onError: () => {
                         toast.error('Failed to initialize payment gateway.');
@@ -61,6 +63,7 @@ export default function CheckoutPage() {
     const handleSuccessRedirect = () => {
         navigate('/employer/post-job/create');
     };
+
     if (isPlansLoading || !selectedPlan) {
         return (
             <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4'>
@@ -79,6 +82,7 @@ export default function CheckoutPage() {
             </div>
         );
     }
+    const activeQrCodeString = paymentData?.qrCode || qrCodeString;
 
     return (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200'>
@@ -93,6 +97,7 @@ export default function CheckoutPage() {
                 <PaymentQRSection
                     planPrice={selectedPlan.price}
                     paymentStatus={paymentStatus}
+                    qrCodeString={activeQrCodeString}
                 />
 
                 <OrderSummarySection

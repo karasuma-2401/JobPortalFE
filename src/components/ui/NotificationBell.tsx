@@ -91,15 +91,34 @@ export default function NotificationBell() {
                                                     : 'bg-blue-50/30'
                                             }`}
                                         >
-                                            <div className='mt-0.5 shrink-0'>
-                                                <CheckCircle2
-                                                    size={18}
-                                                    className={
-                                                        notification.isRead
-                                                            ? 'text-gray-400'
-                                                            : 'text-blue-500'
-                                                    }
-                                                />
+                                            <div className='mt-0.5 shrink-0 flex items-center justify-center w-8 h-8 rounded-full overflow-hidden'>
+                                                {notification.icon ? (
+                                                    <img
+                                                        src={notification.icon}
+                                                        alt='Notification Icon'
+                                                        className={`w-full h-full object-cover ${
+                                                            notification.isRead
+                                                                ? 'opacity-70'
+                                                                : ''
+                                                        }`}
+                                                        onError={(e) => {
+                                                            // Nếu link ảnh bị lỗi, tự ẩn ảnh đi
+                                                            (
+                                                                e.target as HTMLImageElement
+                                                            ).style.display =
+                                                                'none';
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <CheckCircle2
+                                                        size={18}
+                                                        className={
+                                                            notification.isRead
+                                                                ? 'text-gray-400'
+                                                                : 'text-blue-500'
+                                                        }
+                                                    />
+                                                )}
                                             </div>
                                             <div className='flex-1 min-w-0'>
                                                 <p

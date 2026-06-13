@@ -63,6 +63,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
                 id: Date.now(),
                 title: payload.notification?.title ?? 'New Notification',
                 message: payload.notification?.body ?? '',
+                icon: payload.notification?.icon || payload.notification?.image,
                 isRead: false,
                 createdAt: new Date().toISOString(),
             };

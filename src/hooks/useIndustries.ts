@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { publicApi } from '../api/api';
-import type { Industry } from '../types/industry';
+import type { Industry, IndustryResponse } from '../types/industry';
 
 export const useIndustries = () => {
     return useQuery({
