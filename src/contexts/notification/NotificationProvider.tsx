@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { getToken, onMessage } from 'firebase/messaging';
 import { useQueryClient } from '@tanstack/react-query';
@@ -32,8 +32,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     const { mutate: deleteMutation } = useDeleteNotification();
     const { mutate: deleteAllMutation } = useDeleteAllNotifications();
 
+    const prevUserRef = useRef<typeof user>(null);
+
     useEffect(() => {
-        if (!user) {
+        const wasLoggedIn = Boolean(prevUserRef.current);
+        const isLoggedOut = !user && wasLoggedIn;
+
+        if (isLoggedOut) {
             NotificationService.cleanupOnLogout()
                 .then(() => {
                     console.log('Device tokens cleaned up on logout');
@@ -41,8 +46,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
                 .catch((error) => {
                     console.warn('Error during logout cleanup:', error);
                 });
+        }
+
+        if (!user) {
             queryClient.setQueryData(['notifications'], []);
         }
+
+        prevUserRef.current = user;
     }, [user, queryClient]);
 
     useEffect(() => {
