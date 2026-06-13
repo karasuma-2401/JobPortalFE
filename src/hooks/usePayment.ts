@@ -1,29 +1,16 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { PaymentService } from '../services/paymentService';
 
-export const useCreatePayment = () => {
+export const useCreateCheckout = () => {
     return useMutation({
-        mutationFn: PaymentService.createPayment,
+        mutationFn: (planId: number) => PaymentService.createCheckout(planId),
     });
 };
 
-export const usePaymentStatus = (transactionRef: string | null) => {
-    return useQuery({
-        queryKey: ['paymentStatus', transactionRef],
-        queryFn: () =>
-            PaymentService.getPaymentStatus(transactionRef as string),
-        enabled: !!transactionRef,
-        refetchInterval: (query) => {
-            const status = query.state?.data?.status;
-            if (
-                status === 'COMPLETED' ||
-                status === 'FAILED' ||
-                status === 'CANCELED'
-            ) {
-                return false;
-            }
-            return 3000;
-        },
+export const useConfirmPayment = () => {
+    return useMutation({
+        mutationFn: (paymentId: number) =>
+            PaymentService.confirmPayment(paymentId),
     });
 };
 

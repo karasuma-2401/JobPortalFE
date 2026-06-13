@@ -5,8 +5,8 @@ import { toast } from 'sonner';
 import PaymentQRSection from './components/PaymentQRSection';
 import OrderSummarySection from './components/OrderSummarySection';
 import {
-    useCreatePayment,
-    usePaymentStatus,
+    useCreateCheckout,
+    useConfirmPayment,
     usePlans,
 } from '../../../hooks/usePayment';
 
@@ -15,62 +15,65 @@ export default function CheckoutPage() {
     const navigate = useNavigate();
     const planId = searchParams.get('plan');
 
-    const [transactionRef, setTransactionRef] = useState<string | null>(null);
+    const [paymentId, setPaymentId] = useState<number | null>(null);
     const [qrCodeString, setQrCodeString] = useState<string | null>(null);
     const isInitiated = useRef(false);
-    const { data: plans, isLoading: isPlansLoading } = usePlans();
 
+    const { data: plans, isLoading: isPlansLoading } = usePlans();
     const selectedPlan = plans?.find((p) => String(p.id) === planId);
 
-    const { mutate: createPayment } = useCreatePayment();
-    const { data: paymentData } = usePaymentStatus(transactionRef);
+    const { mutate: createCheckout, isPending: isCreating } =
+        useCreateCheckout();
+    const { mutate: confirmPayment, isPending: isConfirming } =
+        useConfirmPayment();
 
     useEffect(() => {
         if (!isInitiated.current && selectedPlan) {
             isInitiated.current = true;
-            createPayment(
-                {
-                    cost: selectedPlan.price,
-                    planName: selectedPlan.name,
-                    note: 'Job Posting Plan Subscription',
+            createCheckout(selectedPlan.id, {
+                onSuccess: (data) => {
+                    setPaymentId(data.id);
+                    setQrCodeString(data.qrCode || null);
                 },
-                {
-                    onSuccess: (data) => {
-                        setTransactionRef(data.transactionRef);
-                        setQrCodeString(data.qrCode || null);
-                    },
-                    onError: () => {
+                onError: (error: unknown) => {
+                    if (error instanceof Error) {
+                        toast.error(error.message);
+                    } else {
                         toast.error('Failed to initialize payment gateway.');
-                    },
-                }
-            );
-        }
-    }, [createPayment, selectedPlan]);
+                    }
 
-    const paymentStatus =
-        paymentData?.status === 'COMPLETED' ? 'success' : 'pending';
-
-    useEffect(() => {
-        if (paymentStatus === 'success') {
-            toast.success('Payment confirmed successfully!');
+                    navigate('/employer/post-job');
+                },
+            });
         }
-    }, [paymentStatus]);
+    }, [createCheckout, selectedPlan, navigate]);
 
     const handleCancel = () => {
         navigate('/employer/post-job');
     };
 
-    const handleSuccessRedirect = () => {
-        navigate('/employer/post-job/create');
+    const handleConfirmPaid = () => {
+        if (!paymentId) return;
+        confirmPayment(paymentId, {
+            onSuccess: () => {
+                toast.success('Admin has been notified!');
+                navigate('/employer/payment-pending');
+            },
+            onError: () => {
+                toast.error('Failed to notify admin. Please try again.');
+            },
+        });
     };
 
-    if (isPlansLoading || !selectedPlan) {
+    if (isPlansLoading || !selectedPlan || isCreating) {
         return (
             <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4'>
                 <div className='bg-white p-8 rounded-2xl flex flex-col items-center shadow-xl'>
                     <Loader2 className='w-10 h-10 animate-spin text-blue-600 mb-4' />
                     <p className='font-medium text-gray-700'>
-                        Loading checkout details...
+                        {isCreating
+                            ? 'Generating QR Code...'
+                            : 'Loading checkout details...'}
                     </p>
                     <button
                         onClick={handleCancel}
@@ -82,7 +85,6 @@ export default function CheckoutPage() {
             </div>
         );
     }
-    const activeQrCodeString = paymentData?.qrCode || qrCodeString;
 
     return (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200'>
@@ -94,18 +96,14 @@ export default function CheckoutPage() {
                     <X size={20} />
                 </button>
 
-                <PaymentQRSection
-                    planPrice={selectedPlan.price}
-                    paymentStatus={paymentStatus}
-                    qrCodeString={activeQrCodeString}
-                />
+                <PaymentQRSection qrCodeString={qrCodeString} />
 
                 <OrderSummarySection
                     planTitle={selectedPlan.name}
                     planPrice={selectedPlan.price}
-                    paymentStatus={paymentStatus}
+                    isConfirming={isConfirming}
                     onCancel={handleCancel}
-                    onSuccessRedirect={handleSuccessRedirect}
+                    onConfirmPaid={handleConfirmPaid}
                 />
             </div>
         </div>
