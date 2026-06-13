@@ -1,18 +1,15 @@
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { useState } from 'react';
 import ProfilePicture from './components/ProfilePicture';
 import BasicInfoForm from './components/BasicInfoForm';
 import ResumeManager from './components/ResumeManager';
 import ProfileTab from './components/ProfileTab';
 import SocialLinksTab from './components/SocialLinksTab';
 import AccountSettingsTab from './components/AccountSettingsTab';
-import { JobseekerService } from '../../../../services/jobseekerService';
-import type { JobSeekerProfile } from '../../../../types/jobseeker';
+import { useJobseekerProfile } from '../../../../hooks/useJobseeker';
 
 export default function Settings() {
     const [activeTab, setActiveTab] = useState('Personal');
-    const [profile, setProfile] = useState<JobSeekerProfile | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const { data: profile, isLoading, refetch } = useJobseekerProfile();
 
     const tabs = [
         { id: 'Personal', label: 'Personal' },
@@ -22,20 +19,8 @@ export default function Settings() {
     ];
 
     const loadProfile = async () => {
-        try {
-            setIsLoading(true);
-            const response = await JobseekerService.getProfile();
-            setProfile(response);
-        } catch (error) {
-            toast.error((error as Error).message || 'Failed to load profile.');
-        } finally {
-            setIsLoading(false);
-        }
+        await refetch();
     };
-
-    useEffect(() => {
-        void loadProfile();
-    }, []);
 
     return (
         <div className='mx-auto max-w-6xl bg-bg-white p-8'>

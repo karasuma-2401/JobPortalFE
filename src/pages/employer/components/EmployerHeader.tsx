@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 import NotificationBell from '../../../components/ui/NotificationBell';
 import useAuth from '../../../contexts/auth/useAuth';
+import { useEmployerProfile } from '../../../hooks/useEmployer';
 
 const navLinks = [
     { name: 'Home', path: '/home' },
@@ -20,6 +21,7 @@ export default function EmployerHeader() {
     const navigate = useNavigate();
 
     const { user, logout } = useAuth();
+    const { data: profile } = useEmployerProfile();
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -40,7 +42,11 @@ export default function EmployerHeader() {
         toast.success('Logged out successfully!');
         navigate('/login', { replace: true });
     };
-    const defaultAvatar = `https://ui-avatars.com/api/?name=${user?.displayName || 'Employer'}&background=eff6ff&color=2563eb`;
+    const defaultAvatar = `${
+        profile?.logo ||
+        user?.avatar ||
+        `https://ui-avatars.com/api/?name=${profile?.companyName || user?.displayName || 'Employer'}&background=eff6ff&color=2563eb`
+    }`;
 
     return (
         <header className='h-20 bg-white border-b border-gray-100 flex items-center justify-between px-8 shrink-0'>

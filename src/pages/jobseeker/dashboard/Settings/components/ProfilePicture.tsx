@@ -4,6 +4,9 @@ import { toast } from 'sonner';
 import type { JobSeekerProfile } from '../../../../../types/jobseeker';
 import { JobseekerService } from '../../../../../services/jobseekerService';
 import Button from '../../../../../components/ui/Button';
+import useAuth from '../../../../../contexts/auth/useAuth';
+import { AuthService } from '../../../../../services/authService';
+import { AuthSessionService } from '../../../../../services/authSessionService';
 
 interface ProfilePictureProps {
     profile: JobSeekerProfile;
@@ -14,6 +17,7 @@ export default function ProfilePicture({
     profile,
     onUpdated,
 }: ProfilePictureProps) {
+    const { refreshAuth } = useAuth();
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -31,6 +35,13 @@ export default function ProfilePicture({
             setIsLoading(true);
             await JobseekerService.updateProfile(formData);
             await onUpdated();
+
+            // Đồng bộ avatar vào AuthContext (CandidateTopbar đọc từ user.avatar)
+            const meResponse = await AuthService.getMe();
+            AuthSessionService.saveUser(meResponse);
+
+            refreshAuth();
+
             toast.success('Profile picture updated.');
             setSelectedFile(null);
         } catch (error) {
@@ -50,7 +61,7 @@ export default function ProfilePicture({
             </div>
             <div className='rounded-xl border-2 border-dashed border-gray-100 bg-gray-50/20 p-8 text-center'>
                 <img
-                    src={profile.avatar || 'https://i.pravatar.cc/150?img=11'}
+                    src={profile.avatar || `https://ui-avatars.com/api/?name=${profile.fullName || 'Candidate'}&background=eff6ff&color=2563eb`}
                     alt={profile.fullName}
                     className='mx-auto mb-4 h-24 w-24 rounded-full border border-gray-100 object-cover'
                 />
