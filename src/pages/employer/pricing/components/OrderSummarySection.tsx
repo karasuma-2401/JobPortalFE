@@ -1,19 +1,19 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 
 interface OrderSummarySectionProps {
     planTitle: string;
     planPrice: number;
-    paymentStatus: 'pending' | 'success';
+    isConfirming: boolean;
     onCancel: () => void;
-    onSuccessRedirect: () => void;
+    onConfirmPaid: () => void;
 }
 
 export default function OrderSummarySection({
     planTitle,
     planPrice,
-    paymentStatus,
+    isConfirming,
     onCancel,
-    onSuccessRedirect,
+    onConfirmPaid,
 }: OrderSummarySectionProps) {
     return (
         <div className='w-full lg:w-95 bg-gray-50 p-8 flex flex-col justify-between'>
@@ -47,23 +47,32 @@ export default function OrderSummarySection({
             </div>
 
             <div className='mt-8 flex flex-col gap-3'>
-                {paymentStatus === 'success' ? (
-                    <button
-                        onClick={onSuccessRedirect}
-                        className='w-full flex items-center justify-center gap-2 py-3 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition-colors animate-pulse'
-                    >
-                        Continue to Post Job <ArrowRight size={18} />
-                    </button>
-                ) : (
-                    <button
-                        onClick={onCancel}
-                        className='w-full py-3 border border-gray-200 text-gray-600 bg-white rounded-md font-semibold hover:bg-gray-50 transition-colors'
-                    >
-                        Cancel Transaction
-                    </button>
-                )}
-                <p className='text-xs text-center text-gray-400 leading-normal'>
-                    This package will expire after one month.
+                <button
+                    onClick={onConfirmPaid}
+                    disabled={isConfirming}
+                    className='w-full flex items-center justify-center gap-2 py-3 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed shadow-md shadow-blue-200'
+                >
+                    {isConfirming ? (
+                        <>
+                            <Loader2 className='animate-spin' size={18} />{' '}
+                            Verifying...
+                        </>
+                    ) : (
+                        <>
+                            I Have Paid <ArrowRight size={18} />
+                        </>
+                    )}
+                </button>
+                <button
+                    onClick={onCancel}
+                    disabled={isConfirming}
+                    className='w-full py-3 border border-gray-200 text-gray-600 bg-white rounded-md font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50'
+                >
+                    Cancel Transaction
+                </button>
+                <p className='text-xs text-center text-gray-400 leading-normal mt-2'>
+                    Click "I Have Paid" only after you have successfully
+                    transferred the money.
                 </p>
             </div>
         </div>
