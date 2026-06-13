@@ -8,6 +8,8 @@ import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import RichTextEditor from '../../../components/ui/RichTextEditor';
 
+import SettingsFormSkeleton from '../settings/components/SettingsFormSkeleton';
+
 import {
     useEmployerProfile,
     useUpdateEmployerProfile,
@@ -28,7 +30,7 @@ export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
         banner?: File | null;
     } | null;
 
-    const { data: profile } = useEmployerProfile();
+    const { data: profile, isLoading } = useEmployerProfile();
     const { mutate: updateProfile, isPending: isUpdating } =
         useUpdateEmployerProfile();
 
@@ -52,6 +54,9 @@ export default function CompanyInfo({ mode = 'setup' }: CompanyInfoProps) {
         }
     }, [mode, profile]);
 
+    if (mode === 'settings' && isLoading) {
+        return <SettingsFormSkeleton />;
+    }
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 

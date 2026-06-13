@@ -12,6 +12,7 @@ import {
     useEmployerProfile,
     useUpdateEmployerProfile,
 } from '../../../hooks/useEmployer';
+import SettingsFormSkeleton from '../settings/components/SettingsFormSkeleton';
 
 const CountryCodes = [
     {
@@ -37,7 +38,7 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
 
     const { mutate: setupEmployer, isPending: isSettingUp } =
         useSetupEmployer();
-    const { data: profile } = useEmployerProfile();
+    const { data: profile, isLoading } = useEmployerProfile();
     const { mutate: updateProfile, isPending: isUpdating } =
         useUpdateEmployerProfile();
 
@@ -68,6 +69,10 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
             return () => clearTimeout(timer);
         }
     }, [mode, profile]);
+
+    if (mode === 'settings' && isLoading) {
+        return <SettingsFormSkeleton />;
+    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

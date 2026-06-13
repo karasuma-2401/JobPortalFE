@@ -13,6 +13,7 @@ import {
     useUpdateEmployerProfile,
 } from '../../../hooks/useEmployer';
 import { useIndustries } from '../../../hooks/useIndustries';
+import SettingsFormSkeleton from '../settings/components/SettingsFormSkeleton';
 
 const orgTypes = [
     { label: 'Private Company', value: 'PRIVATE_COMPANY' },
@@ -35,11 +36,12 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
     const location = useLocation();
     const previousState = location.state || {};
 
-    const { data: profile } = useEmployerProfile();
+    const { data: profile, isLoading: isProfileLoading } = useEmployerProfile();
     const { mutate: updateProfile, isPending: isUpdating } =
         useUpdateEmployerProfile();
 
-    const { data: industriesData = [] } = useIndustries();
+    const { data: industriesData = [], isLoading: isIndustriesLoading } =
+        useIndustries();
 
     const dynamicIndustryTypes = useMemo(() => {
         return industriesData.map((ind) => ({
@@ -114,6 +116,10 @@ export default function FoundingInfo({ mode = 'setup' }: FoundingInfoProps) {
             return () => clearTimeout(timer);
         }
     }, [mode, profile, dynamicIndustryTypes]);
+
+    if (mode === 'settings' && (isProfileLoading || isIndustriesLoading)) {
+        return <SettingsFormSkeleton />;
+    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

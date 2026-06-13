@@ -1,11 +1,12 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, ChevronDown, Loader2 } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react'; // Đã xóa Loader2
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 
 import KanbanColumn, { type ColumnData } from './components/KanbanColumn';
 import CandidateProfileModal from '../components/CandidateProfileModal';
+import KanbanBoardSkeleton from './components/KanbanBoardSkeleton'; // IMPORT SKELETON
 
 import type { Candidate } from '../../../types/candidate';
 import type {
@@ -148,14 +149,6 @@ export default function ApplicationsPage() {
         }
     };
 
-    if (isLoading) {
-        return (
-            <div className='w-full h-full flex items-center justify-center min-h-[60vh]'>
-                <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-            </div>
-        );
-    }
-
     return (
         <div className='w-full h-[calc(100vh-100px)] flex flex-col animate-in fade-in duration-500'>
             <div className='flex flex-col sm:flex-row sm:items-center justify-between mb-8 shrink-0 gap-4'>
@@ -234,26 +227,31 @@ export default function ApplicationsPage() {
                 </div>
             </div>
 
-            <div className='flex gap-8 flex-1 min-h-0 relative'>
-                <div className='flex-1 flex gap-6 overflow-x-auto pb-4'>
-                    {FIXED_COLUMNS.map((column) => (
-                        <KanbanColumn
-                            key={column.id}
-                            column={column}
-                            applicants={filteredAndSortedCandidates.filter(
-                                (candidate) => candidate.columnId === column.id
-                            )}
-                            onDragStart={handleDragStart}
-                            onDragOver={handleDragOver}
-                            onDrop={handleDrop}
-                            onDelete={() => {}}
-                            onEdit={() => {}}
-                            onDeleteApplicant={handleDeleteCandidate}
-                            onViewProfile={setSelectedCandidateId}
-                        />
-                    ))}
+            {isLoading ? (
+                <KanbanBoardSkeleton />
+            ) : (
+                <div className='flex gap-8 flex-1 min-h-0 relative'>
+                    <div className='flex-1 flex gap-6 overflow-x-auto pb-4'>
+                        {FIXED_COLUMNS.map((column) => (
+                            <KanbanColumn
+                                key={column.id}
+                                column={column}
+                                applicants={filteredAndSortedCandidates.filter(
+                                    (candidate) =>
+                                        candidate.columnId === column.id
+                                )}
+                                onDragStart={handleDragStart}
+                                onDragOver={handleDragOver}
+                                onDrop={handleDrop}
+                                onDelete={() => {}}
+                                onEdit={() => {}}
+                                onDeleteApplicant={handleDeleteCandidate}
+                                onViewProfile={setSelectedCandidateId}
+                            />
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
             <CandidateProfileModal
                 isOpen={!!selectedCandidate}

@@ -8,6 +8,7 @@ import { useEmployerDashboard } from '../../../hooks/useDashboard';
 import { useJobActions } from '../../../hooks/useJobActions';
 import PromoteJobModal from '../my-jobs/components/PromoteJobModal';
 
+import { DashboardSkeleton } from './components/DashboardSkeleton';
 export default function Overview() {
     const navigate = useNavigate();
     const { data, isLoading } = useEmployerDashboard();
@@ -59,11 +60,7 @@ export default function Overview() {
     };
 
     if (isLoading) {
-        return (
-            <div className='w-full h-full flex items-center justify-center min-h-100'>
-                <div className='w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin'></div>
-            </div>
-        );
+        return <DashboardSkeleton />;
     }
 
     return (
