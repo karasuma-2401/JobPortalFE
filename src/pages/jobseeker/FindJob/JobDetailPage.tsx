@@ -19,31 +19,6 @@ import {
     savePostAuthRedirect,
 } from '../../../utils/post-auth-redirect';
 
-const MOCK_RELATED_JOBS = [
-    {
-        id: '1',
-        title: 'Marketing Manager',
-        companyName: 'Stripe',
-        type: 'Remote',
-        isFeatured: true,
-        logo: 'https://logo.clearbit.com/stripe.com',
-        location: 'New Mexico, USA',
-        salary: '$50k-$80k/month',
-        daysRemaining: '4 Days Remaining',
-    },
-    {
-        id: '2',
-        title: 'Project Manager',
-        companyName: 'Shopify',
-        type: 'Full Time',
-        isFeatured: true,
-        logo: 'https://logo.clearbit.com/shopify.com',
-        location: 'Dhaka, Bangladesh',
-        salary: '$50k-$80k/month',
-        daysRemaining: '4 Days Remaining',
-    },
-];
-
 interface JobDetailPageProps {
     jobId?: string;
 }
@@ -54,19 +29,26 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
     const [searchParams, setSearchParams] = useSearchParams();
     const { user, isJobSeeker } = useAuth();
     const resolvedJobId = jobId || params.jobId || '';
-    const { jobData, loading, error, isSaved, handleToggleSave, handleApplySubmit } =
+  
+    const { jobData, relatedJobs, loading, error, isSaved, handleToggleSave, handleApplySubmit } =
         useJobDetail(resolvedJobId);
-
+    
     const descriptionParagraphs = useMemo(() => {
-        if (!jobData?.description) return [];
-        if (typeof jobData.description === 'string') {
-            return jobData.description.split('\n').filter((p) => p.trim() !== '');
+        const description = jobData?.description;
+        if (!description) return [];
+
+        if (typeof description === 'string') {
+            return description.split('\n').filter((p) => p.trim() !== '');
         }
-        return Array.isArray(jobData.description) ? jobData.description : [];
+        return Array.isArray(description) ? description : [];
     }, [jobData?.description]);
 
     const requirementsItems = useMemo(() => {
-        const rawRequirements = jobData?.requirements || (jobData as any)?.responsibilities;
+        if (!jobData) return [];
+        
+        const extendedJobData = jobData as unknown as { responsibilities?: string | string[] };
+        const rawRequirements = jobData.requirements || extendedJobData.responsibilities;
+
         if (!rawRequirements) return [];
         if (typeof rawRequirements === 'string') {
             return rawRequirements.split('\n').filter((p) => p.trim() !== '');
@@ -298,7 +280,7 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
                 <div className='border-t border-gray-100 pt-8'>
                     <JobGridSection
                         title='Related Jobs'
-                        jobs={MOCK_RELATED_JOBS}
+                        jobs={relatedJobs} 
                         onJobDoubleClick={(id) => navigate(`/job/${id}`)}
                     />
                 </div>
