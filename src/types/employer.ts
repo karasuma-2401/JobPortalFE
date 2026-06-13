@@ -50,3 +50,25 @@ export interface JobResponse {
     expiresAt: string;
     status: string;
 }
+
+export interface JobSeekerData {
+    id: string | number;
+    fullName?: string;
+    avatar?: string;
+    professionalTitle?: string;
+    experienceSummary?: string;
+    educationSummary?: string;
+    biography?: string;
+    dateOfBirth?: string;
+    nationality?: string;
+    maritalStatus?: string;
+    gender?: string;
+    website?: string;
+    address?: string;
+    phone?: string;
+    secondaryPhone?: string;
+    email?: string;
+    facebookUrl?: string;
+    twitterUrl?: string;
+    linkedlnUrl?: string;
+}

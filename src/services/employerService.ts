@@ -40,4 +40,5 @@ export const EmployerService = {
         const response = await privateApi.get('/job-seeker/discover', { params });
         return response;
     },
+    
 };
