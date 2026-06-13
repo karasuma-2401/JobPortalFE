@@ -63,8 +63,9 @@ export interface JobDetailType {
     phone: string;
     email: string;
     expireDate: string;
-    description: string[];
+    description: string | string[];
     responsibilities: string[];
+    requirements?: string;
     overview: JobOverview;
     companyProfile: CompanyProfile;
 }

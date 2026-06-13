@@ -1,21 +1,32 @@
 import { useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Calendar, Building2, Users, Layers} from "lucide-react";
 import JobGridSection from "../../../components/ui/JobGridSection"; 
 import { useEmployerDetail } from "./hooks/useEmployerDetail";
+import useAuth from "../../../contexts/auth/useAuth";
 
-interface EmployerDetailPageProps {
-  employerId: string;
-}
-
-export default function EmployerDetailPage({ employerId }: EmployerDetailPageProps) {
+export default function EmployerDetailPage() {
+  const { id } = useParams<{ id: string }>(); 
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const positionsRef = useRef<HTMLDivElement>(null);
-  
+
   const {
     employerData,
     openJobs,
     loading,
     error,
-  } = useEmployerDetail(employerId);
+  } = useEmployerDetail(id || "");
+
+  const handleJobDoubleClick = (jobId: string | number) => {
+    const authUser = user as { role?: string } | null;
+
+    if (authUser && authUser.role === 'SEEKER') {
+      navigate(`/jobseeker/find-job/${jobId}`);
+    } else {
+      navigate(`/job/${jobId}`);
+    }
+  };
 
   if (loading) {
     return (
@@ -37,6 +48,7 @@ export default function EmployerDetailPage({ employerId }: EmployerDetailPagePro
     <div className="w-full bg-[#F8F9FA] py-8 px-8 text-left">
       <div className="max-w-7xl mx-auto space-y-8">
         
+        {/* Company Header Card */}
         <div className="w-full bg-white border border-gray-200/60 rounded-xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 shadow-sm">
           <div className="flex items-center gap-5">
             <img src={employerData.logo} alt={employerData.name} className="w-16 h-16 rounded-xl object-cover border border-gray-100 shadow-sm" />
@@ -59,6 +71,7 @@ export default function EmployerDetailPage({ employerId }: EmployerDetailPagePro
               <h2 className="text-[18px] font-bold text-gray-900">Description</h2>
               <p className="text-[14px] text-gray-500 leading-relaxed">{employerData.description}</p>
             </div>
+            
             {employerData.benefits && employerData.benefits.length > 0 && (
               <div className="space-y-3">
                 <h2 className="text-[18px] font-bold text-gray-900">Company Benefits</h2>
@@ -67,6 +80,7 @@ export default function EmployerDetailPage({ employerId }: EmployerDetailPagePro
                 </ul>
               </div>
             )}
+            
             {employerData.vision && (
               <div className="space-y-3">
                 <h2 className="text-[18px] font-bold text-gray-900">Company Vision</h2>
@@ -74,7 +88,6 @@ export default function EmployerDetailPage({ employerId }: EmployerDetailPagePro
               </div>
             )}
           </div>
-
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white border border-gray-200/60 rounded-2xl p-6 shadow-sm space-y-5">
               <h3 className="text-[16px] font-bold text-gray-900">Job Overview</h3>
@@ -92,7 +105,7 @@ export default function EmployerDetailPage({ employerId }: EmployerDetailPagePro
           <JobGridSection 
             title={`Open Position (${openJobs.length})`}
             jobs={openJobs}
-            onJobDoubleClick={(id) => console.log("Open position double clicked:", id)}
+            onJobDoubleClick={(jobId) => handleJobDoubleClick(jobId)}
           />
         </div>
 

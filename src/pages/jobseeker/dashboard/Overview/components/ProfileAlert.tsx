@@ -1,14 +1,24 @@
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import useAuth from '../../../../../contexts/auth/useAuth';
+import { useJobseekerProfile } from '../../../../../hooks/useJobseeker';
 
 export default function ProfileAlert() {
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const { data: profile } = useJobseekerProfile();
+
+    const avatarUrl = `${
+        profile?.avatar ||
+        user?.avatar ||
+        `https://ui-avatars.com/api/?name=${profile?.fullName || user?.name || user?.displayName || 'Candidate'}&background=eff6ff&color=2563eb`
+    }`;
 
     return (
         <div className='flex items-center justify-between px-8 py-7 rounded-xl bg-danger-500 text-white shadow-sm'>
             <div className='flex items-center gap-5'>
                 <img
-                    src='https://i.pravatar.cc/150?img=11'
+                    src={avatarUrl}
                     alt='Avatar'
                     className='w-16 h-16 rounded-full border-2 border-white/20 object-cover'
                 />

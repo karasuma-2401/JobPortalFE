@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
-import type { Candidate } from '../../components/CandidateProfileModal';
+import type { Candidate } from '../../../../types/candidate';
 
 interface SavedCandidateItemProps {
     candidate: Candidate;

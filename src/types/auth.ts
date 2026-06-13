@@ -30,4 +30,6 @@ export interface UserResponse {
     roles: Role[];
     hasProfile: boolean;
     employerApprovalStatus: string | null;
+    avatar?: string | null;
+    name?: string | null;
 }

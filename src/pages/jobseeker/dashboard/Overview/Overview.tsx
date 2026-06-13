@@ -85,9 +85,10 @@ export default function OverviewPage() {
                   logo={job.logo}
                   role={job.role}
                   type={job.type}
+                  jobPostId={job.jobPostId}
                   location={job.location}
                   salary={job.salary}
-                  dateApplied={job.dateApplied}
+                  dateApplied={job.appliedAt}
                   status={job.status}
                   isSelected={selectedJobId === job.id}
                   onSelect={() => setSelectedJobId(job.id)}

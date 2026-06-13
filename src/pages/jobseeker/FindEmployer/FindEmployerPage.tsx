@@ -1,11 +1,15 @@
+import { useNavigate } from 'react-router-dom';
 import DashboardPagination from "../../../components/ui/DashboardPagination";
 import EmployerSearchBar from "./components/EmployerSearchBar";
 import FilterSortBar from "./components/EmployerFilterSortBar"; 
 import EmployerList from "./components/EmployerList";
-import EmployerDetailPage from "./EmployerDetailPage";
 import { useFindEmployers } from "./hooks/useFindEmployers";
+import useAuth from '../../../contexts/auth/useAuth'; 
 
 export default function FindEmployerPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth(); 
+  
   const {
     employers,
     loading,
@@ -19,30 +23,23 @@ export default function FindEmployerPage() {
     setLocation,
     category,
     setCategory,
-    selectedEmployerId,
-    setSelectedEmployerId,
     totalPages,
     totalCount,
     handleSearch,
     handlePageChange,
   } = useFindEmployers();
 
-  if (selectedEmployerId) {
-    return (
-      <div className="w-full bg-[#F8F9FA] font-sans min-h-screen pb-16 animate-fadeIn">
-        <div className="max-w-7xl mx-auto px-8 pt-6 text-left">
-          <button 
-            onClick={() => setSelectedEmployerId(null)}
-            className="inline-flex items-center gap-2 text-[14px] font-semibold text-gray-500 hover:text-primary-500 transition-colors bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm"
-          >
-            ← Back to Employer List
-          </button>
-        </div>
-        
-        <EmployerDetailPage employerId={selectedEmployerId} /> 
-      </div>
-    );
-  }
+  const handleEmployerDoubleClick = (id: string | number) => {
+    const authUser = user as { role?: string } | null;
+
+    if (authUser && authUser.role === 'SEEKER') {
+      // Đã đăng nhập -> Điều hướng vào Layout của Jobseeker
+      navigate(`/jobseeker/find-employers/${id}`);
+    } else {
+      // Chưa đăng nhập -> Giao diện công cộng của MainLayout
+      navigate(`/employer-detail/${id}`);
+    }
+  };
 
   return (
     <div className="w-full bg-white font-sans min-h-screen pb-16">
@@ -73,7 +70,7 @@ export default function FindEmployerPage() {
           <EmployerList 
             employers={employers} 
             viewMode={viewMode} 
-            onEmployerDoubleClick={(id) => setSelectedEmployerId(id)} 
+            onEmployerDoubleClick={handleEmployerDoubleClick} 
           />
         )}
 

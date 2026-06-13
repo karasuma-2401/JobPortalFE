@@ -7,8 +7,21 @@ export const useSavedCandidates = () => {
     return useQuery({
         queryKey: ['savedCandidates'],
         queryFn: async () => {
-            const response = await SavedCandidateServices.getSavedCandidates();
-            return response.data;
+            return await SavedCandidateServices.getSavedCandidates();
+        },
+    });
+};
+
+export const useSaveCandidate = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (jobSeekerId: number) =>
+            SavedCandidateServices.saveCandidate(jobSeekerId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['savedCandidates'] });
+        },
+        onError: (error: ApiError) => {
+            toast.error(error.message || 'Failed to save candidate');
         },
     });
 };

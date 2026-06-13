@@ -63,7 +63,8 @@ import GuestRoute from './routes/GuestRoute';
 import ProtectedRoute from './routes/ProtectedRoute';
 import JobSeekerSetupPage from './pages/jobseeker/setup/JobSeekerSetupPage';
 import JobSeekerJobDetailPage from './pages/jobseeker/FindJob/JobDetailPage';
-
+import DynamicJobDetailRoute from './routes/DynamicJobDetailRoute';
+import EmployerDetailPage from './pages/jobseeker/FindEmployer/EmployerDetailPage';
 const router = createBrowserRouter([
     {
         element: <MainLayout />,
@@ -73,6 +74,7 @@ const router = createBrowserRouter([
             { path: '/find-job', element: <FindJobPage /> },
             { path: '/job/:jobId', element: <JobSeekerJobDetailPage /> },
             { path: '/find-employers', element: <FindEmployerPage /> },
+            { path: '/employer-detail/:id', element: <EmployerDetailPage /> },
         ],
     },
     {
@@ -184,7 +186,9 @@ const router = createBrowserRouter([
         children: [
             { path: 'home', element: <Home /> },
             { path: 'find-job', element: <FindJobPage /> },
+            { path: 'job/:jobId', element: <DynamicJobDetailRoute /> },
             { path: 'find-employers', element: <FindEmployerPage /> },
+            { path: 'find-employers/:id', element: <EmployerDetailPage /> },
             {
                 path: 'setup',
                 element: (

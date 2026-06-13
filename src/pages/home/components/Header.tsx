@@ -1,16 +1,12 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Search, PhoneCall } from 'lucide-react';
+import { Search} from 'lucide-react';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import Button from '../../../components/ui/Button';
-import ComboBox, { type OptionType } from '../../../components/ui/ComboBox';
 import Logo from '../../../components/Logo';
 import useAuth from '../../../contexts/auth/useAuth';
 import { getDefaultAuthenticatedRoute } from '../../../contexts/auth/auth-utils';
-const languages = [
-    { label: 'English', value: 'english' },
-    { label: 'Vietnamese', value: 'vietnamese' },
-];
+
 const navLinks = [
     { path: '/', label: 'Home' },
     { path: '/find-job', label: 'Find Job' },
@@ -23,7 +19,6 @@ const navLinks = [
 export default function Header() {
     const { scrollY } = useScroll();
     const [hidden, setHidden] = useState(false);
-    const [language, setLanguage] = useState<OptionType>(languages[0]);
     const { user, isAuthenticated } = useAuth();
     const dashboardRoute = getDefaultAuthenticatedRoute(user);
 
@@ -61,19 +56,7 @@ export default function Header() {
                         </NavLink>
                     ))}
                 </nav>
-                <div className='flex items-center gap-4'>
-                    <div className='flex items-center gap-2'>
-                        <PhoneCall size={16} />
-                        <span className='font-medium text-gray-900'>
-                            +84867070087
-                        </span>
-                    </div>
-                    <ComboBox
-                        options={languages}
-                        value={language}
-                        onChange={setLanguage}
-                    />
-                </div>
+        
             </div>
 
             <div className='flex justify-between items-center py-4 px-8'>

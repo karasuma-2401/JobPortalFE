@@ -22,6 +22,8 @@ export default function FindJobPage() {
         setSearchKeyword,
         locationKeyword,
         setLocationKeyword,
+        category,
+        setCategory,
         experience,
         setExperience,
         salaryRange,
@@ -40,6 +42,16 @@ export default function FindJobPage() {
         handleToggleSave,
     } = useFindJobs();
 
+    const handleJobDoubleClick = (id: string) => {
+        const authUser = user as { role?: string } | null;
+
+        if (authUser && authUser.role === 'SEEKER') {
+            navigate(`/jobseeker/find-job/${id}`);
+        } else {
+            navigate(`/job/${id}`);
+        }
+    };
+
     const handleProtectedListApplyClick = (jobId: string) => {
         if (!user) {
             toast.info('Please sign in before applying.');
@@ -55,6 +67,8 @@ export default function FindJobPage() {
                 setSearchKeyword={setSearchKeyword}
                 locationKeyword={locationKeyword}
                 setLocationKeyword={setLocationKeyword}
+                category={category}
+                setCategory={setCategory}
                 onSearch={handleSearch}
                 experience={experience}
                 setExperience={setExperience}
@@ -86,7 +100,7 @@ export default function FindJobPage() {
                         viewMode={viewMode}
                         savedJobIds={savedJobIds}
                         onToggleSave={handleToggleSave}
-                        onJobDoubleClick={(id) => navigate(`/job/${id}`)}
+                        onJobDoubleClick={handleJobDoubleClick}
                         onApplyClick={handleProtectedListApplyClick}
                     />
                 )}
