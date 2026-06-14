@@ -1,9 +1,10 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { toast } from 'sonner';
-import { getToken, onMessage } from 'firebase/messaging';
+import { onMessage } from 'firebase/messaging';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { messaging } from '../../firebase/firebase';
+import { messaging } from '../../lib/firebase';
+import { registerDeviceToken } from '../../lib/fcm';
 import { NotificationContext } from './NotificationContext';
 import useAuth from '../auth/useAuth';
 import { NotificationService } from '../../services/notificationService';
@@ -17,9 +18,6 @@ import {
 } from '../../hooks/useNotifications';
 
 import type { NotificationItem } from '../../types/notification';
-
-const VAPID_KEY =
-    'BC55ci3KpI1JNkfzS7BJvzADUS2mGa1L4iOrOKjLPHA_UIpyRZf3ammewT-Pjy6fk2ZQ4kg1K569DOtu3I0-tbo';
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
     const queryClient = useQueryClient();
@@ -60,32 +58,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
         const setupFCM = async () => {
             try {
-                const permission = await Notification.requestPermission();
+                const token = await registerDeviceToken();
 
-                if (permission === 'granted') {
-                    try {
-                        const registration =
-                            await navigator.serviceWorker.register(
-                                '/firebase-messaging-sw.js'
-                            );
-
-                        const token = await getToken(messaging, {
-                            vapidKey: VAPID_KEY,
-                            serviceWorkerRegistration: registration,
-                        });
-
-                        if (token) {
-                            console.log('FCM Token generated successfully');
-                            saveToken(token);
-                        }
-                    } catch (serviceWorkerError) {
-                        console.warn(
-                            'Service Worker registration failed:',
-                            serviceWorkerError
-                        );
-                    }
-                } else if (permission === 'denied') {
-                    console.log('Notification permission denied by user');
+                if (token) {
+                    saveToken(token);
                 }
             } catch (error) {
                 console.error('FCM setup failed:', error);
@@ -126,8 +102,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         });
 
         return () => unsubscribe();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user, saveToken]);
+    }, [queryClient, saveToken, user]);
 
     const unreadCount = notifications.filter((n) => !n.isRead).length;
 

@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { AuthService } from '../services/authService';
+import { registerDeviceToken } from '../lib/fcm';
 import type {
     LoginRequest,
     RegisterRequest,
@@ -27,7 +28,12 @@ export const useLogin = () => {
         mutationFn: async (payload: LoginRequest) => {
             let tokens;
             try {
-                tokens = await AuthService.login(payload);
+                const deviceToken = await registerDeviceToken();
+                console.log('Device Token nhan duo la: ', deviceToken);
+                tokens = await AuthService.login({
+                    ...payload,
+                    ...(deviceToken ? { deviceToken } : {}),
+                });
             } catch (err) {
                 const apiError = err as ApiError;
 
@@ -68,7 +74,8 @@ export const useLogin = () => {
 
             navigate(
                 shouldUsePendingRedirect
-                    ? consumePostAuthRedirect() || getDefaultAuthenticatedRoute(user)
+                    ? consumePostAuthRedirect() ||
+                          getDefaultAuthenticatedRoute(user)
                     : getDefaultAuthenticatedRoute(user),
                 { replace: true }
             );

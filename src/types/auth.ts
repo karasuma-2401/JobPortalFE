@@ -3,6 +3,7 @@ import type { Role } from '../bases/constants/app';
 export interface LoginRequest {
     email: string;
     password: string;
+    deviceToken?: string;
 }
 
 export interface LoginResponse {
