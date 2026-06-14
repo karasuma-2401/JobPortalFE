@@ -1,4 +1,10 @@
 import { privateApi } from '../api/api';
+import type { JobPostResponse, PagedJobResponse } from '../types/jobpost';
+
+export interface InviteCandidatePayload {
+    jobSeekerId: number;
+    jobPostId: number;
+}
 
 export const EmployerService = {
     setupProfile: async (formData: FormData) => {
@@ -43,5 +49,22 @@ export const EmployerService = {
             params,
         });
         return response;
+    },
+    getEmployerJobPosts: async (
+        params: Record<string, unknown> = {}
+    ): Promise<PagedJobResponse> => {
+        const response = await privateApi.get('/employer/job-posts', {
+            params,
+        });
+        const dataNode = ((response as unknown as Record<string, unknown>)
+            ?.data ?? response) as Record<string, unknown>;
+
+        return {
+            items: (dataNode?.items as JobPostResponse[]) || [],
+            totalItems: (dataNode?.totalItems as number) || 0,
+        };
+    },
+    inviteCandidate: async (payload: InviteCandidatePayload) => {
+        return await privateApi.post('/employer/candidate-invitations', payload);
     },
 };

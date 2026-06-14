@@ -54,7 +54,13 @@ export default function FindCandidatesPage() {
                                 isSaved={savedIds.has(candidate.id)}
                                 onToggleSave={actions.toggleSaveCandidate}
                                 onViewProfile={actions.setSelectedCandidate}
-                                onInvite={(name) => actions.setInviteModalData({ isOpen: true, candidateName: name })}
+                                onInvite={(candidate) =>
+                                    actions.setInviteModalData({
+                                        isOpen: true,
+                                        candidateId: candidate.id,
+                                        candidateName: candidate.name,
+                                    })
+                                }
                             />
                         ))}
                     </div>
@@ -63,7 +69,14 @@ export default function FindCandidatesPage() {
 
             <InviteModal
                 isOpen={state.inviteModalData.isOpen}
-                onClose={() => actions.setInviteModalData({ isOpen: false, candidateName: '' })}
+                onClose={() =>
+                    actions.setInviteModalData({
+                        isOpen: false,
+                        candidateId: '',
+                        candidateName: '',
+                    })
+                }
+                candidateId={state.inviteModalData.candidateId}
                 candidateName={state.inviteModalData.candidateName}
             />
 
@@ -73,6 +86,14 @@ export default function FindCandidatesPage() {
                 candidate={state.selectedCandidate}
                 isGeneralSeeker={true}
                 onHire={actions.handleHireCandidate}
+                onInviteCandidate={(candidate) => {
+                    actions.setSelectedCandidate(null);
+                    actions.setInviteModalData({
+                        isOpen: true,
+                        candidateId: candidate.id,
+                        candidateName: candidate.name,
+                    });
+                }}
             />
         </div>
     );

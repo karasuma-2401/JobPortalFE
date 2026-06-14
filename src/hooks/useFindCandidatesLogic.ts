@@ -17,6 +17,7 @@ export function useFindCandidatesLogic() {
 
     const [inviteModalData, setInviteModalData] = useState({
         isOpen: false,
+        candidateId: '',
         candidateName: '',
     });
 

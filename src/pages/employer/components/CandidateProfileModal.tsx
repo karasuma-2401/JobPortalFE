@@ -14,6 +14,7 @@ interface CandidateProfileModalProps {
     candidate: Candidate | null;
     onHire: (id: string) => void;
     isGeneralSeeker?: boolean;
+    onInviteCandidate?: (candidate: Candidate) => void;
 }
 
 export default function CandidateProfileModal({
@@ -21,6 +22,7 @@ export default function CandidateProfileModal({
     onClose,
     candidate,
     isGeneralSeeker,
+    onInviteCandidate,
 }: CandidateProfileModalProps) {
     const [isSaved, setIsSaved] = useState(true);
 
@@ -97,6 +99,11 @@ export default function CandidateProfileModal({
     };
 
     const handleSendMail = () => {
+        if (onInviteCandidate) {
+            onInviteCandidate(candidate);
+            return;
+        }
+
         const subject = encodeURIComponent(
             `Interview Invitation: ${displayData.role}`
         );

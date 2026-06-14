@@ -1,24 +1,55 @@
-import { X, CheckCircle2 } from 'lucide-react';
+import { Loader2, X, CheckCircle2 } from 'lucide-react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { EmployerService } from '../../../../services/employerService';
 
 interface InviteModalProps {
     isOpen: boolean;
     onClose: () => void;
+    candidateId: string;
     candidateName: string;
 }
 
 export default function InviteModal({
     isOpen,
     onClose,
+    candidateId,
     candidateName,
 }: InviteModalProps) {
+    const { data: jobData, isLoading: isLoadingJobs } = useQuery({
+        queryKey: ['employerInviteJobs'],
+        queryFn: () =>
+            EmployerService.getEmployerJobPosts({
+                limit: 100,
+                offset: 0,
+            }),
+        enabled: isOpen,
+        staleTime: 60 * 1000,
+    });
+
+    const inviteMutation = useMutation({
+        mutationFn: (jobPostId: number) =>
+            EmployerService.inviteCandidate({
+                jobSeekerId: Number(candidateId),
+                jobPostId,
+            }),
+        onSuccess: (_response, jobPostId) => {
+            const job = activeJobs.find((item) => Number(item.id) === jobPostId);
+            toast.success(
+                `Invitation sent to ${candidateName}${job ? ` for ${job.title}` : ''}.`
+            );
+            onClose();
+        },
+        onError: (error: Error) => {
+            toast.error(error.message || 'Failed to send invitation email.');
+        },
+    });
+
     if (!isOpen) return null;
 
-    const mockActiveJobs = [
-        'Senior UI/UX Designer',
-        'Frontend Developer',
-        'Product Manager',
-    ];
+    const activeJobs = (jobData?.items || []).filter((job) =>
+        ['OPEN', 'ACTIVE', 'Active'].includes(String(job.status))
+    );
 
     return (
         <div className='fixed inset-0 z-100 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200'>
@@ -38,28 +69,44 @@ export default function InviteModal({
                     <p className='text-sm text-gray-600 mb-4'>
                         Select an active job to invite this candidate to apply:
                     </p>
-                    <div className='space-y-3'>
-                        {mockActiveJobs.map((job) => (
+                    {isLoadingJobs ? (
+                        <div className='flex items-center justify-center gap-2 py-6 text-sm text-gray-500'>
+                            <Loader2 size={18} className='animate-spin' />
+                            Loading active jobs...
+                        </div>
+                    ) : activeJobs.length === 0 ? (
+                        <div className='py-6 text-center text-sm text-gray-500'>
+                            No active jobs available.
+                        </div>
+                    ) : (
+                        <div className='space-y-3'>
+                        {activeJobs.map((job) => (
                             <button
-                                key={job}
+                                key={job.id}
+                                disabled={inviteMutation.isPending}
                                 onClick={() => {
-                                    toast.success(
-                                        `Invitation sent to ${candidateName} for ${job}!`
-                                    );
-                                    onClose();
+                                    inviteMutation.mutate(Number(job.id));
                                 }}
-                                className='w-full flex items-center justify-between p-3 border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group text-left'
+                                className='w-full flex items-center justify-between p-3 border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group text-left disabled:opacity-60 disabled:cursor-not-allowed'
                             >
                                 <span className='font-medium text-gray-700 group-hover:text-blue-700'>
-                                    {job}
+                                    {job.title}
                                 </span>
-                                <CheckCircle2
-                                    size={18}
-                                    className='text-gray-300 group-hover:text-blue-500'
-                                />
+                                {inviteMutation.isPending ? (
+                                    <Loader2
+                                        size={18}
+                                        className='text-blue-500 animate-spin'
+                                    />
+                                ) : (
+                                    <CheckCircle2
+                                        size={18}
+                                        className='text-gray-300 group-hover:text-blue-500'
+                                    />
+                                )}
                             </button>
                         ))}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
