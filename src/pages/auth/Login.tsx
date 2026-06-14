@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLogin } from '../../hooks/useAuth';
+import { handleEnterToNext } from '../../utils/formUtils';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -36,7 +37,11 @@ export default function Login() {
                 </p>
             </div>
 
-            <form onSubmit={handleLogin} className='flex flex-col gap-5'>
+            <form
+                onKeyDown={handleEnterToNext}
+                onSubmit={handleLogin}
+                className='flex flex-col gap-5 '
+            >
                 <input
                     type='email'
                     placeholder='Email address'

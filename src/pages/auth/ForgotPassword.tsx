@@ -7,6 +7,7 @@ import { useRequestPasswordReset } from '../../hooks/useAuth';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import GoogleLogo from '../../assets/GoogleLogo.svg';
+import { handleEnterToNext } from '../../utils/formUtils';
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState('');
@@ -66,6 +67,7 @@ export default function ForgotPassword() {
                 </div>
             ) : (
                 <form
+                    onKeyDown={handleEnterToNext}
                     onSubmit={handleForgotPassword}
                     className='flex flex-col gap-5'
                 >

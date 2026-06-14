@@ -9,6 +9,7 @@ import GoogleLogo from '../../assets/GoogleLogo.svg';
 import type { RegisterRequest } from '../../types/auth';
 import { useRegister } from '../../hooks/useAuth';
 import TermsModal from '../../components/TermsModal';
+import { handleEnterToNext } from '../../utils/formUtils';
 
 const accountTypes = [
     { label: 'Employers', value: 'EMPLOYER' },
@@ -76,7 +77,11 @@ export default function Register() {
                 </Link>
             </p>
 
-            <form onSubmit={handleRegister} className='flex flex-col gap-5'>
+            <form
+                onKeyDown={handleEnterToNext}
+                onSubmit={handleRegister}
+                className='flex flex-col gap-5'
+            >
                 <Input
                     type='email'
                     placeholder='Email address'
