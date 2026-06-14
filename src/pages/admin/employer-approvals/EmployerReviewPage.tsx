@@ -30,6 +30,20 @@ type EmployerProfileView = {
     description: string;
 };
 
+// Hàm hỗ trợ nối Base URL cho ảnh nếu Database chỉ lưu đường dẫn tương đối
+const getFullImageUrl = (url: string | null | undefined, fallbackName?: string) => {
+    if (!url) {
+        return fallbackName
+            ? `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=2563eb&size=200`
+            : 'https://via.placeholder.com/800x200?text=No+Banner'; // Fallback cho banner
+    }
+    if (url.startsWith('http')) return url;
+    
+    // Đổi lại URL này thành URL Backend thực tế của bạn hoặc dùng biến môi trường
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+    return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 const toEmployerProfileView = (emp: EmployerProfileResponse): EmployerProfileView => {
     return {
         id: String(emp.id),
@@ -45,10 +59,9 @@ const toEmployerProfileView = (emp: EmployerProfileResponse): EmployerProfileVie
                 : emp.approvalStatus === 'APPROVED'
                   ? 'Approved'
                   : 'Rejected',
-        logoUrl:
-            emp.logo ||
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.companyName)}&background=2563eb&size=200`,
-        bannerUrl: emp.banner,
+        // Áp dụng hàm sửa lỗi ảnh ở đây
+        logoUrl: getFullImageUrl(emp.logo, emp.companyName),
+        bannerUrl: getFullImageUrl(emp.banner),
         address: emp.address,
         website: emp.companyWebsite,
         businessLicenseUrl: emp.businessLicense || null,
@@ -94,6 +107,7 @@ export default function EmployerReviewPage() {
 
     return (
         <div className='animate-in fade-in duration-500 pb-16'>
+            {/* Giữ nguyên phần Header (các nút bấm) */}
             <div className='flex items-center justify-between mb-6'>
                 <button
                     onClick={() => navigate('/admin/employer-approvals')}
@@ -174,12 +188,16 @@ export default function EmployerReviewPage() {
                                     <h3 className='text-sm font-bold text-gray-900 uppercase tracking-widest mb-4'>
                                         Company Description
                                     </h3>
-                                    <div className='text-sm text-gray-600 leading-relaxed whitespace-pre-line p-6 bg-gray-50 rounded-xl border border-gray-100'>
-                                        {view.description}
-                                    </div>
+                                    
+                                    {/* FIX HTML Ở ĐÂY: Dùng dangerouslySetInnerHTML và bỏ whitespace-pre-line */}
+                                    <div 
+                                        className='text-sm text-gray-600 leading-relaxed p-6 bg-gray-50 rounded-xl border border-gray-100'
+                                        dangerouslySetInnerHTML={{ __html: view.description }}
+                                    />
                                 </section>
                             </div>
 
+                            {/* Giữ nguyên Sidebar bên phải */}
                             <div className='space-y-6'>
                                 <div className='p-6 border border-gray-100 rounded-xl bg-white space-y-4'>
                                     <h3 className='text-sm font-bold text-gray-900 mb-4'>
@@ -217,9 +235,6 @@ export default function EmployerReviewPage() {
                                                     <p className='text-sm font-bold text-gray-900 line-clamp-1'>
                                                         Business_License.pdf
                                                     </p>
-                                                    <p className='text-xs text-gray-500'>
-                                                        2.4 MB
-                                                    </p>
                                                 </div>
                                             </div>
                                             <a
@@ -252,4 +267,3 @@ export default function EmployerReviewPage() {
         </div>
     );
 }
-
