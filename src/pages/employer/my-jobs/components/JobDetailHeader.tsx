@@ -27,6 +27,8 @@ export default function JobDetailHeader({
     onShare,
     onEdit,
 }: JobDetailHeaderProps) {
+    const isActive = status === 'Active' || status === 'OPEN';
+
     return (
         <>
             <button
@@ -46,12 +48,12 @@ export default function JobDetailHeader({
                         <h1 className='text-3xl font-bold text-gray-900'>
                             {title}
                         </h1>
-                        {status === 'Active' ? (
-                            <span className='inline-flex items-center gap-1.5 px-3 py-1 rounded-md border bg-green-50 border-green-200 text-sm font-medium text-green-700'>
+                        {isActive ? (
+                            <span className='inline-flex items-center gap-1.5 px-3 py-1 rounded-md border bg-green-50 border-green-200 text-sm font-medium text-green-700 uppercase'>
                                 <CheckCircle2 size={16} /> {status}
                             </span>
                         ) : (
-                            <span className='inline-flex items-center gap-1.5 px-3 py-1 rounded-md border bg-red-50 border-red-200 text-sm font-medium text-red-700'>
+                            <span className='inline-flex items-center gap-1.5 px-3 py-1 rounded-md border bg-red-50 border-red-200 text-sm font-medium text-red-700 uppercase'>
                                 <XCircle size={16} /> {status}
                             </span>
                         )}

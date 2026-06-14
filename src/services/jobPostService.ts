@@ -18,7 +18,10 @@ export const JobPostService = {
         )?.data ?? response) as JobPostResponse;
         return normalizedResponse;
     },
-
+    getJobForEdit: async (id: string) => {
+        const response = await privateApi.get(`/jobpost/${id}/for-edit`);
+        return response; 
+    },
     updateJob: async (
         id: string,
         payload: Record<string, unknown>

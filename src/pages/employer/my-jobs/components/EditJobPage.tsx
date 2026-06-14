@@ -7,10 +7,10 @@ import Input from '../../../../components/ui/Input';
 import CustomDropdown from '../../../../components/ui/DropDown';
 import CustomDatePicker from '../../../../components/ui/DatePicker';
 import TagsInput from '../../../../components/ui/TagsInput';
-import { useJobDetail } from '../../../../hooks/useJobDetail';
 import { useUpdateJob } from '../../../../hooks/useUpdateJob';
 import { useIndustries } from '../../../../hooks/useIndustries';
 import type { JobDetail } from '../../../../types/jobpost';
+import { useJobForEdit } from '../../../../hooks/useJobForEdit';
 
 type UpdateJobMutationFn = (
     variables: { id: string; payload: Record<string, unknown> },
@@ -127,12 +127,10 @@ function JobFormInner({
             !formData.location ||
             !formData.expirationDate ||
             !formData.description ||
-            !formData.tags ||
+            !formData.tags.length ||
             !formData.industry
         ) {
-            toast.error(
-                'Please fill in all required fields (Title, Location, Industry, Tags, Description, Expiration Date).'
-            );
+            toast.error('Please fill in all required fields...');
             return;
         }
 
@@ -149,6 +147,7 @@ function JobFormInner({
             experience: Number(formData.experience) || 0,
             employmentType: formData.jobType,
             expiresAt: formData.expirationDate,
+            isUpdateExpires: true, // THÊM DÒNG NÀY ĐỂ BACKEND CHỊU UPDATE NGÀY HẾT HẠN
             tags: formData.tags,
             isFeatured: false,
             isHighlighted: false,
@@ -435,11 +434,12 @@ export default function EditJobPage() {
         data: job,
         isLoading: isFetching,
         isError,
-    } = useJobDetail(id) as {
+    } = useJobForEdit(id) as {
         data: JobDetail | undefined;
         isLoading: boolean;
         isError: boolean;
     };
+    
     const { mutate: updateJob, isPending: isUpdating } = useUpdateJob() as {
         mutate: UpdateJobMutationFn;
         isPending: boolean;
@@ -491,7 +491,9 @@ export default function EditJobPage() {
             <div className='mb-8 border-b border-gray-100 pb-4'>
                 <h1 className='text-2xl font-bold text-gray-900'>Edit Job</h1>
             </div>
+
             <JobFormInner
+                key={job.id || id}
                 job={job}
                 id={id || ''}
                 isUpdating={isUpdating}

@@ -22,7 +22,6 @@ export const EmployerService = {
         });
         return response;
     },
-
     getRecentJobs: async () => {
         const response = await privateApi.get('/jobpost');
         // `privateApi` response interceptor returns `response.data` already.
