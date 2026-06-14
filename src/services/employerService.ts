@@ -23,20 +23,19 @@ export const EmployerService = {
         return response;
     },
 
-    getRecentJobs: async () => {
-        const response = await privateApi.get('/jobpost');
-        // `privateApi` response interceptor returns `response.data` already.
-        // Return the response directly (which is the unwrapped data) and let callers
-        // normalize in case backend wraps results in a `data` field.
+    getRecentJobs: async (params?: Record<string, unknown>) => {
+        const response = await privateApi.get('/employer/job-posts/recent', {
+            params,
+        });
         return response;
+    },
+    getStatistics: async () => {
+        const response = await privateApi.get('/employer/statistics');
+        return response.data;
     },
 
     getSavedCandidates: async () => {
         const response = await privateApi.get('/saved-candidates');
-        return response.data;
-    },
-    getStatistics: async () => {
-        const response = await privateApi.get('/employer/statistics');
         return response.data;
     },
     discoverCandidates: async (params: Record<string, unknown>) => {
