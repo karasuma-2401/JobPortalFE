@@ -116,8 +116,8 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
                             formData.append('facebookUrl', link.url);
                         if (link.networkValue === 'twitter')
                             formData.append('twitterUrl', link.url);
-                        if (link.networkValue === 'linkedin')
-                            formData.append('linkedinUrl', link.url);
+                        if (link.networkValue === 'linkedln')
+                            formData.append('linkedlnUrl', link.url);
                     }
                 );
             }

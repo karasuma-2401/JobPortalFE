@@ -6,7 +6,7 @@ import {
     Phone,
     Building2,
 } from 'lucide-react';
-import { FaFacebook, FaYoutube, FaLinkedin } from 'react-icons/fa';
+import { FaFacebook, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
 interface ProfileSidebarProps {
     founded: string;
@@ -18,7 +18,7 @@ interface ProfileSidebarProps {
     socials: {
         facebook?: string;
         twitter?: string;
-        linkedin?: string;
+        linkedln?: string;
     };
 }
 
@@ -146,15 +146,15 @@ export default function ProfileSidebar({
                             href={socials.twitter}
                             target='_blank'
                             rel='noreferrer'
-                            className='w-11 h-11 rounded-xl bg-[#FF0000]/10 text-[#FF0000] flex items-center justify-center transition-all duration-300 hover:bg-[#FF0000] hover:text-white hover:-translate-y-1 hover:shadow-md'
+                            className='w-11 h-11 rounded-xl bg-[#1877F2]/10 text-[#1877F2] flex items-center justify-center transition-all duration-300 hover:bg-[#1877F2] hover:text-white hover:-translate-y-1 hover:shadow-md'
                             title='Twitter'
                         >
-                            <FaYoutube size={18} strokeWidth={2} />
+                            <FaTwitter size={18} strokeWidth={2} />
                         </a>
                     )}
-                    {socials.linkedin && (
+                    {socials.linkedln && (
                         <a
-                            href={socials.linkedin}
+                            href={socials.linkedln}
                             target='_blank'
                             rel='noreferrer'
                             className='w-11 h-11 rounded-xl bg-[#0A66C2]/10 text-[#0A66C2] flex items-center justify-center transition-all duration-300 hover:bg-[#0A66C2] hover:text-white hover:-translate-y-1 hover:shadow-md'

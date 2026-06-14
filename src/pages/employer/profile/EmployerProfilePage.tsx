@@ -98,7 +98,7 @@ export default function EmployerProfilePage() {
                         socials={{
                             facebook: profile.facebookUrl,
                             twitter: profile.twitterUrl,
-                            linkedin: profile.linkedInUrl,
+                            linkedln: profile.linkedlnUrl,
                         }}
                     />
                 </div>

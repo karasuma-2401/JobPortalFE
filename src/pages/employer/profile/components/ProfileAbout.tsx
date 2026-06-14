@@ -11,7 +11,7 @@ export default function ProfileAbout({ aboutUs, vision }: ProfileAboutProps) {
                     About Us
                 </h2>
                 <div
-                    className='text-sm text-gray-600 leading-relaxed max-w-none prose prose-sm'
+                    className='text-sm text-gray-700 leading-relaxed max-w-none prose prose-sm'
                     dangerouslySetInnerHTML={{
                         __html: aboutUs || 'No description provided.',
                     }}
@@ -24,9 +24,12 @@ export default function ProfileAbout({ aboutUs, vision }: ProfileAboutProps) {
                 <h2 className='text-lg font-bold text-gray-900 mb-4'>
                     Company Vision
                 </h2>
-                <div className='text-sm text-gray-600 leading-relaxed whitespace-pre-line p-6 bg-blue-50/50 rounded-lg border border-blue-100 italic'>
-                    "{vision || 'No vision statement provided.'}"
-                </div>
+                <div
+                    className='text-sm text-gray-700 leading-relaxed whitespace-pre-line p-6 bg-blue-50/50 rounded-lg border border-blue-100 italic'
+                    dangerouslySetInnerHTML={{
+                        __html: vision || 'No vision provided',
+                    }}
+                ></div>
             </section>
         </div>
     );
