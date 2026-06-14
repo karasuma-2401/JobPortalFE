@@ -57,7 +57,7 @@ export default function UserManagementPage() {
                 email: user.email,
                 role: user.roles?.includes('EMPLOYER') ? 'Employer' : 'Candidate',
                 createdAt: user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A',
-                status: user.active ? 'Active' : 'Locked',
+                status: user.banned ? 'Locked' : 'Active',
             }));
 
             setUsers(mapped);

@@ -34,7 +34,8 @@ const normalizeApiError = (error: AxiosApiError): ApiError => {
     };
 };
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+const BASE_URL =
+    import.meta.env.VITE_BACKEND_URL;
 let refreshTokenRequest: Promise<string> | null = null;
 let isRedirectingToLogin = false;
 
@@ -49,10 +50,7 @@ const redirectToLogin = (message?: string) => {
 
     isRedirectingToLogin = true;
     AuthSessionService.clear();
-
-    if (window.location.pathname !== '/login') {
-        window.location.replace('/login');
-    }
+    window.location.replace('/login');
 };
 
 const refreshAccessToken = async () => {
@@ -85,7 +83,7 @@ const refreshAccessToken = async () => {
 
 export const publicApi = axios.create({
     baseURL: BASE_URL,
-    timeout: 10000,
+    timeout: 20000,
 });
 
 publicApi.interceptors.response.use(
@@ -95,7 +93,7 @@ publicApi.interceptors.response.use(
 
 export const privateApi = axios.create({
     baseURL: BASE_URL,
-    timeout: 10000,
+    timeout: 20000,
 });
 privateApi.interceptors.request.use(
     (config) => {
