@@ -26,6 +26,7 @@ import SetupSuccess from './pages/employer/account-setup/SetupSuccess';
 import Overview from './pages/employer/dashboard/Overview';
 import PostJobPricing from './pages/employer/pricing/PostJobPricing';
 import CheckoutPage from './pages/employer/pricing/Checkout';
+import PaymentPending from './pages/employer/pricing/components/PaymentPending';
 import PlansBillingPage from './pages/employer/plans-billing/PlansBillingPage';
 import CreateJobForm from './pages/employer/post-job/CreateJobForm';
 import MyJobsPage from './pages/employer/my-jobs/MyJobsPage';
@@ -150,6 +151,11 @@ const router = createBrowserRouter([
                 path: 'saved-candidates',
                 element: <SavedCandidatesPage />,
             },
+            {
+                path: 'payment-pending',
+                element: <PaymentPending />,
+            },
+
             {
                 path: 'plans-billing',
                 element: <PlansBillingPage />,

@@ -30,19 +30,67 @@ export const useEmployerProfilePageData = () => {
     return useQuery<EmployerProfilePageData>({
         queryKey: ['employerProfilePage'],
         queryFn: async () => {
-            const profileResponse = await EmployerService.getProfile();
-            const profileData = profileResponse as unknown as Record<
-                string,
-                unknown
-            >;
-            const profile =
-                (profileData.data as EmployerProfile) ||
-                (profileResponse as unknown as EmployerProfile);
+            try {
+                const profileResponse = await EmployerService.getProfile();
+                // normalize profile
+                // The API returns the employer profile as a plain object (see API schema).
+                // Normalize: if the response already looks like EmployerProfile use it,
+                // otherwise try to read `data` field as a fallback.
+                const maybeProfile = profileResponse as unknown;
+                let profile: EmployerProfile;
+                if (
+                    maybeProfile &&
+                    typeof maybeProfile === 'object' &&
+                    'companyName' in (maybeProfile as Record<string, unknown>)
+                ) {
+                    profile = maybeProfile as EmployerProfile;
+                } else {
+                    const profileData = maybeProfile as
+                        | Record<string, unknown>
+                        | undefined;
+                    profile =
+                        (profileData?.data as EmployerProfile) ||
+                        (profileResponse as unknown as EmployerProfile);
+                }
 
-            const jobs =
-                (await EmployerService.getRecentJobs()) as JobResponse[];
+                const jobsResponse = await EmployerService.getRecentJobs();
+                // Normalize jobs which might be returned as an array or wrapped in `data`.
+                const rawJobs: unknown = jobsResponse;
+                let jobs: JobResponse[] = [];
 
-            return { profile, jobs };
+                if (Array.isArray(rawJobs)) {
+                    jobs = rawJobs as JobResponse[];
+                } else if (
+                    rawJobs &&
+                    typeof rawJobs === 'object' &&
+                    'data' in (rawJobs as Record<string, unknown>)
+                ) {
+                    const maybeData = (rawJobs as Record<string, unknown>).data;
+                    if (Array.isArray(maybeData))
+                        jobs = maybeData as JobResponse[];
+                }
+
+                if (import.meta.env.DEV) {
+                    console.debug(
+                        'useEmployerProfilePageData: profileResponse=',
+                        profileResponse
+                    );
+                    console.debug(
+                        'useEmployerProfilePageData: jobsResponse=',
+                        jobsResponse
+                    );
+                    console.debug(
+                        'useEmployerProfilePageData: normalized jobs=',
+                        jobs
+                    );
+                }
+
+                return { profile, jobs };
+            } catch (err) {
+                // Log error and rethrow to let react-query handle retries
+                console.error('useEmployerProfilePageData error:', err);
+                throw err;
+            }
         },
     });
 };
