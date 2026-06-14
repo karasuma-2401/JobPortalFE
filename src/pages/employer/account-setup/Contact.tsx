@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import {
+    useNavigate,
+    useLocation,
+    useOutletContext,
+} from 'react-router-dom';
 import { toast } from 'sonner';
 import { ArrowRight, Mail, Loader2 } from 'lucide-react';
 
 import ComboBox, { type OptionType } from '../../../components/ui/ComboBox';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
+import type { SetupFileContext } from '../../../layouts/EmployerSetupLayout';
 
 import { useSetupEmployer } from '../../../hooks/useEmployer';
 import {
@@ -35,6 +40,7 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
     const navigate = useNavigate();
     const location = useLocation();
     const previousState = location.state || {};
+    const context = useOutletContext<SetupFileContext | null>();
 
     const { mutate: setupEmployer, isPending: isSettingUp } =
         useSetupEmployer();
@@ -121,10 +127,12 @@ export default function Contact({ mode = 'setup' }: ContactProps) {
                     }
                 );
             }
-
-            if (previousState.logo) formData.append('logo', previousState.logo);
-            if (previousState.banner)
-                formData.append('banner', previousState.banner);
+            if (context?.setupFiles.logo) {
+                formData.append('logo', context.setupFiles.logo);
+            }
+            if (context?.setupFiles.banner) {
+                formData.append('banner', context.setupFiles.banner);
+            }
 
             setupEmployer(formData);
         } else {
