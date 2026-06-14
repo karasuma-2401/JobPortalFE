@@ -1,10 +1,6 @@
+// src/hooks/useDashboard.ts
 import { useQuery } from '@tanstack/react-query';
 import { EmployerService } from '../services/employerService';
-import type { JobResponse } from '../types/employer';
-
-interface SavedCandidateResponse {
-    id: number;
-}
 
 interface MappedJob {
     id: number;
@@ -18,6 +14,17 @@ interface MappedJob {
 interface DashboardStatistics {
     totalJobs: number;
     totalApplicants: number;
+    totalSavedCandidates: number;
+}
+interface RawJobResponse {
+    id: number;
+    title: string;
+    type?: string;
+    employmentType?: string;
+    daysRemaining?: string;
+    expiresAt?: string;
+    status: string;
+    applicationCount?: number;
 }
 
 const getRemainingDays = (expiresAt: string): string => {
@@ -32,12 +39,11 @@ export const useEmployerDashboard = () => {
     return useQuery({
         queryKey: ['employerDashboard'],
         queryFn: async () => {
-            const [jobsResponse, savedResponse, statsResponse] =
-                await Promise.all([
-                    EmployerService.getRecentJobs(),
-                    EmployerService.getSavedCandidates(),
-                    EmployerService.getStatistics(),
-                ]);
+            const [jobsResponse, statsResponse] = await Promise.all([
+                EmployerService.getRecentJobs({ limit: 5 }),
+                EmployerService.getStatistics(),
+            ]);
+
             const safeJobsRes = jobsResponse as unknown as Record<
                 string,
                 unknown
@@ -45,51 +51,48 @@ export const useEmployerDashboard = () => {
             const jobsData = safeJobsRes?.data as
                 | Record<string, unknown>
                 | undefined;
-
-            const jobsList: JobResponse[] =
-                (jobsData?.items as JobResponse[]) ||
-                (safeJobsRes?.data as JobResponse[]) ||
-                (jobsResponse as JobResponse[]) ||
+            const jobsList: RawJobResponse[] =
+                (jobsData?.items as RawJobResponse[]) ||
+                (safeJobsRes?.data as RawJobResponse[]) ||
+                (jobsResponse as unknown as RawJobResponse[]) ||
                 [];
-
-            const safeSavedRes = savedResponse as unknown as Record<
-                string,
-                unknown
-            >;
-            const savedList: SavedCandidateResponse[] =
-                (safeSavedRes?.data as SavedCandidateResponse[]) || [];
 
             const safeStatsRes = statsResponse as unknown as Record<
                 string,
                 unknown
             >;
             const statsData: DashboardStatistics =
-                (safeStatsRes?.data as DashboardStatistics) || {
-                    totalJobs: 0,
-                    totalApplicants: 0,
-                };
-
+                safeStatsRes && 'totalJobs' in safeStatsRes
+                    ? (safeStatsRes as unknown as DashboardStatistics)
+                    : (safeStatsRes?.data as DashboardStatistics) || {
+                          totalJobs: 0,
+                          totalApplicants: 0,
+                          totalSavedCandidates: 0,
+                      };
             const mappedJobs: MappedJob[] = jobsList.map(
-                (job: JobResponse) => ({
+                (job: RawJobResponse) => ({
                     id: job.id,
                     title: job.title,
-                    type: job.employmentType
-                        ? job.employmentType.replace('_', ' ')
-                        : 'N/A',
-                    remaining: job.expiresAt
-                        ? getRemainingDays(job.expiresAt)
-                        : 'N/A',
+                    type:
+                        job.type ||
+                        (job.employmentType
+                            ? job.employmentType.replace('_', ' ')
+                            : 'N/A'),
+                    remaining:
+                        job.daysRemaining ||
+                        (job.expiresAt
+                            ? getRemainingDays(job.expiresAt)
+                            : 'N/A'),
                     status:
                         job.status === 'OPEN' || job.status === 'ACTIVE'
                             ? 'Active'
                             : 'Expired',
-                    applications: 0,
+                    applications: job.applicationCount || 0,
                 })
             );
 
             return {
                 jobs: mappedJobs,
-                savedCandidates: savedList.length || 0,
                 statistics: statsData,
             };
         },

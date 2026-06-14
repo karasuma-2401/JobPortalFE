@@ -91,7 +91,7 @@ export default function Overview() {
                 />
                 <StatCard
                     title='Saved Candidates'
-                    count={data?.savedCandidates || 0}
+                    count={data?.statistics?.totalSavedCandidates || 0}
                     icon={<BookmarkCheck size={24} />}
                     bgColorClass='bg-warning-50'
                     textColorClass='text-warning-500'
