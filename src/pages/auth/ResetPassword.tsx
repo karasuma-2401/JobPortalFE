@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useVerifyResetPassword } from '../../hooks/useAuth';
-
+import { handleEnterToNext } from '../../utils/formUtils';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import JobLogo from '../../assets/JobLogo.svg';
@@ -62,6 +62,7 @@ export default function ResetPassword() {
                     </p>
 
                     <form
+                        onKeyDown={handleEnterToNext}
                         onSubmit={handleResetPassword}
                         className='flex flex-col gap-5'
                     >
