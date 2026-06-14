@@ -1,4 +1,4 @@
-import { Bookmark, BookmarkMinus, Mail, ArrowRight } from 'lucide-react';
+import { Bookmark, BookmarkMinus, Mail } from 'lucide-react';
 
 interface ModalHeaderProps {
     avatar: string;
@@ -7,7 +7,6 @@ interface ModalHeaderProps {
     isSaved: boolean;
     onToggleSave: () => void;
     onSendMail: () => void;
-    onHire: () => void;
 }
 
 export default function ModalHeader({
@@ -17,7 +16,6 @@ export default function ModalHeader({
     isSaved,
     onToggleSave,
     onSendMail,
-    onHire,
 }: ModalHeaderProps) {
     return (
         <div className='flex flex-col sm:flex-row sm:items-center justify-between p-8 border-b border-gray-100 shrink-0 gap-4'>
@@ -48,17 +46,13 @@ export default function ModalHeader({
                         <BookmarkMinus size={20} />
                     )}
                 </button>
+                
+                {/* Đã đồng bộ UI giống với nút Invite bên CandidateCard */}
                 <button
                     onClick={onSendMail}
-                    className='flex items-center gap-2 px-6 py-2.5 bg-white border border-blue-600 text-blue-600 rounded-md text-sm font-bold hover:bg-blue-50 transition-colors'
+                    className='flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20'
                 >
                     <Mail size={16} /> Send Mail
-                </button>
-                <button
-                    onClick={onHire}
-                    className='flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-md text-sm font-bold hover:bg-blue-700 transition-colors'
-                >
-                    Hire Candidate <ArrowRight size={16} />
                 </button>
             </div>
         </div>

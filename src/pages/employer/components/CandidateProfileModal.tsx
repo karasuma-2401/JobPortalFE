@@ -20,7 +20,6 @@ export default function CandidateProfileModal({
     isOpen,
     onClose,
     candidate,
-    onHire,
     isGeneralSeeker,
 }: CandidateProfileModalProps) {
     const [isSaved, setIsSaved] = useState(true);
@@ -142,6 +141,8 @@ export default function CandidateProfileModal({
                 >
                     <X size={20} />
                 </button>
+                
+                {/* Đã loại bỏ hoàn toàn prop onHire dư thừa ở đây */}
                 <ModalHeader
                     avatar={displayData.avatar}
                     name={displayData.name}
@@ -149,10 +150,6 @@ export default function CandidateProfileModal({
                     isSaved={isSaved}
                     onToggleSave={handleToggleSave}
                     onSendMail={handleSendMail}
-                    onHire={() => {
-                        onHire(candidate.id);
-                        onClose();
-                    }}
                 />
 
                 {isLoading ? (
