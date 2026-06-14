@@ -18,7 +18,7 @@ const socialNetworks: OptionType[] = [
     {
         label: 'LinkedIn',
         icon: <FaLinkedin className='text-blue-700' />,
-        value: 'linkedin',
+        value: 'linkedln',
     },
     {
         label: 'Facebook',
@@ -92,11 +92,11 @@ export default function SocialLinks({ mode = 'setup' }: SocialLinksProps) {
                         network: socialNetworks[2],
                         url: profile.twitterUrl,
                     });
-                if (profile.linkedInUrl)
+                if (profile.linkedlnUrl)
                     initialLinks.push({
                         id: 'li',
                         network: socialNetworks[0],
-                        url: profile.linkedInUrl,
+                        url: profile.linkedlnUrl,
                     });
 
                 if (initialLinks.length === 0)
@@ -178,15 +178,15 @@ export default function SocialLinks({ mode = 'setup' }: SocialLinksProps) {
             const formData = new FormData();
             formData.append('facebookUrl', '');
             formData.append('twitterUrl', '');
-            formData.append('linkedInUrl', '');
+            formData.append('linkedlnUrl', '');
 
             links.forEach((link) => {
                 if (link.network.value === 'facebook')
                     formData.set('facebookUrl', link.url);
                 if (link.network.value === 'twitter')
                     formData.set('twitterUrl', link.url);
-                if (link.network.value === 'linkedin')
-                    formData.set('linkedInUrl', link.url);
+                if (link.network.value === 'linkedln')
+                    formData.set('linkedlnUrl', link.url);
             });
 
             updateProfile(formData);

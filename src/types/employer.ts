@@ -37,7 +37,7 @@ export interface EmployerProfile {
     phone: string;
     facebookUrl?: string;
     twitterUrl?: string;
-    linkedInUrl?: string;
+    linkedlnUrl?: string;
 }
 
 export interface JobResponse {
