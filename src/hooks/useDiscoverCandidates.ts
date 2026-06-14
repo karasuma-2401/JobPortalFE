@@ -3,6 +3,15 @@ import { EmployerService } from '../services/employerService';
 import type { JobSeekerData } from '../types/employer';
 import type { Candidate } from '../types/candidate';
 
+interface DiscoverCandidatesResponse {
+    success?: boolean;
+    message?: string;
+    data?: {
+        items?: JobSeekerData[];
+    };
+    items?: JobSeekerData[];
+}
+
 export const useDiscoverCandidates = (filters: {
     search?: string;
     jobLevel?: string;
@@ -13,7 +22,8 @@ export const useDiscoverCandidates = (filters: {
         queryKey: ['discoverCandidates', filters],
         queryFn: async () => {
             const response = await EmployerService.discoverCandidates(filters);
-            return (response as { data: { items: JobSeekerData[] } }).data;
+            const payload = response as unknown as DiscoverCandidatesResponse;
+            return payload.data ?? payload;
         },
         select: (data) => {
             if (!data?.items) return [];
