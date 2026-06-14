@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { JobPostService } from '../services/jobPostService';
-import type { JobDetail } from '../types/jobPost';
+import type { JobDetail } from '../types/jobpost';
 
 export const useJobDetail = (jobId: string | undefined) => {
     return useQuery({

@@ -12,7 +12,7 @@ interface CandidateCardProps {
     candidate: Candidate;
     isSaved: boolean;
     onToggleSave: (id: string, name: string) => void;
-    onInvite: (name: string) => void;
+    onInvite: (candidate: Candidate) => void;
     onViewProfile?: (candidate: Candidate) => void;
 }
 
@@ -89,7 +89,7 @@ export default function CandidateCard({
                     View Profile
                 </button>
                 <button
-                    onClick={() => onInvite(candidate.name)}
+                    onClick={() => onInvite(candidate)}
                     className='flex-1 py-2.5 flex items-center justify-center gap-2 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20'
                 >
                     <Mail size={16} /> Invite
