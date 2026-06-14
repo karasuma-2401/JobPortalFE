@@ -4,6 +4,7 @@ interface OrderSummarySectionProps {
     planTitle: string;
     planPrice: number;
     isConfirming: boolean;
+    isConfirmEnabled?: boolean;
     onCancel: () => void;
     onConfirmPaid: () => void;
 }
@@ -12,6 +13,7 @@ export default function OrderSummarySection({
     planTitle,
     planPrice,
     isConfirming,
+    isConfirmEnabled = false,
     onCancel,
     onConfirmPaid,
 }: OrderSummarySectionProps) {
@@ -49,7 +51,7 @@ export default function OrderSummarySection({
             <div className='mt-8 flex flex-col gap-3'>
                 <button
                     onClick={onConfirmPaid}
-                    disabled={isConfirming}
+                    disabled={isConfirming || !isConfirmEnabled}
                     className='w-full flex items-center justify-center gap-2 py-3 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed shadow-md shadow-blue-200'
                 >
                     {isConfirming ? (

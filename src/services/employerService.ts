@@ -25,7 +25,10 @@ export const EmployerService = {
 
     getRecentJobs: async () => {
         const response = await privateApi.get('/jobpost');
-        return response.data;
+        // `privateApi` response interceptor returns `response.data` already.
+        // Return the response directly (which is the unwrapped data) and let callers
+        // normalize in case backend wraps results in a `data` field.
+        return response;
     },
 
     getSavedCandidates: async () => {
@@ -37,8 +40,9 @@ export const EmployerService = {
         return response.data;
     },
     discoverCandidates: async (params: Record<string, unknown>) => {
-        const response = await privateApi.get('/job-seeker/discover', { params });
+        const response = await privateApi.get('/job-seeker/discover', {
+            params,
+        });
         return response;
     },
-    
 };

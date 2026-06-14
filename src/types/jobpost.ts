@@ -23,3 +23,12 @@ export interface PagedJobResponse {
     items: JobPostResponse[];
     totalItems: number;
 }
+
+export interface JobDetail extends JobPostResponse {
+    salaryType?: string;
+    jobRole?: string;
+    vacancies?: number;
+    requirements?: string;
+    benefits?: string[];
+    industryIds?: number[];
+}

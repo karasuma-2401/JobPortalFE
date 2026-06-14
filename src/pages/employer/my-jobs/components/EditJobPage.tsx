@@ -1,78 +1,161 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, X, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Save, X } from 'lucide-react';
+import { toast } from 'sonner';
+import RichTextEditor from '../../../../components/ui/RichTextEditor';
+import Input from '../../../../components/ui/Input';
+import CustomDropdown from '../../../../components/ui/DropDown';
+import CustomDatePicker from '../../../../components/ui/DatePicker';
+import TagsInput from '../../../../components/ui/TagsInput';
 import { useJobDetail } from '../../../../hooks/useJobDetail';
 import { useUpdateJob } from '../../../../hooks/useUpdateJob';
-import type { JobDetail } from '../../../../types/jobPost';
+import { useIndustries } from '../../../../hooks/useIndustries';
+import type { JobDetail } from '../../../../types/jobpost';
 
 type UpdateJobMutationFn = (
     variables: { id: string; payload: Record<string, unknown> },
     options?: { onSuccess?: () => void }
 ) => void;
 
+const roleOptions = [
+    { label: 'Designer', value: 'DESIGNER' },
+    { label: 'Developer', value: 'DEVELOPER' },
+    { label: 'Manager', value: 'MANAGER' },
+    { label: 'Marketing', value: 'MARKETING' },
+];
+
+const salaryTypeOptions = [
+    { label: 'Monthly', value: 'MONTHLY' },
+    { label: 'Yearly', value: 'YEARLY' },
+    { label: 'Hourly', value: 'HOURLY' },
+];
+
+const educationOptions = [
+    { label: 'High School', value: 'HIGH_SCHOOL' },
+    { label: 'Associate Degree', value: 'ASSOCIATE' },
+    { label: 'Bachelor Degree', value: 'BACHELOR' },
+    { label: 'Master Degree', value: 'MASTER' },
+    { label: 'Doctorate', value: 'DOCTORATE' },
+];
+
+const experienceOptions = [
+    { label: 'No Experience', value: '0' },
+    { label: '1 Year', value: '1' },
+    { label: '2 Years', value: '2' },
+    { label: '5+ Years', value: '5' },
+];
+
+const jobTypeOptions = [
+    { label: 'Full Time', value: 'FULL_TIME' },
+    { label: 'Part Time', value: 'PART_TIME' },
+    { label: 'Internship', value: 'INTERNSHIP' },
+    { label: 'Contract', value: 'CONTRACT' },
+    { label: 'Temporary', value: 'TEMPORARY' },
+];
+
+const vacanciesOptions = [
+    { label: '1', value: '1' },
+    { label: '2', value: '2' },
+    { label: '5', value: '5' },
+    { label: '10+', value: '10' },
+];
+
+const jobLevelOptions = [
+    { label: 'Intern', value: 'INTERN' },
+    { label: 'Fresher', value: 'FRESHER' },
+    { label: 'Junior', value: 'JUNIOR' },
+    { label: 'Middle', value: 'MIDDLE' },
+    { label: 'Senior', value: 'SENIOR' },
+];
+
 interface JobFormInnerProps {
     job: JobDetail;
     id: string;
     isUpdating: boolean;
+    industryOptions: Array<{ label: string; value: string }>;
     updateJob: UpdateJobMutationFn;
     handleCancel: () => void;
 }
+
 function JobFormInner({
     job,
     id,
     isUpdating,
+    industryOptions,
     updateJob,
     handleCancel,
 }: JobFormInnerProps) {
     const navigate = useNavigate();
+
+    const parseDate = (dStr: string) => (dStr ? new Date(dStr) : null);
+    const formatISO = (date: Date | null) => {
+        if (!date) return '';
+        return date.toISOString();
+    };
+
     const [formData, setFormData] = useState(() => ({
         title: job.title || '',
-        employmentType: job.employmentType || 'FULL_TIME',
-        location: job.location || '',
-        salaryMin: job.salaryMin || 0,
-        salaryMax: job.salaryMax || 0,
-        experience: job.experience || 0,
+        tags: Array.isArray(job.tags) ? job.tags : [],
+        industry:
+            job.industryIds && job.industryIds.length > 0
+                ? String(job.industryIds[0])
+                : '',
+        role: job.jobRole || 'DEVELOPER',
+        minSalary: job.salaryMin ? String(job.salaryMin) : '',
+        maxSalary: job.salaryMax ? String(job.salaryMax) : '',
+        salaryType: job.salaryType || 'MONTHLY',
+        education: job.educationLevel || 'BACHELOR',
+        experience: job.experience ? String(job.experience) : '1',
+        jobType: job.employmentType || 'FULL_TIME',
+        vacancies: job.vacancies ? String(job.vacancies) : '1',
+        expirationDate: job.expiresAt || '',
+        jobLevel: job.jobLevel || 'MIDDLE',
         description: job.description || '',
         requirements: job.requirements || '',
-        benefits: Array.isArray(job.benefits) ? job.benefits.join('\n') : '',
-        skills: Array.isArray(job.skills) ? job.skills.join(', ') : '',
+        location: job.location || '',
     }));
 
-    const handleChange = (
-        e: React.ChangeEvent<
-            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-        >
-    ) => {
-        const { name, value } = e.target;
-        if (
-            name === 'salaryMin' ||
-            name === 'salaryMax' ||
-            name === 'experience'
-        ) {
-            setFormData((prev) => ({
-                ...prev,
-                [name]: value === '' ? 0 : Number(value),
-            }));
-        } else {
-            setFormData((prev) => ({ ...prev, [name]: value }));
-        }
+    const handleChange = (field: string, value: string | string[]) => {
+        setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (
+            !formData.title ||
+            !formData.location ||
+            !formData.expirationDate ||
+            !formData.description ||
+            !formData.tags ||
+            !formData.industry
+        ) {
+            toast.error(
+                'Please fill in all required fields (Title, Location, Industry, Tags, Description, Expiration Date).'
+            );
+            return;
+        }
+
         const payload: Record<string, unknown> = {
-            ...formData,
-            benefits: formData.benefits
-                .split('\n')
-                .map((item) => item.trim())
-                .filter((item) => item !== ''),
-            skills: formData.skills
-                .split(',')
-                .map((item) => item.trim())
-                .filter((item) => item !== ''),
-            educationLevel: 'BACHELOR',
-            jobLevel: 'MIDDLE',
+            title: formData.title,
+            description: formData.description,
+            location: formData.location,
+            industryIds: [Number(formData.industry)],
+            salaryMin: Number(formData.minSalary) || 0,
+            salaryMax: Number(formData.maxSalary) || 0,
+            educationLevel: formData.education,
+            jobLevel: formData.jobLevel,
             status: 'OPEN',
+            experience: Number(formData.experience) || 0,
+            employmentType: formData.jobType,
+            expiresAt: formData.expirationDate,
+            tags: formData.tags,
+            isFeatured: false,
+            isHighlighted: false,
+            jobRole: formData.role,
+            requirements: formData.requirements,
+            vacancies: Number(formData.vacancies) || 1,
+            salaryType: formData.salaryType,
         };
 
         updateJob(
@@ -84,146 +167,231 @@ function JobFormInner({
     };
 
     return (
-        <form
-            onSubmit={handleSubmit}
-            className='bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col gap-8'
-        >
+        <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                 <div className='flex flex-col gap-2'>
-                    <label className='text-sm font-bold text-gray-900'>
-                        Job Title
+                    <label className='text-sm font-semibold text-gray-900'>
+                        Job Title *
                     </label>
-                    <input
+                    <Input
                         type='text'
-                        name='title'
-                        value={formData.title}
-                        onChange={handleChange}
                         required
-                        className='w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-gray-900'
+                        placeholder='Add job title, role, vacancies etc'
+                        value={formData.title}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            handleChange('title', e.target.value)
+                        }
+                    />
+                </div>
+                <div className='flex flex-col gap-2'>
+                    <label className='text-sm font-semibold text-gray-900'>
+                        Location *
+                    </label>
+                    <Input
+                        type='text'
+                        required
+                        placeholder='e.g. Ho Chi Minh City'
+                        value={formData.location}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            handleChange('location', e.target.value)
+                        }
+                    />
+                </div>
+            </div>
+
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                <div className='flex flex-col gap-2'>
+                    <label className='text-sm font-semibold text-gray-900'>
+                        Tags / Skills *
+                    </label>
+                    <TagsInput
+                        value={formData.tags}
+                        onChange={(newTags) => handleChange('tags', newTags)}
+                        placeholder='e.g. React, Nodejs, TypeScript (Press Enter)'
+                    />
+                </div>
+                <div className='flex flex-col gap-2'>
+                    <label className='text-sm font-semibold text-gray-900'>
+                        Job Role
+                    </label>
+                    <CustomDropdown
+                        options={roleOptions}
+                        value={formData.role}
+                        onChange={(val: string) => handleChange('role', val)}
+                    />
+                </div>
+            </div>
+
+            <div className='mt-4'>
+                <h3 className='text-sm font-bold text-gray-900 mb-4'>Salary</h3>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-sm font-medium text-gray-700'>
+                            Min Salary
+                        </label>
+                        <div className='relative'>
+                            <Input
+                                type='number'
+                                placeholder='Minimum salary...'
+                                value={formData.minSalary}
+                                onChange={(
+                                    e: React.ChangeEvent<HTMLInputElement>
+                                ) => handleChange('minSalary', e.target.value)}
+                            />
+                            <span className='absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium'>
+                                USD
+                            </span>
+                        </div>
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-sm font-medium text-gray-700'>
+                            Max Salary
+                        </label>
+                        <div className='relative'>
+                            <Input
+                                type='number'
+                                placeholder='Maximum salary...'
+                                value={formData.maxSalary}
+                                onChange={(
+                                    e: React.ChangeEvent<HTMLInputElement>
+                                ) => handleChange('maxSalary', e.target.value)}
+                            />
+                            <span className='absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium'>
+                                USD
+                            </span>
+                        </div>
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-sm font-medium text-gray-700'>
+                            Salary Type
+                        </label>
+                        <CustomDropdown
+                            options={salaryTypeOptions}
+                            value={formData.salaryType}
+                            onChange={(val: string) =>
+                                handleChange('salaryType', val)
+                            }
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className='mt-4'>
+                <h3 className='text-sm font-bold text-gray-900 mb-4'>
+                    Advance Information
+                </h3>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-sm font-medium text-gray-700'>
+                            Education Level
+                        </label>
+                        <CustomDropdown
+                            options={educationOptions}
+                            value={formData.education}
+                            onChange={(val: string) =>
+                                handleChange('education', val)
+                            }
+                        />
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-sm font-medium text-gray-700'>
+                            Experience
+                        </label>
+                        <CustomDropdown
+                            options={experienceOptions}
+                            value={formData.experience}
+                            onChange={(val: string) =>
+                                handleChange('experience', val)
+                            }
+                        />
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-sm font-medium text-gray-700'>
+                            Employment Type
+                        </label>
+                        <CustomDropdown
+                            options={jobTypeOptions}
+                            value={formData.jobType}
+                            onChange={(val: string) =>
+                                handleChange('jobType', val)
+                            }
+                        />
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-sm font-medium text-gray-700'>
+                            Industry *
+                        </label>
+                        <CustomDropdown
+                            options={industryOptions}
+                            value={formData.industry}
+                            onChange={(val: string) =>
+                                handleChange('industry', val)
+                            }
+                        />
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-sm font-medium text-gray-700'>
+                            Vacancies
+                        </label>
+                        <CustomDropdown
+                            options={vacanciesOptions}
+                            value={formData.vacancies}
+                            onChange={(val: string) =>
+                                handleChange('vacancies', val)
+                            }
+                        />
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-sm font-medium text-gray-700'>
+                            Expiration Date *
+                        </label>
+                        <CustomDatePicker
+                            placeholder='dd/mm/yyyy'
+                            onChange={(date) => {
+                                handleChange('expirationDate', formatISO(date));
+                            }}
+                            selected={parseDate(formData.expirationDate)}
+                        />
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-sm font-medium text-gray-700'>
+                            Job Level
+                        </label>
+                        <CustomDropdown
+                            options={jobLevelOptions}
+                            value={formData.jobLevel}
+                            onChange={(val: string) =>
+                                handleChange('jobLevel', val)
+                            }
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className='mt-4 pt-6 border-t border-gray-100'>
+                <h3 className='text-sm font-bold text-gray-900 mb-4'>
+                    Description & Requirements
+                </h3>
+
+                <div className='mb-6 flex flex-col gap-2'>
+                    <label className='text-sm font-semibold text-gray-900'>
+                        Job Description *
+                    </label>
+                    <RichTextEditor
+                        placeholder='Add your job description...'
+                        value={formData.description}
+                        onChange={(val) => handleChange('description', val)}
                     />
                 </div>
 
                 <div className='flex flex-col gap-2'>
-                    <label className='text-sm font-bold text-gray-900'>
-                        Employment Type
+                    <label className='text-sm font-semibold text-gray-900'>
+                        Job Requirements
                     </label>
-                    <select
-                        name='employmentType'
-                        value={formData.employmentType}
-                        onChange={handleChange}
-                        className='w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-gray-900'
-                    >
-                        <option value='FULL_TIME'>Full Time</option>
-                        <option value='PART_TIME'>Part Time</option>
-                        <option value='INTERNSHIP'>Internship</option>
-                        <option value='CONTRACT'>Contract</option>
-                        <option value='TEMPORARY'>Temporary</option>
-                    </select>
-                </div>
-                <div className='flex flex-col gap-2 md:col-span-2'>
-                    <label className='text-sm font-bold text-gray-900'>
-                        Location
-                    </label>
-                    <input
-                        type='text'
-                        name='location'
-                        value={formData.location}
-                        onChange={handleChange}
-                        required
-                        className='w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-gray-900'
-                    />
-                </div>
-                <div className='flex flex-col gap-2'>
-                    <label className='text-sm font-bold text-gray-900'>
-                        Min Salary (USD)
-                    </label>
-                    <input
-                        type='number'
-                        name='salaryMin'
-                        min='0'
-                        value={formData.salaryMin}
-                        onChange={handleChange}
-                        required
-                        className='w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-gray-900'
-                    />
-                </div>
-                <div className='flex flex-col gap-2'>
-                    <label className='text-sm font-bold text-gray-900'>
-                        Max Salary (USD)
-                    </label>
-                    <input
-                        type='number'
-                        name='salaryMax'
-                        min='0'
-                        value={formData.salaryMax}
-                        onChange={handleChange}
-                        required
-                        className='w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-gray-900'
-                    />
-                </div>
-                <div className='flex flex-col gap-2 md:col-span-2'>
-                    <label className='text-sm font-bold text-gray-900'>
-                        Experience Required (Years)
-                    </label>
-                    <input
-                        type='number'
-                        name='experience'
-                        min='0'
-                        value={formData.experience}
-                        onChange={handleChange}
-                        required
-                        className='w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-gray-900'
-                    />
-                </div>
-                <div className='flex flex-col gap-2 md:col-span-2'>
-                    <label className='text-sm font-bold text-gray-900'>
-                        Required Skills (Comma separated)
-                    </label>
-                    <input
-                        type='text'
-                        name='skills'
-                        value={formData.skills}
-                        onChange={handleChange}
-                        placeholder='e.g. React, Node.js, TypeScript'
-                        className='w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-gray-900'
-                    />
-                </div>
-                <div className='flex flex-col gap-2 md:col-span-2'>
-                    <label className='text-sm font-bold text-gray-900'>
-                        Job Description
-                    </label>
-                    <textarea
-                        name='description'
-                        value={formData.description}
-                        onChange={handleChange}
-                        rows={5}
-                        required
-                        className='w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none text-gray-600 leading-relaxed'
-                    />
-                </div>
-                <div className='flex flex-col gap-2 md:col-span-2'>
-                    <label className='text-sm font-bold text-gray-900'>
-                        Requirements (One per line)
-                    </label>
-                    <textarea
-                        name='requirements'
+                    <RichTextEditor
+                        placeholder='Add your job requirements...'
                         value={formData.requirements}
-                        onChange={handleChange}
-                        rows={5}
-                        required
-                        className='w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none text-gray-600 leading-relaxed'
-                    />
-                </div>
-                <div className='flex flex-col gap-2 md:col-span-2'>
-                    <label className='text-sm font-bold text-gray-900'>
-                        Benefits (One per line)
-                    </label>
-                    <textarea
-                        name='benefits'
-                        value={formData.benefits}
-                        onChange={handleChange}
-                        rows={4}
-                        className='w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none text-gray-600 leading-relaxed'
+                        onChange={(val) => handleChange('requirements', val)}
                     />
                 </div>
             </div>
@@ -257,6 +425,12 @@ function JobFormInner({
 export default function EditJobPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { data: industries = [] } = useIndustries();
+    const industryOptions = industries.map((ind) => ({
+        label: ind.name,
+        value: String(ind.id),
+    }));
+
     const {
         data: job,
         isLoading: isFetching,
@@ -301,7 +475,7 @@ export default function EditJobPage() {
     }
 
     return (
-        <div className='w-full max-w-4xl mx-auto animate-in fade-in duration-500 pb-16'>
+        <div className='w-full max-w-5xl mx-auto animate-in fade-in duration-500 pb-16'>
             <button
                 onClick={handleCancel}
                 disabled={isUpdating}
@@ -314,18 +488,14 @@ export default function EditJobPage() {
                 Back to Job Details
             </button>
 
-            <div className='mb-8'>
-                <h1 className='text-3xl font-bold text-gray-900 mb-2'>
-                    Edit Job Posting
-                </h1>
-                <p className='text-gray-500'>
-                    Update the information for this job listing.
-                </p>
+            <div className='mb-8 border-b border-gray-100 pb-4'>
+                <h1 className='text-2xl font-bold text-gray-900'>Edit Job</h1>
             </div>
             <JobFormInner
                 job={job}
                 id={id || ''}
                 isUpdating={isUpdating}
+                industryOptions={industryOptions}
                 updateJob={updateJob}
                 handleCancel={handleCancel}
             />

@@ -85,7 +85,7 @@ const refreshAccessToken = async () => {
 
 export const publicApi = axios.create({
     baseURL: BASE_URL,
-    timeout: 10000,
+    timeout: 20000,
 });
 
 publicApi.interceptors.response.use(
@@ -95,7 +95,7 @@ publicApi.interceptors.response.use(
 
 export const privateApi = axios.create({
     baseURL: BASE_URL,
-    timeout: 10000,
+    timeout: 20000,
 });
 privateApi.interceptors.request.use(
     (config) => {
