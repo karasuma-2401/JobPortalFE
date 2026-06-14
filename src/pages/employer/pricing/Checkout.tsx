@@ -9,6 +9,13 @@ import {
     useConfirmPayment,
     usePlans,
 } from '../../../hooks/usePayment';
+import type { PaymentResponse } from '../../../types/payment';
+
+type CheckoutResponse = PaymentResponse & {
+    qrCodeUrl?: string;
+    qrImage?: string;
+    paymentId?: number;
+};
 
 export default function CheckoutPage() {
     const [searchParams] = useSearchParams();
@@ -17,6 +24,7 @@ export default function CheckoutPage() {
 
     const [paymentId, setPaymentId] = useState<number | null>(null);
     const [qrCodeString, setQrCodeString] = useState<string | null>(null);
+    const [checkoutError, setCheckoutError] = useState<string | null>(null);
     const isInitiated = useRef(false);
 
     const { data: plans, isLoading: isPlansLoading } = usePlans();
@@ -27,22 +35,48 @@ export default function CheckoutPage() {
     const { mutate: confirmPayment, isPending: isConfirming } =
         useConfirmPayment();
 
+    const canConfirmPayment = Boolean(paymentId);
+
     useEffect(() => {
         if (!isInitiated.current && selectedPlan) {
             isInitiated.current = true;
+
             createCheckout(selectedPlan.id, {
-                onSuccess: (data) => {
-                    setPaymentId(data.id);
-                    setQrCodeString(data.qrCode || null);
-                },
-                onError: (error: unknown) => {
-                    if (error instanceof Error) {
-                        toast.error(error.message);
-                    } else {
-                        toast.error('Failed to initialize payment gateway.');
+                onSuccess: (data: CheckoutResponse) => {
+                    const resolvedQrCode =
+                        data.qrCode ||
+                        data.checkoutUrl ||
+                        data.qrCodeUrl ||
+                        data.qrImage ||
+                        null;
+                    const resolvedPaymentId = data.id ?? data.paymentId ?? null;
+
+                    if (!resolvedPaymentId) {
+                        const message =
+                            'Failed to initialize payment gateway. Payment identifier is missing.';
+                        setCheckoutError(message);
+                        toast.error(message);
+                        return;
                     }
 
-                    navigate('/employer/post-job');
+                    if (!resolvedQrCode) {
+                        const message =
+                            'Payment initialized, but QR image is unavailable. You can still confirm payment after transfer.';
+                        setPaymentId(resolvedPaymentId);
+                        setCheckoutError(message);
+                        return;
+                    }
+
+                    setPaymentId(resolvedPaymentId);
+                    setQrCodeString(resolvedQrCode);
+                },
+                onError: (error: unknown) => {
+                    const message =
+                        error instanceof Error
+                            ? error.message
+                            : 'Failed to initialize payment gateway.';
+                    setCheckoutError(message);
+                    toast.error(message);
                 },
             });
         }
@@ -96,12 +130,16 @@ export default function CheckoutPage() {
                     <X size={20} />
                 </button>
 
-                <PaymentQRSection qrCodeString={qrCodeString} />
+                <PaymentQRSection
+                    qrCodeString={qrCodeString}
+                    error={checkoutError}
+                />
 
                 <OrderSummarySection
                     planTitle={selectedPlan.name}
                     planPrice={selectedPlan.price}
                     isConfirming={isConfirming}
+                    isConfirmEnabled={canConfirmPayment}
                     onCancel={handleCancel}
                     onConfirmPaid={handleConfirmPaid}
                 />

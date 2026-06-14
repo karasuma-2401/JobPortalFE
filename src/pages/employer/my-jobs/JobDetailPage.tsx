@@ -21,7 +21,7 @@ interface JobDetailResponse {
     salaryMax?: number;
     createdAt?: string;
     expiresAt?: string;
-    tags?: string;
+    tags?: string | string[];
     location?: string;
     applicationCount?: number;
     views?: number;
@@ -88,12 +88,14 @@ export default function JobDetailPage() {
         );
     }
 
-    const skillsArray = job.tags
-        ? job.tags
-              .split(',')
-              .map((s) => s.trim())
-              .filter(Boolean)
-        : [];
+    const skillsArray = Array.isArray(job.tags)
+        ? job.tags.filter(Boolean)
+        : job.tags
+          ? job.tags
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean)
+          : [];
 
     return (
         <div className='w-full max-w-7xl mx-auto animate-in fade-in duration-500 pb-16'>

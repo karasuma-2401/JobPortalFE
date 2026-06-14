@@ -18,11 +18,18 @@ interface CustomInputProps {
     className?: string;
 }
 
-const CustomInput = forwardRef<HTMLButtonElement, CustomInputProps>(
+const CustomInput = forwardRef<HTMLDivElement, CustomInputProps>(
     ({ value, onClick, placeholderText, onClear, className = '' }, ref) => (
-        <button
-            type='button'
+        <div
+            role='button'
+            tabIndex={0}
             onClick={onClick}
+            onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    onClick?.();
+                }
+            }}
             ref={ref}
             className={`
         flex items-center justify-between
@@ -72,7 +79,7 @@ const CustomInput = forwardRef<HTMLButtonElement, CustomInputProps>(
                     <X size={16} />
                 </button>
             )}
-        </button>
+        </div>
     )
 );
 

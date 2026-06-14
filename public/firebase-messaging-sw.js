@@ -1,29 +1,31 @@
 importScripts(
-    'https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js'
+    'https://www.gstatic.com/firebasejs/12.14.0/firebase-app-compat.js'
 );
+
 importScripts(
-    'https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js'
+    'https://www.gstatic.com/firebasejs/12.14.0/firebase-messaging-compat.js'
 );
 
-const firebaseConfig = {
-    apiKey: 'AIzaSyCPB9PUYtOFNqihxhCfG_oWTMZn5s8VlMs',
-    authDomain: 'job-portal-fe.firebaseapp.com',
-    projectId: 'job-portal-fe',
-    storageBucket: 'job-portal-fe.firebasestorage.app',
-    messagingSenderId: '1078599347629',
-    appId: '1:1078599347629:web:2457a5533b6bf1b8b14524',
-    measurementId: 'G-38N3HW8GF1',
-};
+firebase.initializeApp({
+    apiKey: 'AIzaSyBqO6cl0NJq37f_s_4_9KkswGajpBcveS8',
+    authDomain: 'jobportal-application.firebaseapp.com',
+    projectId: 'jobportal-application',
+    storageBucket: 'jobportal-application.firebasestorage.app',
+    messagingSenderId: '749328981590',
+    appId: '1:749328981590:web:e60fbe8170d7dc65c0e5f7',
+    measurementId: 'G-EHW86C12R3',
+});
 
-firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] Background message: ', payload);
-    const notificationTitle = payload.notification.title;
-    const notificationOptions = {
-        body: payload.notification.body,
-        icon: '/vite.svg',
-    };
-    self.registration.showNotification(notificationTitle, notificationOptions);
+    console.log('Background Message:', payload);
+
+    self.registration.showNotification(
+        payload.notification?.title || 'Notification',
+        {
+            body: payload.notification?.body,
+            icon: '/favicon.ico',
+        }
+    );
 });

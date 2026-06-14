@@ -13,8 +13,12 @@ export const useCreateJob = () => {
             queryClient.invalidateQueries({ queryKey: ['employerJobs'] });
             toast.success('Job posted successfully!');
         },
-        onError: () => {
-            toast.error('Failed to post job. Please check your inputs.');
+        onError: (error: unknown) => {
+            console.error('Create job error:', error);
+            const errorMessage =
+                (error as Record<string, unknown>)?.message ||
+                'Failed to post job. Please check your inputs.';
+            toast.error(errorMessage as string);
         },
     });
 };
