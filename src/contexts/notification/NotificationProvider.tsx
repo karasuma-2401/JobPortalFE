@@ -19,6 +19,42 @@ import {
 
 import type { NotificationItem } from '../../types/notification';
 
+async function showSystemNotification(payload: {
+    title: string;
+    body: string;
+    icon?: string;
+    image?: string;
+    url?: string;
+}) {
+    if (
+        typeof window === 'undefined' ||
+        !('Notification' in window) ||
+        Notification.permission !== 'granted'
+    ) {
+        return;
+    }
+
+    const options: NotificationOptions = {
+        body: payload.body,
+        icon: payload.icon || payload.image || '/favicon.ico',
+        data: {
+            url: payload.url,
+        },
+    };
+
+    try {
+        if ('serviceWorker' in navigator) {
+            const registration = await navigator.serviceWorker.ready;
+            await registration.showNotification(payload.title, options);
+            return;
+        }
+
+        new Notification(payload.title, options);
+    } catch (error) {
+        console.warn('Unable to show system notification:', error);
+    }
+}
+
 export function NotificationProvider({ children }: { children: ReactNode }) {
     const queryClient = useQueryClient();
     const { user } = useAuth();
@@ -70,12 +106,26 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
         setupFCM();
         const unsubscribe = onMessage(messaging, (payload) => {
+            const title = payload.notification?.title ?? 'New Notification';
+            const message = payload.notification?.body ?? '';
+            const icon = payload.notification?.icon;
+            const image = payload.notification?.image;
+            const targetUrl = (payload.data?.url as string) || undefined;
+
+            void showSystemNotification({
+                title,
+                body: message,
+                icon,
+                image,
+                url: targetUrl,
+            });
+
             const newNotification: NotificationItem = {
                 id: Date.now(),
-                title: payload.notification?.title ?? 'New Notification',
-                message: payload.notification?.body ?? '',
-                icon: payload.notification?.icon || payload.notification?.image,
-                targetUrl: (payload.data?.url as string) || undefined,
+                title,
+                message,
+                icon: icon || image,
+                targetUrl,
                 isRead: false,
                 createdAt: new Date().toISOString(),
             };

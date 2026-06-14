@@ -23,14 +23,12 @@ export async function registerDeviceToken(): Promise<string | null> {
             Notification.permission === 'granted'
                 ? 'granted'
                 : await Notification.requestPermission();
-        console.log(permission)
         if (permission !== 'granted') {
             return null;
         }
 
         const serviceWorkerRegistration =
             await navigator.serviceWorker.register(getServiceWorkerUrl());
-        console.log(VAPID_KEY) 
         return await getToken(messaging, {
             vapidKey: VAPID_KEY,
             serviceWorkerRegistration,
