@@ -83,7 +83,7 @@ export default function PostSuccessModal({
                         Skip Now
                     </button>
                     <button
-                        onClick={() => navigate('/employer/checkout')}
+                        onClick={() => navigate('/employer/my-jobs')}
                         className='flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-md font-bold hover:bg-blue-700 transition-all uppercase tracking-wide text-sm'
                     >
                         Promote Job <ArrowRight size={18} />
