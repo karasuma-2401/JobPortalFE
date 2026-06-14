@@ -9,6 +9,7 @@ interface ConfirmModalProps {
     confirmText?: string;
     cancelText?: string;
     isDanger?: boolean;
+    isLoading?: boolean;
 }
 
 export default function ConfirmModal({
@@ -20,6 +21,7 @@ export default function ConfirmModal({
     confirmText = 'Confirm',
     cancelText = 'Cancel',
     isDanger = false,
+    isLoading = false,
 }: ConfirmModalProps) {
     if (!isOpen) return null;
 
@@ -52,15 +54,17 @@ export default function ConfirmModal({
                         <div className='flex items-center gap-3 justify-end'>
                             <button
                                 onClick={onCancel}
+                                disabled={isLoading}
                                 className='px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors'
                             >
                                 {cancelText}
                             </button>
                             <button
                                 onClick={onConfirm}
-                                className={`px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors ${isDanger ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+                                disabled={isLoading}
+                                className={`px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${isDanger ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
                             >
-                                {confirmText}
+                                {isLoading ? 'Processing...' : confirmText}
                             </button>
                         </div>
                     </div>

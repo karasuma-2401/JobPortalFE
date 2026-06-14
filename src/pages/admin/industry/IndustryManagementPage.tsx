@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { type Industry } from './components/types';
@@ -6,42 +7,31 @@ import IndustryTable from './components/IndustryTable';
 import IndustryModal from './components/IndustryModal';
 import TablePagination from '../../../components/ui/TablePagination';
 import ConfirmModal from '../../../components/ui/ConfirmModal';
+import { AdminService } from '../../../services/adminService';
+import type { IndustryResponse } from '../../../types/admin';
 
-const MOCK_INDUSTRIES: Industry[] = [
-    {
-        id: 'IND-001',
-        name: 'Information Technology',
-        jobCount: 145,
-        createdAt: '2024-01-15',
-    },
-    {
-        id: 'IND-002',
-        name: 'Finance & Banking',
-        jobCount: 89,
-        createdAt: '2024-01-18',
-    },
-    {
-        id: 'IND-003',
-        name: 'Healthcare & Medicine',
-        jobCount: 0,
-        createdAt: '2024-02-10',
-    },
-    {
-        id: 'IND-004',
-        name: 'Education & Training',
-        jobCount: 34,
-        createdAt: '2024-03-05',
-    },
-    {
-        id: 'IND-005',
-        name: 'Marketing & Advertising',
-        jobCount: 56,
-        createdAt: '2024-03-12',
-    },
-];
+const industryQueryKey = ['admin', 'industries'] as const;
+
+const formatDate = (date?: string) => {
+    if (!date) return 'N/A';
+
+    const parsed = new Date(date);
+    if (Number.isNaN(parsed.getTime())) {
+        return date;
+    }
+
+    return parsed.toLocaleDateString();
+};
+
+const mapIndustry = (industry: IndustryResponse): Industry => ({
+    id: String(industry.id),
+    name: industry.name || 'N/A',
+    jobCount: industry.jobCount || 0,
+    createdAt: formatDate(industry.createdAt),
+});
 
 export default function IndustryManagementPage() {
-    const [industries, setIndustries] = useState<Industry[]>(MOCK_INDUSTRIES);
+    const queryClient = useQueryClient();
     const [searchQuery, setSearchQuery] = useState('');
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -55,17 +45,67 @@ export default function IndustryManagementPage() {
         null
     );
 
-    const filteredIndustries = useMemo(() => {
-        return industries.filter((industry) =>
-            industry.name.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-    }, [industries, searchQuery]);
+    const { data, isLoading, isError, error } = useQuery({
+        queryKey: [
+            ...industryQueryKey,
+            {
+                searchQuery,
+                offset: (currentPage - 1) * itemsPerPage,
+                limit: itemsPerPage,
+            },
+        ],
+        queryFn: () =>
+            AdminService.getIndustries({
+                name: searchQuery || undefined,
+                offset: (currentPage - 1) * itemsPerPage,
+                limit: itemsPerPage,
+            }),
+        staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
 
-    const totalPages = Math.ceil(filteredIndustries.length / itemsPerPage);
-    const currentItems = useMemo(() => {
-        const start = (currentPage - 1) * itemsPerPage;
-        return filteredIndustries.slice(start, start + itemsPerPage);
-    }, [filteredIndustries, currentPage, itemsPerPage]);
+    const industries = useMemo<Industry[]>(() => {
+        return (data?.items ?? []).map(mapIndustry);
+    }, [data]);
+
+    const totalItems = data?.totalItems ?? 0;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    const saveIndustryMutation = useMutation({
+        mutationFn: (name: string) => {
+            if (editingIndustry) {
+                return AdminService.updateIndustry(Number(editingIndustry.id), name);
+            }
+
+            return AdminService.createIndustry(name);
+        },
+        onSuccess: () => {
+            toast.success(
+                editingIndustry
+                    ? 'Industry updated successfully'
+                    : 'New industry created successfully'
+            );
+            setIsModalOpen(false);
+            setEditingIndustry(null);
+            queryClient.invalidateQueries({ queryKey: industryQueryKey });
+        },
+        onError: (mutationError: { message?: string }) => {
+            toast.error(mutationError.message || 'Failed to save industry');
+        },
+    });
+
+    const deleteIndustryMutation = useMutation({
+        mutationFn: (industry: Industry) =>
+            AdminService.deleteIndustry(Number(industry.id)),
+        onSuccess: () => {
+            toast.success('Industry deleted successfully');
+            setDeletingIndustry(null);
+            queryClient.invalidateQueries({ queryKey: industryQueryKey });
+        },
+        onError: (mutationError: { message?: string }) => {
+            toast.error(mutationError.message || 'Failed to delete industry');
+        },
+    });
 
     const handleOpenAddModal = () => {
         setEditingIndustry(null);
@@ -77,40 +117,13 @@ export default function IndustryManagementPage() {
     };
 
     const handleSubmitForm = (name: string) => {
-        if (editingIndustry) {
-            setIndustries((prev) =>
-                prev.map((industry) =>
-                    industry.id === editingIndustry.id
-                        ? { ...industry, name }
-                        : industry
-                )
-            );
-            toast.success('Industry updated successfully');
-        } else {
-            const newIndustry: Industry = {
-                id: `IND-00${industries.length + 1}`,
-                name,
-                jobCount: 0,
-                createdAt: new Date().toISOString().split('T')[0],
-            };
-            setIndustries([newIndustry, ...industries]);
-            toast.success('New industry created successfully');
-        }
+        saveIndustryMutation.mutate(name);
     };
 
     const handleDeleteConfirm = () => {
         if (!deletingIndustry) return;
 
-        if (deletingIndustry.jobCount > 0) {
-            toast.error(
-                `Cannot delete "${deletingIndustry.name}". It is currently linked to ${deletingIndustry.jobCount} jobs.`
-            );
-        } else {
-            setIndustries((prev) =>
-                prev.filter((industry) => industry.id !== deletingIndustry.id)
-            );
-            toast.success('Industry delete successfully');
-        }
+        deleteIndustryMutation.mutate(deletingIndustry);
     };
     return (
         <div className='animate-in fade-in duration-500 h-full flex flex-col'>
@@ -142,17 +155,31 @@ export default function IndustryManagementPage() {
                             type='text'
                             placeholder='Search industries...'
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                setCurrentPage(1);
+                            }}
                             className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white shadow-sm'
                         />
                     </div>
                 </div>
 
-                <IndustryTable
-                    industries={currentItems}
-                    onEdit={handleOpenEditModal}
-                    onDelete={setDeletingIndustry}
-                />
+                {isLoading ? (
+                    <div className='flex-1 flex items-center justify-center p-12'>
+                        <div className='w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin'></div>
+                    </div>
+                ) : isError ? (
+                    <div className='flex-1 flex items-center justify-center p-12 text-sm text-red-600'>
+                        {(error as { message?: string })?.message ||
+                            'Failed to load industries.'}
+                    </div>
+                ) : (
+                    <IndustryTable
+                        industries={industries}
+                        onEdit={handleOpenEditModal}
+                        onDelete={setDeletingIndustry}
+                    />
+                )}
 
                 <TablePagination
                     currentPage={currentPage}
@@ -183,6 +210,7 @@ export default function IndustryManagementPage() {
                 onConfirm={handleDeleteConfirm}
                 onCancel={() => setDeletingIndustry(null)}
                 confirmText='Delete Industry'
+                isLoading={deleteIndustryMutation.isPending}
                 isDanger={true}
             />
         </div>
