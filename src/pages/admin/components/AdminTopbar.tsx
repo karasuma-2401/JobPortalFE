@@ -7,50 +7,62 @@ import {
     Activity,
     CreditCard,
     ChevronRight,
+    LayoutDashboard,
+    BriefcaseBusiness,
+    Building2,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import avatar from '../../../assets/sulkyunggu.jpg';
 import NotificationBell from '../../../components/ui/NotificationBell';
 import useAuth from '../../../contexts/auth/useAuth';
-const globalSearchData = [
+
+const adminSearchLinks = [
     {
-        id: 1,
-        type: 'User',
-        title: 'Ronald Richards',
-        subtitle: 'ronald@example.com',
+        id: 'dashboard',
+        type: 'Page',
+        title: 'Dashboard',
+        subtitle: 'Admin overview and metrics',
+        icon: LayoutDashboard,
+        path: '/admin/dashboard',
+    },
+    {
+        id: 'users',
+        type: 'Page',
+        title: 'User Management',
+        subtitle: 'Manage platform users',
         icon: User,
         path: '/admin/users',
     },
     {
-        id: 2,
-        type: 'User',
-        title: 'Theresa Webb',
-        subtitle: 'theresa@example.com',
-        icon: User,
-        path: '/admin/users',
+        id: 'employers',
+        type: 'Page',
+        title: 'Employer Approvals',
+        subtitle: 'Review employer profiles',
+        icon: Building2,
+        path: '/admin/employer-approvals',
     },
     {
-        id: 3,
-        type: 'Transaction',
-        title: 'Payment #INV-492',
-        subtitle: '$240.00 from TechCorp',
+        id: 'payments',
+        type: 'Page',
+        title: 'Payment Management',
+        subtitle: 'Review employer transactions',
         icon: CreditCard,
         path: '/admin/payments',
     },
     {
-        id: 4,
-        type: 'Transaction',
-        title: 'Payment #INV-512',
-        subtitle: '$1,200.00 from StudioZ',
-        icon: CreditCard,
-        path: '/admin/payments',
+        id: 'industries',
+        type: 'Page',
+        title: 'Industry Management',
+        subtitle: 'Manage job categories',
+        icon: BriefcaseBusiness,
+        path: '/admin/industry',
     },
     {
-        id: 5,
-        type: 'Log',
-        title: 'System Security Update',
-        subtitle: 'Deployed v2.4.1',
+        id: 'audit-logs',
+        type: 'Page',
+        title: 'Audit Logs',
+        subtitle: 'View system audit history',
         icon: Activity,
         path: '/admin/audit-logs',
     },
@@ -64,7 +76,9 @@ export default function AdminTopbar() {
     const profileRef = useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
+    const displayName = user?.name || user?.email || 'Admin';
+    const displayEmail = user?.email || 'N/A';
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -104,7 +118,7 @@ export default function AdminTopbar() {
     };
 
     const searchResults = searchQuery
-        ? globalSearchData.filter(
+        ? adminSearchLinks.filter(
               (item) =>
                   item.title
                       .toLowerCase()
@@ -129,7 +143,7 @@ export default function AdminTopbar() {
                             setIsSearchOpen(true);
                         }}
                         onFocus={() => searchQuery && setIsSearchOpen(true)}
-                        placeholder='Search globally (Transactions, Users, Logs)...'
+                        placeholder='Search admin pages...'
                         className='bg-transparent border-none outline-none ml-2 w-full text-sm text-gray-700 placeholder:text-gray-400'
                     />
                 </div>
@@ -139,7 +153,7 @@ export default function AdminTopbar() {
                         {searchResults.length > 0 ? (
                             <div className='py-2'>
                                 <div className='px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50'>
-                                    Search Results ({searchResults.length})
+                                    Admin Pages ({searchResults.length})
                                 </div>
                                 <div className='max-h-[60vh] overflow-y-auto'>
                                     {searchResults.map((result) => {
@@ -213,10 +227,10 @@ export default function AdminTopbar() {
                     >
                         <div className='text-right hidden sm:block'>
                             <p className='text-sm font-bold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors'>
-                                Super Admin
+                                {displayName}
                             </p>
                             <p className='text-xs text-gray-500'>
-                                admin@system.com
+                                {displayEmail}
                             </p>
                         </div>
                         <img
@@ -230,10 +244,10 @@ export default function AdminTopbar() {
                         <div className='absolute right-0 top-full mt-3 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100'>
                             <div className='px-4 py-3 border-b border-gray-100'>
                                 <p className='text-sm font-bold text-gray-900'>
-                                    Super Admin
+                                    {displayName}
                                 </p>
                                 <p className='text-xs text-gray-500 mt-0.5'>
-                                    admin@system.com
+                                    {displayEmail}
                                 </p>
                             </div>
 

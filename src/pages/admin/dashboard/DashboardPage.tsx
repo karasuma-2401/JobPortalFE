@@ -40,7 +40,7 @@ export default function DashboardPage() {
                     Dashboard Overview
                 </h1>
                 <p className='text-sm text-gray-500 mt-1'>
-                    Welcome back, Super Admin! Here's what's happening today.
+                    Here's what's happening today.
                 </p>
             </div>
 

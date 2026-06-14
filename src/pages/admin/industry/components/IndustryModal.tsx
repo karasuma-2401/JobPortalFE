@@ -16,6 +16,7 @@ export default function IndustryModal({
     initialData,
 }: IndustryModalProps) {
     const [name, setName] = useState(initialData?.name || '');
+
     if (!isOpen) return null;
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -26,6 +27,7 @@ export default function IndustryModal({
     };
 
     const isEditMode = !!initialData;
+
     return (
         <div className='fixed inset-0 z-100 flex items-center justify-center p-4'>
             <div
@@ -53,8 +55,7 @@ export default function IndustryModal({
                 <form onSubmit={handleSubmit}>
                     <div className='mb-6'>
                         <label className='block text-sm font-bold text-gray-700 mb-2'>
-                            Industry Name{' '}
-                            <span className='text-red-500'>*</span>
+                            Industry Name <span className='text-red-500'>*</span>
                         </label>
                         <input
                             type='text'

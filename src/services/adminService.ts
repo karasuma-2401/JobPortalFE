@@ -8,7 +8,7 @@ import type {
     EmployerProfileResponse,
     IndustryResponse,
     AuditLogResponse,
-    SpringPage,
+    PaymentResponse,
 } from '../types/admin';
 // Page Response wrappers
 
@@ -19,7 +19,7 @@ export const AdminService = {
     },
 
     // 2. Users
-   getUsers: async (params: {
+    getUsers: async (params: {
     search?: string;
     role?: string;
     active?: boolean;
@@ -36,6 +36,18 @@ export const AdminService = {
             page: pageData?.page || 0,
             size: pageData?.size || 10
         };
+    },
+
+    toggleUserLock: async (id: number): Promise<UserResponse> => {
+        const response = await privateApi.put(`/admin/users/${id}/lock`) as unknown as BackendResponseEnvelope<UserResponse>;
+
+        return response.data;
+    },
+
+    deactivateUser: async (id: number): Promise<UserResponse> => {
+        const response = await privateApi.delete(`/admin/users/${id}`) as unknown as BackendResponseEnvelope<UserResponse>;
+
+        return response.data;
     },
 
 // 3. Employers
@@ -74,7 +86,18 @@ export const AdminService = {
         offset: number;
         limit: number;
     }): Promise<PageResponse<IndustryResponse>> => {
-        return privateApi.get("/industry", { params });
+        const response = await privateApi.get("/industry", {
+            params,
+        }) as unknown as BackendResponseEnvelope<FlexiblePageData<IndustryResponse>>;
+
+        const pageData = response.data;
+
+        return {
+            items: pageData?.items || pageData?.content || [],
+            totalItems: pageData?.totalItems || pageData?.totalElements || 0,
+            page: pageData?.page || pageData?.number || 0,
+            size: pageData?.size || params.limit,
+        };
     },
 
     createIndustry: async (name: string): Promise<IndustryResponse> => {
@@ -108,14 +131,29 @@ export const AdminService = {
         status?: string;
         page: number;
         size: number;
-    }): Promise<SpringPage<PaymentResponse>> => {
-        return privateApi.get("/admin/payments", { params });
+    }): Promise<PageResponse<PaymentResponse>> => {
+        const response = await privateApi.get("/admin/payments", {
+            params,
+        }) as unknown as BackendResponseEnvelope<FlexiblePageData<PaymentResponse>>;
+
+        const pageData = response.data;
+
+        return {
+            items: pageData?.items || pageData?.content || [],
+            totalItems: pageData?.totalItems || pageData?.totalElements || 0,
+            page: pageData?.page || pageData?.number || 0,
+            size: pageData?.size || params.size,
+        };
     },
 
     updatePaymentStatus: async (
         id: number,
         status: string
-    ): Promise<PaymentResponse> => {
+    ): Promise<unknown> => {
+        if (status === 'COMPLETED') {
+            return privateApi.post(`/admin/payments/approve/${id}`);
+        }
+
         return privateApi.patch(`/payments/${id}/status`, null, { params: { status } });
     }
 };

@@ -1,6 +1,17 @@
 import { Search, Filter } from 'lucide-react';
 import CustomDropdown from '../../../../components/ui/DropDown';
-import { JOB_CATEGORIES, EXPERIENCE_LEVELS } from '../mockData';
+
+const JOB_CATEGORIES = [
+    'All',
+    'Entry Level',
+    'Junior',
+    'Mid Level',
+    'Senior',
+    'Lead',
+    'Manager',
+];
+
+const EXPERIENCE_LEVELS = ['All', '0-2 Years', '3-5 Years', '5+ Years'];
 
 interface FilterSidebarProps {
     searchQuery: string;
