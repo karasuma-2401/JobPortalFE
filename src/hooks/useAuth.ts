@@ -29,10 +29,9 @@ export const useLogin = () => {
             let tokens;
             try {
                 const deviceToken = await registerDeviceToken();
-                console.log('Device Token nhan duo la: ', deviceToken);
                 tokens = await AuthService.login({
                     ...payload,
-                    ...(deviceToken ? { deviceToken } : {}),
+                    ...(deviceToken ? { fcmToken: deviceToken } : {}),
                 });
             } catch (err) {
                 const apiError = err as ApiError;
