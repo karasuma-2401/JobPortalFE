@@ -6,7 +6,7 @@ import { useRequestPasswordReset } from '../../hooks/useAuth';
 
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import GoogleLogo from '../../assets/GooogleLogo.svg';
+import GoogleLogo from '../../assets/GoogleLogo.svg';
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState('');

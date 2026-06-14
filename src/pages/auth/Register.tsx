@@ -5,9 +5,10 @@ import { toast } from 'sonner';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import ComboBox, { type OptionType } from '../../components/ui/ComboBox';
-import GoogleLogo from '../../assets/GooogleLogo.svg';
+import GoogleLogo from '../../assets/GoogleLogo.svg';
 import type { RegisterRequest } from '../../types/auth';
 import { useRegister } from '../../hooks/useAuth';
+import TermsModal from '../../components/TermsModal';
 
 const accountTypes = [
     { label: 'Employers', value: 'EMPLOYER' },
@@ -19,6 +20,9 @@ export default function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+
+    const [isAgreed, setIsAgreed] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { mutate: registerUser, isPending } = useRegister();
 
@@ -32,6 +36,10 @@ export default function Register() {
 
         if (password !== confirmPassword) {
             toast.error('Confirm password does not match');
+            return;
+        }
+        if (!isAgreed) {
+            toast.error('You must agree to the Terms of services to register.');
             return;
         }
 
@@ -93,21 +101,25 @@ export default function Register() {
                         setConfirmPassword(e.target.value)
                     }
                 />
-
                 <label className='flex items-start gap-2 cursor-pointer text-gray-600 -mt-1'>
                     <input
                         type='checkbox'
                         className='w-4 h-4 mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
-                        required
+                        checked={isAgreed}
+                        onChange={(e) => setIsAgreed(e.target.checked)}
                     />
                     <span className='text-sm'>
                         I've read and agree with your{' '}
-                        <Link
-                            to='#'
+                        <button
+                            type='button'
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setIsModalOpen(true);
+                            }}
                             className='text-blue-600 font-medium hover:underline'
                         >
                             Terms of services
-                        </Link>
+                        </button>
                     </span>
                 </label>
 
@@ -139,6 +151,11 @@ export default function Register() {
                     Sign in with Google
                 </Button>
             </div>
+
+            <TermsModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            />
         </div>
     );
 }
