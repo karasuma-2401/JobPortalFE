@@ -2,6 +2,7 @@ export interface JobPostResponse {
     id: string | number;
     title: string;
     description?: string;
+    type?: string;           // employment type string (e.g. "Full-Time")
     employmentType?: string;
     status?: string;
     educationLevel?: string;
@@ -13,6 +14,7 @@ export interface JobPostResponse {
     location?: string;
     createdAt?: string;
     expiresAt?: string;
+    daysRemaining?: string;  // pre-computed string from backend (e.g. "5 days remaining")
     isFeatured?: boolean;
     isHighlighted?: boolean;
     applicationCount?: number;

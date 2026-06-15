@@ -6,32 +6,13 @@ import JobQuickStats from './components/JobQuickStats';
 import JobMainContent from './components/JobContent';
 import JobSidebar from './components/JobSidebar';
 import PromoteJobModal from './components/PromoteJobModal';
-import { useJobDetail } from '../../../hooks/useJobDetail';
+import { useJobForEdit } from '../../../hooks/useJobForEdit';
 import JobDetailSkeleton from './components/JobDetailSkeleton';
-interface JobDetailResponse {
-    id?: string | number;
-    title?: string;
-    description?: string;
-    employmentType?: string;
-    status?: string;
-    educationLevel?: string;
-    experience?: number;
-    jobLevel?: string;
-    salaryMin?: number;
-    salaryMax?: number;
-    createdAt?: string;
-    expiresAt?: string;
-    tags?: string | string[];
-    location?: string;
-    applicationCount?: number;
-    views?: number;
-}
 
 export default function JobDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { data, isLoading, isError } = useJobDetail(id);
-    const job = data as JobDetailResponse | undefined;
+    const { data: job, isLoading, isError } = useJobForEdit(id);
 
     const [promoteModalData, setPromoteModalData] = useState({
         isOpen: false,
@@ -88,14 +69,39 @@ export default function JobDetailPage() {
         );
     }
 
+    // Parse tags — backend trả về string[] từ for-edit endpoint
     const skillsArray = Array.isArray(job.tags)
-        ? job.tags.filter(Boolean)
-        : job.tags
-          ? job.tags
+        ? (job.tags as string[]).filter(Boolean)
+        : typeof job.tags === 'string'
+          ? (job.tags as string)
                 .split(',')
                 .map((s) => s.trim())
                 .filter(Boolean)
           : [];
+
+    // Parse requirements — backend trả về string, hiển thị theo dòng
+    const requirementsArray =
+        typeof job.requirements === 'string' && job.requirements
+            ? job.requirements
+                  .split('\n')
+                  .map((r) => r.trim())
+                  .filter(Boolean)
+            : [];
+
+    // Format salary
+    const salaryDisplay =
+        job.salaryMin != null && job.salaryMax != null
+            ? `$${Number(job.salaryMin).toLocaleString()} - $${Number(job.salaryMax).toLocaleString()}`
+            : 'Negotiable';
+
+    // Format expiration date
+    const expirationDisplay = job.expiresAt
+        ? new Date(job.expiresAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+          })
+        : 'N/A';
 
     return (
         <div className='w-full max-w-7xl mx-auto animate-in fade-in duration-500 pb-16'>
@@ -112,32 +118,20 @@ export default function JobDetailPage() {
             <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
                 <div className='lg:col-span-2 flex flex-col gap-8'>
                     <JobQuickStats
-                        salary={
-                            job.salaryMin && job.salaryMax
-                                ? `$${job.salaryMin} - $${job.salaryMax}`
-                                : 'Negotiable'
-                        }
+                        salary={salaryDisplay}
                         experience={
-                            job.experience
+                            job.experience != null
                                 ? `${job.experience}+ Years`
                                 : 'Not specified'
                         }
-                        postedDate={
-                            job.createdAt
-                                ? new Date(job.createdAt).toLocaleDateString()
-                                : 'N/A'
-                        }
-                        expirationDate={
-                            job.expiresAt
-                                ? new Date(job.expiresAt).toLocaleDateString()
-                                : 'N/A'
-                        }
+                        postedDate='—'
+                        expirationDate={expirationDisplay}
                     />
                     <JobMainContent
                         description={
                             job.description || 'No description available.'
                         }
-                        requirements={[]}
+                        requirements={requirementsArray}
                         benefits={[]}
                     />
                 </div>
