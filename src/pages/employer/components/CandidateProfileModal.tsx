@@ -1,8 +1,11 @@
 import { X, Download, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { useCandidateProfile } from '../../../hooks/useCandidateProfile';
 import type { Candidate } from '../../../types/candidate';
+
+// Giữ nguyên 2 file tách biệt như cấu trúc folder của bạn
+import { useCandidateProfile } from '../../../hooks/useCandidateProfile';
+import { useSeekerProfileById } from '../../../hooks/useSeekerProfileById';
 
 import ModalHeader from './ModalHeader';
 import { BiographySection, PersonalStatsCard } from './CandidateInfoSections';
@@ -26,10 +29,15 @@ export default function CandidateProfileModal({
 }: CandidateProfileModalProps) {
     const [isSaved, setIsSaved] = useState(true);
 
-    // Gọi hook truyền vào ID của lượt ứng tuyển (ép về kiểu number)
-    const { data: profile, isLoading } = useCandidateProfile(
+    const { data: appProfile, isLoading: isAppLoading } = useCandidateProfile(
         isOpen && candidate && !isGeneralSeeker ? Number(candidate.id) : null
+    );  
+      
+    const { data: seekerProfile, isLoading: isSeekerLoading } = useSeekerProfileById(  
+        isOpen && candidate && isGeneralSeeker ? Number(candidate.id) : null  
     );
+
+    const isLoading = isAppLoading || isSeekerLoading;
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -41,47 +49,28 @@ export default function CandidateProfileModal({
 
     if (!isOpen || !candidate) return null;
 
-    // Rút trích gọn đối tượng profile tránh viết lặp lại dài dòng
-    const seeker = profile?.jobSeekerProfile;
+    const seeker = isGeneralSeeker ? seekerProfile : appProfile?.jobSeekerProfile;
 
-    // Mapping chính xác 100% dựa vào JSON Schema thực tế của bạn
     const displayData = {
         name: seeker?.fullName || candidate.name,
         role: seeker?.professionalTitle || candidate.role || 'Candidate',
-        biography:
-            seeker?.biography ||
-            candidate.biography ||
-            'No biography provided.',
-        coverLetter:
-            profile?.coverLetter ||
-            candidate.coverLetter ||
-            'No cover letter provided.',
+        biography: seeker?.biography || candidate.biography || 'No biography provided.',
+        coverLetter: appProfile?.coverLetter || candidate.coverLetter || 'No cover letter provided.',
         dateOfBirth: seeker?.dateOfBirth
             ? new Date(seeker.dateOfBirth).toLocaleDateString()
             : candidate.dateOfBirth,
-        nationality:
-            seeker?.nationality || candidate.nationality || 'Not specified',
-        maritalStatus:
-            seeker?.maritalStatus || candidate.maritalStatus || 'Not specified',
+        nationality: seeker?.nationality || candidate.nationality || 'Not specified',
+        maritalStatus: seeker?.maritalStatus || candidate.maritalStatus || 'Not specified',
         gender: seeker?.gender || candidate.gender || 'Not specified',
-        experience:
-            seeker?.experienceSummary ||
-            candidate.experience ||
-            'Not specified',
-        education:
-            seeker?.educationSummary || candidate.education || 'Not specified',
+        experience: seeker?.experienceSummary || candidate.experience || 'Not specified',
+        education: seeker?.educationSummary || candidate.education || 'Not specified',
         website: seeker?.website || candidate.website,
         location: seeker?.address || candidate.location || 'Not specified',
         phone: seeker?.phone || candidate.phone || 'Not specified',
-        secondaryPhone:
-            seeker?.secondaryPhone ||
-            candidate.secondaryPhone ||
-            'Not specified',
+        secondaryPhone: seeker?.secondaryPhone || candidate.secondaryPhone || 'Not specified',
         email: seeker?.email || candidate.email,
-        avatar:
-            seeker?.avatar ||
-            candidate.avatar ||
-            `https://ui-avatars.com/api/?name=${(seeker?.fullName || candidate.name).replace(' ', '+')}&background=f3f4f6&color=4b5563`,
+        avatar: seeker?.avatar || candidate.avatar || 
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(seeker?.fullName || candidate.name)}&background=f3f4f6&color=4b5563`,
         social: {
             facebook: seeker?.facebookUrl || candidate.social?.facebook,
             twitter: seeker?.twitterUrl || candidate.social?.twitter,
@@ -91,11 +80,7 @@ export default function CandidateProfileModal({
 
     const handleToggleSave = () => {
         setIsSaved(!isSaved);
-        toast.info(
-            isSaved
-                ? `${displayData.name} removed from saved list.`
-                : `${displayData.name} bookmarked!`
-        );
+        toast.info(isSaved ? `${displayData.name} removed.` : `${displayData.name} bookmarked!`);
     };
 
     const handleSendMail = () => {
@@ -103,40 +88,29 @@ export default function CandidateProfileModal({
             onInviteCandidate(candidate);
             return;
         }
-
-        const subject = encodeURIComponent(
-            `Interview Invitation: ${displayData.role}`
-        );
-        const body = encodeURIComponent(
-            `Hi ${displayData.name},\n\nWe would like to invite you to an interview...`
-        );
+        const subject = encodeURIComponent(`Interview Invitation: ${displayData.role}`);
+        const body = encodeURIComponent(`Hi ${displayData.name},\n\nWe would like to invite you...`);
         window.location.href = `mailto:${displayData.email}?subject=${subject}&body=${body}`;
         toast.success(`Opening email composer...`);
     };
 
-    // Tải tệp CV thật từ hệ thống bằng fileUrl nhận từ đối tượng resume
     const handleDownloadCV = () => {
-        if (profile?.resume?.fileUrl) {
-            window.open(profile.resume.fileUrl, '_blank');
-            toast.success(`Opening ${displayData.name}'s official resume...`);
+        if (appProfile?.resume?.fileUrl) {
+            window.open(appProfile.resume.fileUrl, '_blank');
+            toast.success(`Opening official resume...`);
             return;
         }
-
-        // Phương án dự phòng tự xuất file text dạng PDF nếu bản ghi trống file cứng
         const dummyContent = `RESUME\n\nName: ${displayData.name}\nRole: ${displayData.role}`;
         const blob = new Blob([dummyContent], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute(
-            'download',
-            `${displayData.name.replace(/\s+/g, '_')}_Resume.pdf`
-        );
+        link.setAttribute('download', `${displayData.name.replace(/\s+/g, '_')}_Resume.pdf`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-        toast.success(`Downloading generated profile file...`);
+        toast.success(`Downloading profile file...`);
     };
 
     return (
@@ -149,7 +123,6 @@ export default function CandidateProfileModal({
                     <X size={20} />
                 </button>
                 
-                {/* Đã loại bỏ hoàn toàn prop onHire dư thừa ở đây */}
                 <ModalHeader
                     avatar={displayData.avatar}
                     name={displayData.name}

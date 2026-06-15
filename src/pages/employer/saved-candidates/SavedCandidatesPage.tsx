@@ -121,6 +121,7 @@ export default function SavedCandidatesPage() {
             <CandidateProfileModal
                 isOpen={!!selectedCandidateId}
                 onClose={() => setSelectedCandidateId(null)}
+                isGeneralSeeker={true}  
                 candidate={selectedCandidate}
                 onHire={handleHireCandidate}
             />
