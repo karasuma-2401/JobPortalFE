@@ -116,9 +116,9 @@ export interface JobFilterParams {
     jobTypes?: string[];
     education?: string[];
     jobLevel?: string;
+    sortBy?: string;
     page: number;
     limit: number;
-    sortBy?: string;
 }
 
 export interface EmployerFilterParams {

@@ -17,7 +17,7 @@ export default function JobList({
   savedJobIds, 
   onToggleSave, 
   onJobDoubleClick,
-  onApplyClick // bóc tách prop tại đây
+  onApplyClick 
 }: JobListProps) {
   
   if (viewMode === "grid") {
@@ -34,6 +34,7 @@ export default function JobList({
             salary={job.salary}
             daysRemaining={job.daysRemaining} 
             isFeatured={job.isFeatured}
+            isHighlighted={job.isHighlighted}
             onDoubleClick={() => onJobDoubleClick(job.id)}
           />
         ))}
@@ -54,6 +55,7 @@ export default function JobList({
           salary={job.salary}
           timeStatus={job.daysRemaining}
           isFeatured={job.isFeatured}
+          isHighlighted={job.isHighlighted} 
           isBookmarked={savedJobIds.includes(String(job.id))}
           onBookmarkClick={onToggleSave}
           onDoubleClick={() => onJobDoubleClick(job.id)}

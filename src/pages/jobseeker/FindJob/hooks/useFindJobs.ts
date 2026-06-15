@@ -10,6 +10,9 @@ export function useFindJobs() {
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
+    
+    const [sortBy, setSortBy] = useState<string>('LATEST');
+
     const [searchKeyword, setSearchKeyword] = useState('');
     const [locationKeyword, setLocationKeyword] = useState('');
     const [category, setCategory] = useState('');
@@ -45,6 +48,7 @@ export function useFindJobs() {
                 jobLevel: filterParams.jobLevel,
                 page: currentPage,
                 limit: itemsPerPage,
+                sortBy: sortBy, 
             });
             setJobs(data.items);
             setTotalCount(data.totalItems);
@@ -53,7 +57,7 @@ export function useFindJobs() {
         } finally {
             setLoading(false);
         }
-    }, [currentPage, filterParams, itemsPerPage]);
+    }, [currentPage, filterParams, itemsPerPage, sortBy]);
 
     const loadSavedIds = useCallback(async () => {
         try {
@@ -114,6 +118,9 @@ export function useFindJobs() {
         setEducation([]);
         setJobLevel('');
         setCurrentPage(1);
+        
+        setSortBy('latest'); 
+
         setFilterParams({
             keyword: '',
             location: '',
@@ -168,5 +175,8 @@ export function useFindJobs() {
         handleSearch,
         handlePageChange,
         handleToggleSave,
+
+        sortBy,
+        setSortBy,
     };
 }

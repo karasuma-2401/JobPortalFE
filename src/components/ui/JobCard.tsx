@@ -9,6 +9,7 @@ interface JobCardProps {
   salary: string;
   daysRemaining: string; 
   isFeatured?: boolean;
+  isHighlighted?: boolean; 
   onDoubleClick?: () => void;
 }
 
@@ -20,14 +21,15 @@ export default function JobCard({
   type,
   salary,
   daysRemaining,
-  isFeatured,
+  isFeatured = false,
+  isHighlighted = false, 
   onDoubleClick 
 }: JobCardProps) {
   return (
     <div 
       onDoubleClick={onDoubleClick} 
       className={`group border rounded-xl p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:border-primary-500 cursor-pointer h-full ${
-        isFeatured 
+        isHighlighted 
           ? "bg-[#FDF8F4] border-[#FFEAD8]" 
           : "bg-white border-gray-100"
       }`}
@@ -45,6 +47,7 @@ export default function JobCard({
               <span className="text-[14px] font-semibold text-gray-800 truncate">
                 {companyName}
               </span>
+
               {isFeatured && (
                 <span className="bg-[#FFEEEC] text-[#FF4F4F] text-[11px] font-medium px-2 py-0.5 rounded">
                   FEATURED
