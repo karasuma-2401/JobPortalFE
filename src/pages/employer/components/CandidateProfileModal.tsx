@@ -26,7 +26,6 @@ export default function CandidateProfileModal({
 }: CandidateProfileModalProps) {
     const [isSaved, setIsSaved] = useState(true);
 
-    // Gọi hook truyền vào ID của lượt ứng tuyển (ép về kiểu number)
     const { data: profile, isLoading } = useCandidateProfile(
         isOpen && candidate && !isGeneralSeeker ? Number(candidate.id) : null
     );
@@ -40,11 +39,7 @@ export default function CandidateProfileModal({
     }, [isOpen, onClose]);
 
     if (!isOpen || !candidate) return null;
-
-    // Rút trích gọn đối tượng profile tránh viết lặp lại dài dòng
     const seeker = profile?.jobSeekerProfile;
-
-    // Mapping chính xác 100% dựa vào JSON Schema thực tế của bạn
     const displayData = {
         name: seeker?.fullName || candidate.name,
         role: seeker?.professionalTitle || candidate.role || 'Candidate',
