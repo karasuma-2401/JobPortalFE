@@ -1,7 +1,6 @@
 interface JobMainContentProps {
     description: string;
     requirements: string[];
-    benefits: string[];
 }
 
 export default function JobMainContent({
@@ -13,7 +12,12 @@ export default function JobMainContent({
             <h3 className='text-lg font-bold text-gray-900 mb-4'>
                 Job Description
             </h3>
-            <p className='text-gray-600 leading-relaxed mb-8'>{description}</p>
+            <p
+                className='text-gray-600 leading-relaxed mb-8'
+                dangerouslySetInnerHTML={{
+                    __html: description || 'No description provided',
+                }}
+            />
 
             <h3 className='text-lg font-bold text-gray-900 mb-4'>
                 Requirements
@@ -25,7 +29,10 @@ export default function JobMainContent({
                         className='flex items-start gap-3 text-gray-600'
                     >
                         <div className='w-1.5 h-1.5 rounded-full bg-blue-600 mt-2 shrink-0' />
-                        <span className='leading-relaxed'>{req}</span>
+                        <div
+                            className='leading-relaxed flex-1'
+                            dangerouslySetInnerHTML={{ __html: req }}
+                        />
                     </li>
                 ))}
             </ul>
