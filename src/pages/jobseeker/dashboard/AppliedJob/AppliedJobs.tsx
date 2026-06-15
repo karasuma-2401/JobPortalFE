@@ -62,7 +62,7 @@ export default function AppliedJobsPage() {
                             {appliedJobs.map((job) => (
                                 <AppliedJobItem
                                     key={job.id}
-                                    jobPostId={job.jobPostId}
+                                    jobPostId={job.id}
                                     id={job.id}
                                     logo={job.logo}
                                     role={job.role}

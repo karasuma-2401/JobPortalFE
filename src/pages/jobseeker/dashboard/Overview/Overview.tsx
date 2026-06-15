@@ -15,7 +15,7 @@ export default function OverviewPage() {
     selectedJobId,
     setSelectedJobId,
   } = useDashboardOverview();
-
+  console.log("=== KIỂM TRA DỮ LIỆU RECENT APPLIED ===", recentApplied);
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
@@ -77,6 +77,7 @@ export default function OverviewPage() {
         ) : (
           <>
             <JobTableHeader />
+            
             <div className="flex flex-col gap-3">
               {recentApplied.map((job) => (
                 <AppliedJobItem
@@ -85,7 +86,7 @@ export default function OverviewPage() {
                   logo={job.logo}
                   role={job.role}
                   type={job.type}
-                  jobPostId={job.jobPostId}
+                  jobPostId={job.id}
                   location={job.location}
                   salary={job.salary}
                   dateApplied={job.appliedAt}
