@@ -1,5 +1,10 @@
 import { useEffect, useMemo } from 'react';
-import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import {
+    Navigate,
+    useNavigate,
+    useParams,
+    useSearchParams,
+} from 'react-router-dom';
 import { toast } from 'sonner';
 import {
     ArrowRight,
@@ -29,32 +34,42 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
     const [searchParams, setSearchParams] = useSearchParams();
     const { user, isJobSeeker } = useAuth();
     const resolvedJobId = jobId || params.jobId || '';
-  
-    const { jobData, relatedJobs, loading, error, isSaved, handleToggleSave, handleApplySubmit } =
-        useJobDetail(resolvedJobId);
-    
-    const descriptionParagraphs = useMemo(() => {
-        const description = jobData?.description;
-        if (!description) return [];
 
-        if (typeof description === 'string') {
-            return description.split('\n').filter((p) => p.trim() !== '');
-        }
-        return Array.isArray(description) ? description : [];
-    }, [jobData?.description]);
+    const {
+        jobData,
+        relatedJobs,
+        loading,
+        error,
+        isSaved,
+        handleToggleSave,
+        handleApplySubmit,
+    } = useJobDetail(resolvedJobId);
 
-    const requirementsItems = useMemo(() => {
-        if (!jobData) return [];
-        
-        const extendedJobData = jobData as unknown as { responsibilities?: string | string[] };
-        const rawRequirements = jobData.requirements || extendedJobData.responsibilities;
+    // const descriptionParagraphs = useMemo(() => {
+    //     const description = jobData?.description;
+    //     if (!description) return [];
 
-        if (!rawRequirements) return [];
-        if (typeof rawRequirements === 'string') {
-            return rawRequirements.split('\n').filter((p) => p.trim() !== '');
-        }
-        return Array.isArray(rawRequirements) ? rawRequirements : [];
-    }, [jobData]);
+    //     if (typeof description === 'string') {
+    //         return description.split('\n').filter((p) => p.trim() !== '');
+    //     }
+    //     return Array.isArray(description) ? description : [];
+    // }, [jobData?.description]);
+
+    // const requirementsItems = useMemo(() => {
+    //     if (!jobData) return [];
+
+    //     const extendedJobData = jobData as unknown as {
+    //         responsibilities?: string | string[];
+    //     };
+    //     const rawRequirements =
+    //         jobData.requirements || extendedJobData.responsibilities;
+
+    //     if (!rawRequirements) return [];
+    //     if (typeof rawRequirements === 'string') {
+    //         return rawRequirements.split('\n').filter((p) => p.trim() !== '');
+    //     }
+    //     return Array.isArray(rawRequirements) ? rawRequirements : [];
+    // }, [jobData]);
 
     const shouldAutoOpenApply = useMemo(
         () => searchParams.get('apply') === 'true',
@@ -107,7 +122,14 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
             toast.info('Complete your seeker profile before applying.');
             navigate('/jobseeker/setup', { replace: true });
         }
-    }, [isJobSeeker, navigate, resolvedJobId, setSearchParams, shouldAutoOpenApply, user]);
+    }, [
+        isJobSeeker,
+        navigate,
+        resolvedJobId,
+        setSearchParams,
+        shouldAutoOpenApply,
+        user,
+    ]);
 
     if (!resolvedJobId) {
         return <Navigate to='/find-job' replace />;
@@ -164,12 +186,16 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
                                     <LinkIcon size={15} />
                                     <span>{jobData.website}</span>
                                 </a>
-                                <span className='hidden text-gray-300 sm:inline'>|</span>
+                                <span className='hidden text-gray-300 sm:inline'>
+                                    |
+                                </span>
                                 <span className='flex items-center gap-1.5'>
                                     <Phone size={15} />
                                     <span>{jobData.phone}</span>
                                 </span>
-                                <span className='hidden text-gray-300 sm:inline'>|</span>
+                                <span className='hidden text-gray-300 sm:inline'>
+                                    |
+                                </span>
                                 <span className='flex items-center gap-1.5'>
                                     <Mail size={15} />
                                     <span>{jobData.email}</span>
@@ -183,7 +209,9 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
                             <button
                                 onClick={async () => {
                                     if (!user) {
-                                        savePostAuthRedirect(`/job/${resolvedJobId}`);
+                                        savePostAuthRedirect(
+                                            `/job/${resolvedJobId}`
+                                        );
                                         navigate('/login', { replace: true });
                                         return;
                                     }
@@ -231,22 +259,34 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
                             <h3 className='mb-3.5 text-[18px] font-bold text-gray-900'>
                                 Job Description
                             </h3>
-                            {descriptionParagraphs.map((paragraph, index) => (
+                            {/* {descriptionParagraphs.map((paragraph, index) => (
                                 <p key={index} className='mb-4'>
                                     {paragraph}
                                 </p>
-                            ))}
+                            ))} */}
+                            <div
+                                className='prose max-w-none text-gray-600'
+                                dangerouslySetInnerHTML={{
+                                    __html:
+                                        jobData.description ||
+                                        'No description provided',
+                                }}
+                            />
                         </div>
 
                         <div className='mt-2'>
                             <h3 className='mb-3.5 text-[18px] font-bold text-gray-900'>
                                 Responsibilities & Requirements
                             </h3>
-                            <ul className='flex list-disc flex-col gap-2.5 pl-5 text-gray-600'>
-                                {requirementsItems.map((item, index) => (
-                                    <li key={index}>{item}</li>
-                                ))}
-                            </ul>
+                            <div
+                                className='prose max-w-none text-gray-600'
+                                dangerouslySetInnerHTML={{
+                                    __html: Array.isArray(jobData.requirements)
+                                        ? jobData.requirements.join('')
+                                        : jobData.requirements ||
+                                          'No requirements provided',
+                                }}
+                            />
                         </div>
 
                         <div className='mt-6 flex items-center gap-3 border-t border-gray-150 pt-6'>
@@ -254,7 +294,10 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
                                 Share this job:
                             </span>
                             <button className='flex items-center gap-1.5 rounded-md border border-blue-100 px-3 py-1.5 text-[13px] font-medium text-blue-600 transition-colors hover:bg-blue-50'>
-                                <FaFacebook size={14} className='fill-current' />
+                                <FaFacebook
+                                    size={14}
+                                    className='fill-current'
+                                />
                                 Facebook
                             </button>
                             <button className='flex items-center gap-1.5 rounded-md border border-sky-100 px-3 py-1.5 text-[13px] font-medium text-sky-500 transition-colors hover:bg-sky-50'>
@@ -280,14 +323,18 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
                 <div className='border-t border-gray-100 pt-8'>
                     <JobGridSection
                         title='Related Jobs'
-                        jobs={relatedJobs} 
+                        jobs={relatedJobs}
                         onJobDoubleClick={(id) => navigate(`/job/${id}`)}
                     />
                 </div>
             </div>
 
             <ApplyJobModal
-                isOpen={shouldAutoOpenApply && Boolean(user?.hasProfile) && isJobSeeker}
+                isOpen={
+                    shouldAutoOpenApply &&
+                    Boolean(user?.hasProfile) &&
+                    isJobSeeker
+                }
                 onClose={() => setSearchParams({}, { replace: true })}
                 jobTitle={jobData.title}
                 onSubmit={handleApplySubmit}
