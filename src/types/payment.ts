@@ -20,4 +20,7 @@ export interface PlanResponse {
     priority: number;
     duration: number;
     maxJobPostsPerMonth: number;
+    maxResumeAccess: number;
+    allowHighlight: boolean;
+    featureDurationDays: number;
 }

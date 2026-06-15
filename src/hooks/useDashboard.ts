@@ -1,4 +1,3 @@
-// src/hooks/useDashboard.ts
 import { useQuery } from '@tanstack/react-query';
 import { EmployerService } from '../services/employerService';
 
@@ -9,6 +8,8 @@ interface MappedJob {
     remaining: string;
     status: string;
     applications: number;
+    isFeatured: boolean;
+    isHighlighted: boolean;
 }
 
 interface DashboardStatistics {
@@ -16,6 +17,7 @@ interface DashboardStatistics {
     totalApplicants: number;
     totalSavedCandidates: number;
 }
+
 interface RawJobResponse {
     id: number;
     title: string;
@@ -25,6 +27,15 @@ interface RawJobResponse {
     expiresAt?: string;
     status: string;
     applicationCount?: number;
+    isFeatured?: boolean;
+    isHighlighted?: boolean;
+}
+
+interface RecentJobsData {
+    items: RawJobResponse[];
+    totalItems: number;
+    page: number;
+    size: number;
 }
 
 const getRemainingDays = (expiresAt: string): string => {
@@ -39,36 +50,19 @@ export const useEmployerDashboard = () => {
     return useQuery({
         queryKey: ['employerDashboard'],
         queryFn: async () => {
-            const [jobsResponse, statsResponse] = await Promise.all([
-                EmployerService.getRecentJobs({ limit: 5 }),
-                EmployerService.getStatistics(),
+            const [jobsData, statsData] = await Promise.all([
+                EmployerService.getRecentJobs<RecentJobsData>({ limit: 5 }),
+                EmployerService.getStatistics<DashboardStatistics>(),
             ]);
 
-            const safeJobsRes = jobsResponse as unknown as Record<
-                string,
-                unknown
-            >;
-            const jobsData = safeJobsRes?.data as
-                | Record<string, unknown>
-                | undefined;
-            const jobsList: RawJobResponse[] =
-                (jobsData?.items as RawJobResponse[]) ||
-                (safeJobsRes?.data as RawJobResponse[]) ||
-                (jobsResponse as unknown as RawJobResponse[]) ||
-                [];
+            const jobsList: RawJobResponse[] = jobsData?.items || [];
 
-            const safeStatsRes = statsResponse as unknown as Record<
-                string,
-                unknown
-            >;
-            const statsData: DashboardStatistics =
-                safeStatsRes && 'totalJobs' in safeStatsRes
-                    ? (safeStatsRes as unknown as DashboardStatistics)
-                    : (safeStatsRes?.data as DashboardStatistics) || {
-                          totalJobs: 0,
-                          totalApplicants: 0,
-                          totalSavedCandidates: 0,
-                      };
+            const stats: DashboardStatistics = statsData || {
+                totalJobs: 0,
+                totalApplicants: 0,
+                totalSavedCandidates: 0,
+            };
+
             const mappedJobs: MappedJob[] = jobsList.map(
                 (job: RawJobResponse) => ({
                     id: job.id,
@@ -88,12 +82,14 @@ export const useEmployerDashboard = () => {
                             ? 'Active'
                             : 'Expired',
                     applications: job.applicationCount || 0,
+                    isFeatured: job.isFeatured || false,
+                    isHighlighted: job.isHighlighted || false,
                 })
             );
 
             return {
                 jobs: mappedJobs,
-                statistics: statsData,
+                statistics: stats,
             };
         },
     });

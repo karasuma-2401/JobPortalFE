@@ -70,10 +70,14 @@ export default function PostJobPricing() {
                             isRecommended={plan.priority === 1}
                             features={[
                                 `Post up to ${plan.maxJobPostsPerMonth} Jobs`,
-                                'Urgents & Featured Jobs',
-                                'Highlights Job with Colors',
-                                'Access & Saved Candidates',
-                                `${plan.duration} Days Resume Visibility`,
+                                `Access up to ${plan.maxResumeAccess} Resumes`,
+                                plan.allowHighlight
+                                    ? 'Highlights Job with Colors'
+                                    : 'Standard Job Display',
+                                plan.featureDurationDays > 0
+                                    ? `Featured on Top for ${plan.featureDurationDays} Days`
+                                    : 'No Featured Status',
+                                `${plan.duration} Days Plan Duration`,
                                 '24/7 Critical Support',
                             ]}
                             onChoose={() => handleChoosePlan(plan.id)}

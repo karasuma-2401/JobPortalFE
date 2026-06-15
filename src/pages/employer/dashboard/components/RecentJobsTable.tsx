@@ -4,12 +4,10 @@ import {
     MoreVertical,
     CheckCircle2,
     XCircle,
-    ArrowUpCircle,
     Eye,
     XSquare,
-    Users, // Import thêm icon Users ở đây
+    Users,
 } from 'lucide-react';
-import Button from '../../../../components/ui/Button';
 
 export interface Job {
     id: number;
@@ -18,12 +16,13 @@ export interface Job {
     remaining: string;
     status: string;
     applications: number;
+    isFeatured: boolean;
+    isHighlighted: boolean;
 }
 
 interface RecentJobsTableProps {
     jobs: Job[];
     onViewApplications: (jobId: number) => void;
-    onPromote: (jobId: number) => void;
     onViewDetail: (jobId: number) => void;
     onMarkExpired: (jobId: number) => void;
 }
@@ -31,7 +30,6 @@ interface RecentJobsTableProps {
 export default function RecentJobsTable({
     jobs,
     onViewApplications,
-    onPromote,
     onViewDetail,
     onMarkExpired,
 }: RecentJobsTableProps) {
@@ -53,7 +51,10 @@ export default function RecentJobsTable({
     }, []);
 
     return (
-        <div className='bg-white border border-gray-200 rounded-xl mt-8'>
+        <div
+            className='bg-white border border-gray-200 rounded-xl mt-8 overflow-hidden'
+            ref={tableRef}
+        >
             <div className='flex items-center justify-between p-6 border-b border-gray-100'>
                 <h3 className='text-lg font-bold text-gray-900'>
                     Recently Posted Jobs
@@ -66,119 +67,131 @@ export default function RecentJobsTable({
                 </Link>
             </div>
 
-            <div className='overflow-x-auto' ref={tableRef}>
+            <div className='overflow-x-auto'>
                 <table className='w-full text-left border-collapse'>
                     <thead>
-                        <tr className='bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider'>
-                            <th className='px-6 py-4 rounded-tl-xl'>JOBS</th>
+                        <tr className='bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100'>
+                            <th className='px-6 py-4'>JOBS</th>
                             <th className='px-6 py-4'>STATUS</th>
                             <th className='px-6 py-4'>APPLICATIONS</th>
-                            <th className='px-6 py-4 rounded-tr-xl'>ACTIONS</th>
+                            <th className='px-6 py-4'>ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody className='divide-y divide-gray-100'>
-                        {jobs.map((job) => (
-                            <tr
-                                key={job.id}
-                                className='hover:bg-gray-50/50 transition-colors group'
-                            >
-                                <td className='px-6 py-4'>
-                                    <p className='font-semibold text-gray-900 mb-1'>
-                                        {job.title}
-                                    </p>
-                                    <p className='text-xs text-gray-500'>
-                                        {job.type} &bull; {job.remaining}
-                                    </p>
-                                </td>
+                        {jobs.map((job) => {
+                            const rowClass = job.isHighlighted
+                                ? 'bg-amber-50/50 hover:bg-amber-100/50 border-l-4 border-l-amber-400 transition-colors group'
+                                : 'hover:bg-blue-50/30 border-l-4 border-l-transparent transition-colors group';
 
-                                <td className='px-6 py-4'>
-                                    {/* Bọc Border, Background và chỉnh bo góc cho Status Badge */}
-                                    {job.status === 'Active' ? (
-                                        <span className='inline-flex items-center gap-1.5 px-3 py-1 rounded-md border bg-success-50 border-success-200 text-sm font-medium text-success-700'>
-                                            <CheckCircle2 size={16} />{' '}
-                                            {job.status}
-                                        </span>
-                                    ) : (
-                                        <span className='inline-flex items-center gap-1.5 px-3 py-1 rounded-md border bg-danger-50 border-danger-200 text-sm font-medium text-danger-700'>
-                                            <XCircle size={16} /> {job.status}
-                                        </span>
-                                    )}
-                                </td>
+                            return (
+                                <tr key={job.id} className={rowClass}>
+                                    <td className='px-6 py-4'>
+                                        <div className='flex items-center gap-2 mb-1'>
+                                            <p className='font-semibold text-gray-900'>
+                                                {job.title}
+                                            </p>
+                                            {job.isFeatured && (
+                                                <span className='px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 rounded border border-blue-200'>
+                                                    Featured
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className='text-xs text-gray-500'>
+                                            {job.type} &bull; {job.remaining}
+                                        </p>
+                                    </td>
 
-                                <td className='px-6 py-4'>
-                                    <span className='flex items-center gap-2 text-sm font-medium text-gray-600'>
-                                        {/* Thay thế emoji bằng icon Users */}
-                                        <Users
-                                            size={18}
-                                            className='text-gray-400'
-                                        />{' '}
-                                        {job.applications} Applications
-                                    </span>
-                                </td>
-
-                                <td className='px-6 py-4'>
-                                    <div className='flex items-center gap-3 relative'>
-                                        <Button
-                                            variant='social'
-                                            className='bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white px-4 py-2 font-semibold'
-                                            onClick={() =>
-                                                onViewApplications(job.id)
-                                            }
-                                        >
-                                            View Applications
-                                        </Button>
-
-                                        <button
-                                            onClick={() =>
-                                                setOpenDropdownId(
-                                                    openDropdownId === job.id
-                                                        ? null
-                                                        : job.id
-                                                )
-                                            }
-                                            className='p-2 text-gray-400 hover:bg-gray-100 rounded-md transition-colors'
-                                        >
-                                            <MoreVertical size={20} />
-                                        </button>
-
-                                        {openDropdownId === job.id && (
-                                            <div className='absolute right-0 top-12 z-50 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 animate-in fade-in zoom-in-95'>
-                                                <button
-                                                    onClick={() => {
-                                                        onPromote(job.id);
-                                                        setOpenDropdownId(null);
-                                                    }}
-                                                    className='w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors'
-                                                >
-                                                    <ArrowUpCircle size={16} />{' '}
-                                                    Promote Job
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        onViewDetail(job.id);
-                                                        setOpenDropdownId(null);
-                                                    }}
-                                                    className='w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors'
-                                                >
-                                                    <Eye size={16} /> View
-                                                    Detail
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        onMarkExpired(job.id);
-                                                        setOpenDropdownId(null);
-                                                    }}
-                                                    className='w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-danger-50 hover:text-danger-600 transition-colors'
-                                                >
-                                                    <XSquare size={16} /> Mark
-                                                    as expired
-                                                </button>
-                                            </div>
+                                    <td className='px-6 py-4'>
+                                        {job.status === 'Active' ? (
+                                            <span className='inline-flex items-center gap-1.5 px-3 py-1 rounded-md border bg-green-50 border-green-200 text-sm font-medium text-green-700'>
+                                                <CheckCircle2 size={16} />{' '}
+                                                {job.status}
+                                            </span>
+                                        ) : (
+                                            <span className='inline-flex items-center gap-1.5 px-3 py-1 rounded-md border bg-red-50 border-red-200 text-sm font-medium text-red-700'>
+                                                <XCircle size={16} />{' '}
+                                                {job.status}
+                                            </span>
                                         )}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
+                                    </td>
+
+                                    <td className='px-6 py-4'>
+                                        <span className='flex items-center gap-2 text-sm font-medium text-gray-600'>
+                                            <Users
+                                                size={18}
+                                                className='text-gray-400'
+                                            />
+                                            {job.applications} Applications
+                                        </span>
+                                    </td>
+
+                                    <td className='px-6 py-4'>
+                                        <div className='flex items-center gap-3 relative'>
+                                            <button
+                                                onClick={() =>
+                                                    onViewApplications(job.id)
+                                                }
+                                                className='bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-4 py-2 font-semibold text-sm rounded-md transition-colors'
+                                            >
+                                                View Applications
+                                            </button>
+
+                                            <button
+                                                onClick={() =>
+                                                    setOpenDropdownId(
+                                                        openDropdownId ===
+                                                            job.id
+                                                            ? null
+                                                            : job.id
+                                                    )
+                                                }
+                                                className='p-2 text-gray-400 hover:bg-gray-100 rounded-md transition-colors'
+                                            >
+                                                <MoreVertical size={20} />
+                                            </button>
+
+                                            {openDropdownId === job.id && (
+                                                <div className='absolute right-0 top-12 z-50 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 animate-in fade-in zoom-in-95'>
+                                                    <button
+                                                        onClick={() => {
+                                                            onViewDetail(
+                                                                job.id
+                                                            );
+                                                            setOpenDropdownId(
+                                                                null
+                                                            );
+                                                        }}
+                                                        className='w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors'
+                                                    >
+                                                        <Eye size={16} /> View
+                                                        Detail
+                                                    </button>
+                                                    {job.status ===
+                                                        'Active' && (
+                                                        <button
+                                                            onClick={() => {
+                                                                onMarkExpired(
+                                                                    job.id
+                                                                );
+                                                                setOpenDropdownId(
+                                                                    null
+                                                                );
+                                                            }}
+                                                            className='w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors'
+                                                        >
+                                                            <XSquare
+                                                                size={16}
+                                                            />{' '}
+                                                            Mark as expired
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
