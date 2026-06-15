@@ -1,11 +1,11 @@
-import { useState } from 'react';
+// import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import JobDetailHeader from './components/JobDetailHeader';
 import JobQuickStats from './components/JobQuickStats';
 import JobMainContent from './components/JobContent';
 import JobSidebar from './components/JobSidebar';
-import PromoteJobModal from './components/PromoteJobModal';
+// import PromoteJobModal from './components/PromoteJobModal';
 import { useJobDetail } from '../../../hooks/useJobDetail';
 import JobDetailSkeleton from './components/JobDetailSkeleton';
 interface JobDetailResponse {
@@ -33,11 +33,11 @@ export default function JobDetailPage() {
     const { data, isLoading, isError } = useJobDetail(id);
     const job = data as JobDetailResponse | undefined;
 
-    const [promoteModalData, setPromoteModalData] = useState({
-        isOpen: false,
-        jobId: '',
-        jobTitle: '',
-    });
+    // const [promoteModalData, setPromoteModalData] = useState({
+    //     isOpen: false,
+    //     jobId: '',
+    //     jobTitle: '',
+    // });
 
     const handleBack = () => navigate('/employer/my-jobs');
 
@@ -54,19 +54,19 @@ export default function JobDetailPage() {
         if (job?.id) navigate(`/employer/applications?jobId=${job.id}`);
     };
 
-    const handlePromote = () => {
-        if (job)
-            setPromoteModalData({
-                isOpen: true,
-                jobId: String(job.id),
-                jobTitle: job.title || '',
-            });
-    };
+    // const handlePromote = () => {
+    //     if (job)
+    //         setPromoteModalData({
+    //             isOpen: true,
+    //             jobId: String(job.id),
+    //             jobTitle: job.title || '',
+    //         });
+    // };
 
-    const handleConfirmPromote = (plan: string) => {
-        toast.success(`Successfully promoted job as ${plan.toUpperCase()}`);
-        setPromoteModalData({ isOpen: false, jobId: '', jobTitle: '' });
-    };
+    // const handleConfirmPromote = (plan: string) => {
+    //     toast.success(`Successfully promoted job as ${plan.toUpperCase()}`);
+    //     setPromoteModalData({ isOpen: false, jobId: '', jobTitle: '' });
+    // };
 
     if (isLoading) {
         return <JobDetailSkeleton />;
@@ -147,18 +147,18 @@ export default function JobDetailPage() {
                     views={job.views || 0}
                     skills={skillsArray}
                     onViewApplications={handleViewApplications}
-                    onPromote={handlePromote}
+                    // onPromote={handlePromote}
                 />
             </div>
 
-            <PromoteJobModal
+            {/* <PromoteJobModal
                 isOpen={promoteModalData.isOpen}
                 jobTitle={promoteModalData.jobTitle}
                 onClose={() =>
                     setPromoteModalData((prev) => ({ ...prev, isOpen: false }))
                 }
                 onConfirm={handleConfirmPromote}
-            />
+            /> */}
         </div>
     );
 }

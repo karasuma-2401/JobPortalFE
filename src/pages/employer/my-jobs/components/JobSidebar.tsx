@@ -1,11 +1,11 @@
-import { Users, Eye, TrendingUp } from 'lucide-react';
+import { Users, Eye } from 'lucide-react';
 
 interface JobSidebarProps {
     applications: number;
     views: number;
     skills: string[];
     onViewApplications: () => void;
-    onPromote: () => void;
+    // onPromote: () => void;
 }
 
 export default function JobSidebar({
@@ -13,7 +13,7 @@ export default function JobSidebar({
     views,
     skills,
     onViewApplications,
-    onPromote,
+    // onPromote,
 }: JobSidebarProps) {
     return (
         <div className='lg:col-span-1 flex flex-col gap-6'>
@@ -68,7 +68,7 @@ export default function JobSidebar({
                 </div>
             </div>
 
-            <div className='bg-linear-to-br from-blue-600 to-blue-800 rounded-2xl shadow-md p-6 text-white relative overflow-hidden'>
+            {/* <div className='bg-linear-to-br from-blue-600 to-blue-800 rounded-2xl shadow-md p-6 text-white relative overflow-hidden'>
                 <div className='relative z-10'>
                     <div className='w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm mb-4'>
                         <TrendingUp size={24} className='text-white' />
@@ -89,7 +89,7 @@ export default function JobSidebar({
                 </div>
                 <div className='absolute -bottom-8 -right-8 w-32 h-32 bg-white/10 rounded-full blur-2xl'></div>
                 <div className='absolute -top-8 -left-8 w-24 h-24 bg-white/10 rounded-full blur-xl'></div>
-            </div>
+            </div> */}
         </div>
     );
 }

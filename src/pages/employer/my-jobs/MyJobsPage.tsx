@@ -1,8 +1,8 @@
+// src/pages/employer/my-jobs/MyJobsPage.tsx
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MyJobsTable, { type JobItem } from './components/MyJobsTable';
 import Pagination from '../../../components/ui/Pagination';
-import PromoteJobModal from './components/PromoteJobModal';
 import CustomDropdown from '../../../components/ui/DropDown';
 
 import { useEmployerJobs } from '../../../hooks/useEmployerJobs';
@@ -23,27 +23,18 @@ export default function MyJobsPage() {
     const [filter, setFilter] = useState<string>('All Jobs');
     const [currentPage, setCurrentPage] = useState(1);
 
-    const [promoteModalData, setPromoteModalData] = useState<{
-        isOpen: boolean;
-        jobId: string;
-        jobTitle: string;
-    }>({
-        isOpen: false,
-        jobId: '',
-        jobTitle: '',
-    });
     const { data: jobData, isLoading } = useEmployerJobs(
         filter,
         currentPage,
         ITEMS_PER_PAGE
     );
-    const { promoteJob, expireJob } = useJobActions();
+    const { expireJob } = useJobActions();
 
     const mappedJobs: JobItem[] = useMemo(() => {
         if (!jobData?.items) return [];
         return jobData.items.map((job: JobPostResponse) => {
-            let dateInfo = 'N/A';
-            if (job.expiresAt) {
+            let dateInfo = job.daysRemaining || 'N/A';
+            if (!job.daysRemaining && job.expiresAt) {
                 const diffTime =
                     new Date(job.expiresAt).getTime() - new Date().getTime();
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -54,7 +45,9 @@ export default function MyJobsPage() {
             return {
                 id: String(job.id),
                 title: job.title || 'Untitled',
-                type: job.employmentType || 'N/A',
+                type: job.employmentType
+                    ? job.employmentType.replace('_', ' ')
+                    : 'N/A',
                 dateInfo,
                 status: job.status === 'EXPIRED' ? 'Expire' : 'Active',
                 applications: job.applicationCount || 0,
@@ -79,24 +72,6 @@ export default function MyJobsPage() {
         navigate(`/employer/my-jobs/${id}`);
     };
 
-    const handlePromoteClick = (id: string) => {
-        const job = mappedJobs.find((j) => j.id === id);
-        if (job) {
-            setPromoteModalData({
-                isOpen: true,
-                jobId: job.id,
-                jobTitle: job.title,
-            });
-        }
-    };
-
-    const handleConfirmPromote = (plan: string) => {
-        promoteJob({
-            id: promoteModalData.jobId,
-            plan: plan as 'featured' | 'highlight',
-        });
-        setPromoteModalData((prev) => ({ ...prev, isOpen: false }));
-    };
     const handleMarkExpired = (id: string) => {
         expireJob(id);
     };
@@ -132,7 +107,6 @@ export default function MyJobsPage() {
                     <MyJobsTable
                         jobs={mappedJobs}
                         onViewApplications={handleViewApplications}
-                        onPromote={handlePromoteClick}
                         onViewDetail={handleViewDetail}
                         onMarkExpired={handleMarkExpired}
                     />
@@ -146,15 +120,6 @@ export default function MyJobsPage() {
                     )}
                 </>
             )}
-
-            <PromoteJobModal
-                isOpen={promoteModalData.isOpen}
-                jobTitle={promoteModalData.jobTitle}
-                onClose={() =>
-                    setPromoteModalData((prev) => ({ ...prev, isOpen: false }))
-                }
-                onConfirm={handleConfirmPromote}
-            />
         </div>
     );
 }

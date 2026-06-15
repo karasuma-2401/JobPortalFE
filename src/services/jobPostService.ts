@@ -1,6 +1,10 @@
 import { privateApi, publicApi } from '../api/api';
 import type { JobPostResponse, PagedJobResponse } from '../types/jobpost';
-
+interface ApiResponse<T> {
+    success: boolean;
+    message?: string;
+    data: T;
+}
 export const JobPostService = {
     getJobById: async (id: string): Promise<JobPostResponse> => {
         const response = await publicApi.get(`/jobpost/${id}`);
@@ -20,7 +24,7 @@ export const JobPostService = {
     },
     getJobForEdit: async (id: string) => {
         const response = await privateApi.get(`/jobpost/${id}/for-edit`);
-        return response; 
+        return response;
     },
     updateJob: async (
         id: string,
@@ -35,18 +39,34 @@ export const JobPostService = {
     getEmployerJobs: async (
         params: Record<string, unknown>
     ): Promise<PagedJobResponse> => {
-        const response = await privateApi.get('/jobpost/me/dashboard', {
+        const response = await privateApi.get('/employer/job-posts', {
             params,
         });
         const dataNode = ((response as unknown as Record<string, unknown>)
             ?.data ?? response) as Record<string, unknown>;
 
         return {
-            items: (dataNode?.content as JobPostResponse[]) || [],
-            totalItems: (dataNode?.totalElements as number) || 0,
+            items:
+                (dataNode?.items as JobPostResponse[]) ||
+                (dataNode?.content as JobPostResponse[]) ||
+                [],
+            totalItems:
+                (dataNode?.totalItems as number) ||
+                (dataNode?.totalElements as number) ||
+                0,
         };
     },
     highlightJob: async (id: string): Promise<void> => {
         await privateApi.post(`/jobpost/${id}/highlight`);
+    },
+    updateJobStatus: async (
+        id: string,
+        status: string
+    ): Promise<JobPostResponse> => {
+        const response = (await privateApi.patch(`/jobpost/${id}/status`, {
+            status,
+        })) as ApiResponse<JobPostResponse>;
+
+        return response.data;
     },
 };
