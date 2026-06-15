@@ -1,57 +1,68 @@
-import { Bell, MapPin, Tag } from 'lucide-react';
+import { MapPin, Clock, Briefcase, Building2 } from 'lucide-react';
+import type { Job } from '../../../../types/jobseeker';
 
-export interface JobAlertItemProps {
-    id: string;
-    keyword: string | null;
-    location: string | null;
-    category: string | null;
-    createdAt: string | null;
-    isSelected: boolean;
-    onSelect: () => void;
+interface JobAlertItemProps {
+    job: Job;
+    onViewDetail?: (id: string) => void;
 }
 
-export default function JobAlertItem({
-    keyword,
-    location,
-    category,
-    createdAt,
-    isSelected,
-    onSelect,
-}: JobAlertItemProps) {
-    const activeItemStyles = isSelected
-        ? 'border-primary-500 bg-blue-50/50 border-2'
-        : 'border-gray-100 bg-white';
-
+export default function JobAlertItem({ job, onViewDetail }: JobAlertItemProps) {
     return (
         <div
-            className={`flex cursor-pointer items-start justify-between rounded-xl border p-6 transition-all ${activeItemStyles}`}
-            onClick={onSelect}
+            className='flex cursor-pointer items-start justify-between rounded-xl border border-gray-100 bg-white p-5 transition-all hover:border-primary-200 hover:shadow-sm'
+            onClick={() => onViewDetail?.(job.id)}
         >
-            <div className='flex items-start gap-4 text-left'>
-                <div className='rounded-full bg-blue-50 p-3 text-primary-500'>
-                    <Bell size={20} />
-                </div>
-                <div className='space-y-2'>
-                    <h3 className='text-base font-bold text-gray-900'>
-                        {keyword || 'Any keyword'}
+            {/* Logo + Info */}
+            <div className='flex items-start gap-4'>
+                <img
+                    src={job.logo || '/company-placeholder.png'}
+                    alt={job.companyName}
+                    className='h-12 w-12 rounded-lg border border-gray-100 object-contain p-1'
+                    onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/company-placeholder.png';
+                    }}
+                />
+                <div className='space-y-1.5'>
+                    <h3 className='text-base font-bold text-gray-900 leading-tight'>
+                        {job.title}
                     </h3>
-                    <div className='flex flex-wrap items-center gap-4 text-sm text-gray-500'>
-                        <span className='flex items-center gap-2'>
-                            <MapPin size={16} className='text-gray-400' />
-                            {location || 'Any location'}
-                        </span>
-                        <span className='flex items-center gap-2'>
-                            <Tag size={16} className='text-gray-400' />
-                            {category || 'Any category'}
-                        </span>
+                    <div className='flex items-center gap-1.5 text-sm text-gray-500'>
+                        <Building2 size={13} className='text-gray-400' />
+                        <span>{job.companyName}</span>
                     </div>
-                    <p className='text-xs text-gray-400'>
-                        Created{' '}
-                        {createdAt
-                            ? new Date(createdAt).toLocaleDateString()
-                            : 'recently'}
-                    </p>
+                    <div className='flex flex-wrap items-center gap-3 text-xs text-gray-500'>
+                        {job.location && (
+                            <span className='flex items-center gap-1'>
+                                <MapPin size={12} className='text-gray-400' />
+                                {job.location}
+                            </span>
+                        )}
+                        {job.type && (
+                            <span className='flex items-center gap-1'>
+                                <Briefcase size={12} className='text-gray-400' />
+                                {job.type}
+                            </span>
+                        )}
+                        {job.salary && (
+                            <span className='font-medium text-primary-600'>
+                                {job.salary}
+                            </span>
+                        )}
+                    </div>
                 </div>
+            </div>
+
+            {/* Right side: badge + days remaining */}
+            <div className='ml-4 flex shrink-0 flex-col items-end gap-2'>
+                {job.isFeatured && (
+                    <span className='rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-600'>
+                        Featured
+                    </span>
+                )}
+                <span className='flex items-center gap-1 text-xs text-gray-400'>
+                    <Clock size={12} />
+                    {job.daysRemaining || 'New'}
+                </span>
             </div>
         </div>
     );

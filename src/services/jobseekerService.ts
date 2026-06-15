@@ -17,6 +17,7 @@ import type {
     Resume,
 } from '../types/jobseeker';
 
+
 const MULTIPART_HEADERS = {
     'Content-Type': 'multipart/form-data',
 };
@@ -162,6 +163,21 @@ export const JobseekerService = {
         const response = (await privateApi.get('/job-seeker/alerts', {
             params: { offset, limit },
         })) as ApiResponse<PagedResponse<JobAlertItemType>>;
+
+        return {
+            items: response.data.items,
+            totalCount: response.data.totalItems,
+        };
+    },
+
+    getRecentJobs: async (
+        page: number,
+        limit: number
+    ): Promise<{ items: Job[]; totalCount: number }> => {
+        const offset = (page - 1) * limit;
+        const response = (await privateApi.get('/jobpost/recent', {
+            params: { offset, limit },
+        })) as ApiResponse<PagedResponse<Job>>;
 
         return {
             items: response.data.items,
