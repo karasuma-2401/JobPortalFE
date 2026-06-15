@@ -19,7 +19,6 @@ export interface JobPostResponse {
     isHighlighted?: boolean;
     applicationCount?: number;
     views?: number;
-    daysRemaining?: string;
 }
 
 export interface PagedJobResponse {

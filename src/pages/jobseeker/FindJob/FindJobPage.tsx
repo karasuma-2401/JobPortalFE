@@ -41,6 +41,8 @@ export default function FindJobPage() {
         handleSearch,
         handlePageChange,
         handleToggleSave,
+        sortBy,
+        setSortBy,
     } = useFindJobs();
 
     const handleJobDoubleClick = (id: string) => {
@@ -57,7 +59,6 @@ export default function FindJobPage() {
         if (!user) {
             toast.info('Please sign in before applying.');
         }
-
         navigate(buildJobApplyPath(jobId));
     };
 
@@ -85,7 +86,13 @@ export default function FindJobPage() {
             />
 
             <div className='mx-auto mt-8 max-w-7xl px-8'>
-                <FilterSortBar viewMode={viewMode} setViewMode={setViewMode} />
+                {/* Truyền thêm sortBy và onSortChange vào FilterSortBar */}
+                <FilterSortBar 
+                    viewMode={viewMode} 
+                    setViewMode={setViewMode} 
+                    sortBy={sortBy}
+                    onSortChange={setSortBy}
+                />
 
                 {loading ? (
                     <div className='mt-8 flex flex-col gap-4'>

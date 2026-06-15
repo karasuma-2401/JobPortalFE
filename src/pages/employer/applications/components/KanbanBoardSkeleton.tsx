@@ -6,7 +6,7 @@ export default function KanbanBoardSkeleton() {
     return (
         <div className='flex gap-8 flex-1 min-h-0 relative'>
             <div className='flex-1 flex gap-6 overflow-x-auto pb-4'>
-                {columns.map((col, idx) => (
+                {columns.map((_, idx) => (
                     <div
                         key={idx}
                         className='flex flex-col w-[320px] shrink-0 h-full bg-gray-50/50 rounded-xl p-2 border border-transparent'
