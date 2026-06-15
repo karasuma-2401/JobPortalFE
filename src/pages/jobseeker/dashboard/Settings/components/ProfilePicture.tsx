@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Loader2, Upload } from 'lucide-react';
+import { Loader2, Upload, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import type { JobSeekerProfile } from '../../../../../types/jobseeker';
 import { JobseekerService } from '../../../../../services/jobseekerService';
@@ -36,13 +36,11 @@ export default function ProfilePicture({
             await JobseekerService.updateProfile(formData);
             await onUpdated();
 
-            // Đồng bộ avatar vào AuthContext (CandidateTopbar đọc từ user.avatar)
             const meResponse = await AuthService.getMe();
             AuthSessionService.saveUser(meResponse);
-
             refreshAuth();
 
-            toast.success('Profile picture updated.');
+            toast.success('Profile picture updated successfully!');
             setSelectedFile(null);
         } catch (error) {
             toast.error((error as Error).message || 'Failed to upload avatar.');
@@ -52,25 +50,40 @@ export default function ProfilePicture({
     };
 
     return (
-        <>
-            <h3 className='mb-6 text-left text-sm font-semibold text-gray-900'>
+        <div className='space-y-6'>
+            <h3 className='text-sm font-bold text-gray-900'>
                 Basic Information
             </h3>
-            <div className='mb-3 text-left text-xs font-medium uppercase text-gray-500'>
-                Profile Picture
-            </div>
-            <div className='rounded-xl border-2 border-dashed border-gray-100 bg-gray-50/20 p-8 text-center'>
-                <img
-                    src={profile.avatar || `https://ui-avatars.com/api/?name=${profile.fullName || 'Candidate'}&background=eff6ff&color=2563eb`}
-                    alt={profile.fullName}
-                    className='mx-auto mb-4 h-24 w-24 rounded-full border border-gray-100 object-cover'
-                />
-                <p className='text-sm font-medium text-gray-900'>
-                    {selectedFile ? selectedFile.name : 'Browse photo or drop here'}
-                </p>
-                <p className='mt-2 text-[11px] text-gray-400'>
-                    A photo larger than 400 pixels works best.
-                </p>
+
+            <div className='rounded-xl border border-gray-100 bg-gray-50/30 p-8 text-center transition-all hover:border-gray-200'>
+                <div className='relative inline-block'>
+                    <img
+                        src={
+                            selectedFile
+                                ? URL.createObjectURL(selectedFile)
+                                : profile.avatar ||
+                                  `https://ui-avatars.com/api/?name=${profile.fullName || 'Candidate'}&background=e7f0fa&color=0a65cc`
+                        }
+                        alt={profile.fullName}
+                        className='h-28 w-28 rounded-full border-4 border-white shadow-md object-cover mb-4'
+                    />
+                    <button
+                        onClick={() => inputRef.current?.click()}
+                        className='absolute bottom-4 right-0 bg-primary-500 text-white p-2 rounded-full border-2 border-white shadow-sm hover:bg-primary-600 transition-colors'
+                    >
+                        <Camera size={16} />
+                    </button>
+                </div>
+
+                <div className='space-y-1'>
+                    <p className='text-sm font-bold text-gray-900'>
+                        {selectedFile ? selectedFile.name : 'Upload Avatar'}
+                    </p>
+                    <p className='text-xs text-gray-400'>
+                        PNG, JPG, JPEG (Max 5MB)
+                    </p>
+                </div>
+
                 <input
                     ref={inputRef}
                     type='file'
@@ -80,42 +93,31 @@ export default function ProfilePicture({
                         setSelectedFile(event.target.files?.[0] ?? null)
                     }
                 />
-                <div className='mt-5 flex gap-2.5 w-full items-stretch justify-center'>
-                    <div className='flex-1 min-w-0'>
-                        <Button
-                            variant='social'
-                            className='w-full py-2 px-1 h-full min-h-[54px] flex items-center justify-center'
-                            onClick={() => inputRef.current?.click()}
-                        >
-                            <div className='flex flex-col items-center justify-center gap-0.5 text-center w-full'>
-                                <Upload size={14} className='shrink-0 text-gray-500 mb-0.5' />
-                                <span className='text-[11px] font-bold leading-tight text-gray-700 block'>
-                                    Choose<br />Photo
-                                </span>
-                            </div>
-                        </Button>
-                    </div>
-                    
-                    <div className='flex-1 min-w-0'>
-                        <Button
-                            variant='primary'
-                            className='w-full py-2 px-1 h-full min-h-[54px] flex items-center justify-center'
-                            onClick={handleUpload}
-                            disabled={isLoading || !selectedFile}
-                        >
-                            <div className='flex flex-col items-center justify-center text-center w-full'>
-                                {isLoading ? (
-                                    <Loader2 className='animate-spin' size={14} />
-                                ) : (
-                                    <span className='text-[11px] font-bold leading-tight text-white block'>
-                                        Save<br />Photo
-                                    </span>
-                                )}
-                            </div>
-                        </Button>
-                    </div>
+
+                <div className='mt-6 flex gap-3 w-full'>
+                    <Button
+                        variant='social'
+                        className='flex-1 h-[50px] !border-gray-200'
+                        onClick={() => inputRef.current?.click()}
+                    >
+                        <Upload size={16} />
+                        Choose
+                    </Button>
+
+                    <Button
+                        variant='primary'
+                        className='flex-1 h-[50px]'
+                        onClick={handleUpload}
+                        disabled={isLoading || !selectedFile}
+                    >
+                        {isLoading ? (
+                            <Loader2 className='animate-spin' size={20} />
+                        ) : (
+                            'Save Photo'
+                        )}
+                    </Button>
                 </div>
             </div>
-        </>
+        </div>
     );
 }

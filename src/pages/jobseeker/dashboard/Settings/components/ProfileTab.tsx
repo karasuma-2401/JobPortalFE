@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Button from '../../../../../components/ui/Button';
+import Input from '../../../../../components/ui/Input';
+import RichTextEditor from '../../../../../components/ui/RichTextEditor'; // 🌟 Import component của bạn
 import { JobseekerService } from '../../../../../services/jobseekerService';
 import type { JobSeekerProfile } from '../../../../../types/jobseeker';
 
@@ -52,94 +54,94 @@ export default function ProfileTab({ profile, onUpdated }: ProfileTabProps) {
             setIsLoading(true);
             await JobseekerService.updateProfile(formData);
             await onUpdated();
-            toast.success('Profile information updated.');
+            toast.success('Profile information updated successfully.');
         } catch (error) {
-            toast.error((error as Error).message || 'Failed to update profile.');
+            toast.error(
+                (error as Error).message || 'Failed to update profile.'
+            );
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSave} className='space-y-8 text-left'>
+        <form
+            onSubmit={handleSave}
+            className='space-y-8 text-left animate-in fade-in duration-500'
+        >
+            <h3 className='text-base font-bold text-gray-900'>
+                Personal Details
+            </h3>
+
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-                <label className='flex flex-col gap-2 text-sm font-medium text-gray-700'>
-                    Nationality
-                    <input
-                        value={values.nationality}
-                        onChange={(event) =>
-                            updateValue('nationality', event.target.value)
-                        }
-                        className='rounded-lg border border-gray-100 px-3 py-3 outline-none focus:border-primary-400'
-                    />
-                </label>
-                <label className='flex flex-col gap-2 text-sm font-medium text-gray-700'>
-                    Date of Birth
-                    <input
-                        type='date'
-                        value={values.dateOfBirth}
-                        onChange={(event) =>
-                            updateValue('dateOfBirth', event.target.value)
-                        }
-                        className='rounded-lg border border-gray-100 px-3 py-3 outline-none focus:border-primary-400'
-                    />
-                </label>
-                <label className='flex flex-col gap-2 text-sm font-medium text-gray-700'>
-                    Gender
-                    <input
-                        value={values.gender}
-                        onChange={(event) => updateValue('gender', event.target.value)}
-                        className='rounded-lg border border-gray-100 px-3 py-3 outline-none focus:border-primary-400'
-                    />
-                </label>
-                <label className='flex flex-col gap-2 text-sm font-medium text-gray-700'>
-                    Marital Status
-                    <input
-                        value={values.maritalStatus}
-                        onChange={(event) =>
-                            updateValue('maritalStatus', event.target.value)
-                        }
-                        className='rounded-lg border border-gray-100 px-3 py-3 outline-none focus:border-primary-400'
-                    />
-                </label>
+                <Input
+                    label='Nationality'
+                    value={values.nationality}
+                    onChange={(e) => updateValue('nationality', e.target.value)}
+                />
+                <Input
+                    label='Date of Birth'
+                    type='date'
+                    value={values.dateOfBirth}
+                    onChange={(e) => updateValue('dateOfBirth', e.target.value)}
+                />
+                <Input
+                    label='Gender'
+                    value={values.gender}
+                    onChange={(e) => updateValue('gender', e.target.value)}
+                />
+                <Input
+                    label='Marital Status'
+                    value={values.maritalStatus}
+                    onChange={(e) =>
+                        updateValue('maritalStatus', e.target.value)
+                    }
+                />
             </div>
 
-            <label className='flex flex-col gap-2 text-sm font-medium text-gray-700'>
-                Biography
-                <textarea
-                    value={values.biography}
-                    onChange={(event) => updateValue('biography', event.target.value)}
-                    rows={5}
-                    className='min-h-[160px] rounded-lg border border-gray-100 p-4 outline-none focus:border-primary-400'
-                />
-            </label>
+            <div className='space-y-6'>
+                <div className='flex flex-col gap-2'>
+                    <label className='text-sm font-bold text-gray-900'>
+                        Biography
+                    </label>
+                    <RichTextEditor
+                        value={values.biography}
+                        onChange={(val) => updateValue('biography', val)}
+                        placeholder='Tell us about yourself...'
+                    />
+                </div>
 
-            <label className='flex flex-col gap-2 text-sm font-medium text-gray-700'>
-                Experience Summary
-                <textarea
-                    value={values.experienceSummary}
-                    onChange={(event) =>
-                        updateValue('experienceSummary', event.target.value)
-                    }
-                    rows={5}
-                    className='min-h-[160px] rounded-lg border border-gray-100 p-4 outline-none focus:border-primary-400'
-                />
-            </label>
+                <div className='flex flex-col gap-2'>
+                    <label className='text-sm font-bold text-gray-900'>
+                        Experience Summary
+                    </label>
+                    <RichTextEditor
+                        value={values.experienceSummary}
+                        onChange={(val) =>
+                            updateValue('experienceSummary', val)
+                        }
+                        placeholder='Summarize your work experience...'
+                    />
+                </div>
 
-            <label className='flex flex-col gap-2 text-sm font-medium text-gray-700'>
-                Education Summary
-                <textarea
-                    value={values.educationSummary}
-                    onChange={(event) =>
-                        updateValue('educationSummary', event.target.value)
-                    }
-                    rows={5}
-                    className='min-h-[160px] rounded-lg border border-gray-100 p-4 outline-none focus:border-primary-400'
-                />
-            </label>
+                <div className='flex flex-col gap-2'>
+                    <label className='text-sm font-bold text-gray-900'>
+                        Education Summary
+                    </label>
+                    <RichTextEditor
+                        value={values.educationSummary}
+                        onChange={(val) => updateValue('educationSummary', val)}
+                        placeholder='Summarize your education...'
+                    />
+                </div>
+            </div>
 
             <div className='pt-4'>
-                <Button variant='primary' className='px-10' disabled={isLoading}>
+                <Button
+                    variant='primary'
+                    className='px-10 h-[50px]'
+                    disabled={isLoading}
+                >
                     {isLoading ? (
                         <Loader2 className='animate-spin' size={22} />
                     ) : (

@@ -244,3 +244,4 @@ export interface SpringPageResponse<T> {
     size: number;
     number: number;
 }
+

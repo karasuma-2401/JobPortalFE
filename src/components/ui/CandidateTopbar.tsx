@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, User, Settings, LogOut } from 'lucide-react';
+import { Search, Settings, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 
 import Logo from '../Logo';
@@ -119,20 +119,10 @@ export default function CandidateTopBar() {
                                         {user?.email || 'No email provided'}
                                     </p>
                                 </div>
-
                                 <button
                                     onClick={() => {
                                         setIsProfileOpen(false);
-                                        navigate('/jobseeker/profile'); 
-                                    }}
-                                    className='w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors'
-                                >
-                                    <User size={16} /> Profile
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setIsProfileOpen(false);
-                                        navigate('/jobseeker/settings'); 
+                                        navigate('/jobseeker/DashBoard/settings'); 
                                     }}
                                     className='w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors'
                                 >
