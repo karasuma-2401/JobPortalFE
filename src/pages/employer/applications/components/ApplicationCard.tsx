@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import type { Candidate } from '../../../../types/candidate';
 
 interface ApplicationCardProps {
-    applicant: Candidate;
+    applicant: Candidate & { resumeUrl?: string };
     onDragStart: (e: React.DragEvent, id: string) => void;
     onDeleteApplicant: (id: string) => void;
     onViewProfile: (id: string) => void;
@@ -38,7 +38,27 @@ export default function ApplicationCard({
     }, []);
 
     const handleDownloadCV = () => {
-        toast.success(`Downloading CV of ${applicant.name}...`);
+        let fileUrl = applicant.resumeUrl;
+
+        if (fileUrl) {
+            const httpMatches = fileUrl.match(/http/g);
+            if (httpMatches && httpMatches.length > 1) {
+                const lastHttpIndex = fileUrl.lastIndexOf('http');
+                fileUrl = fileUrl.substring(lastHttpIndex);
+            }
+
+            toast.success(`Opening CV of ${applicant.name}...`);
+
+            const link = document.createElement('a');
+            link.href = fileUrl;
+            link.target = '_blank';
+            link.download = `CV_${applicant.name.replace(/\s+/g, '_')}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            toast.error('No CV attached to this application.');
+        }
     };
 
     return (

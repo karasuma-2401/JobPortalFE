@@ -1,12 +1,12 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, ChevronDown } from 'lucide-react'; // Đã xóa Loader2
+import { Search, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 
 import KanbanColumn, { type ColumnData } from './components/KanbanColumn';
 import CandidateProfileModal from '../components/CandidateProfileModal';
-import KanbanBoardSkeleton from './components/KanbanBoardSkeleton'; // IMPORT SKELETON
+import KanbanBoardSkeleton from './components/KanbanBoardSkeleton';
 
 import type { Candidate } from '../../../types/candidate';
 import type {
@@ -84,6 +84,7 @@ export default function ApplicationsPage() {
                 secondaryPhone: '',
                 email: seeker?.email || 'Unknown Email',
                 social: {},
+                resumeUrl: app.resume?.fileUrl || '',
             };
         });
     }, [apiApplications]);
