@@ -7,7 +7,6 @@ interface JobMainContentProps {
 export default function JobMainContent({
     description,
     requirements,
-    benefits,
 }: JobMainContentProps) {
     return (
         <div className='bg-white rounded-2xl border border-gray-100 shadow-sm p-8'>
@@ -27,19 +26,6 @@ export default function JobMainContent({
                     >
                         <div className='w-1.5 h-1.5 rounded-full bg-blue-600 mt-2 shrink-0' />
                         <span className='leading-relaxed'>{req}</span>
-                    </li>
-                ))}
-            </ul>
-
-            <h3 className='text-lg font-bold text-gray-900 mb-4'>Benefits</h3>
-            <ul className='flex flex-col gap-3'>
-                {benefits.map((benefit, index) => (
-                    <li
-                        key={index}
-                        className='flex items-start gap-3 text-gray-600'
-                    >
-                        <div className='w-1.5 h-1.5 rounded-full bg-green-500 mt-2 shrink-0' />
-                        <span className='leading-relaxed'>{benefit}</span>
                     </li>
                 ))}
             </ul>

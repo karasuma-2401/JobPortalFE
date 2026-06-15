@@ -1,4 +1,6 @@
 import { privateApi, publicApi } from '../api/api';
+import type { JobDetail } from '../types/jobpost';
+
 import type { JobPostResponse, PagedJobResponse } from '../types/jobpost';
 interface ApiResponse<T> {
     success: boolean;
@@ -22,9 +24,12 @@ export const JobPostService = {
         )?.data ?? response) as JobPostResponse;
         return normalizedResponse;
     },
-    getJobForEdit: async (id: string) => {
+    getJobForEdit: async (id: string): Promise<JobDetail> => {
         const response = await privateApi.get(`/jobpost/${id}/for-edit`);
-        return response;
+        const normalizedResponse = ((
+            response as unknown as Record<string, unknown>
+        )?.data ?? response) as JobDetail;
+        return normalizedResponse;
     },
     updateJob: async (
         id: string,

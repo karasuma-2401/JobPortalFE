@@ -17,6 +17,17 @@ export const ApplicationService = {
         return response.data;
     },
 
+    getApplicationCount: async (jobPostId: number): Promise<number> => {
+        const response = await privateApi.get('/job-application', {
+            params: { jobPostId, limit: 1, offset: 0 },
+        });
+        // privateApi interceptor đã unwrap axios response → response = ApiResponse<PageResponse<...>>
+        // Cấu trúc: { status, message, data: { content: [...], totalElements: N, ... } }
+        const apiResponse = response as unknown as Record<string, unknown>;
+        const pageData = (apiResponse?.data ?? apiResponse) as Record<string, unknown>;
+        return (pageData?.totalElements as number) ?? 0;
+    },
+
     getApplicationById: async (id: number): Promise<JobApplicationDetail> => {
         const response = await privateApi.get(`/job-application/${id}`);
         return (
