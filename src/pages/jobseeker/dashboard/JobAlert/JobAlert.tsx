@@ -1,19 +1,24 @@
+import { Bell } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import JobAlertItem from './JobAlertItem';
 import DashboardPagination from '../../../../components/ui/DashboardPagination';
 import { useJobAlerts } from './hooks/useJobAlerts';
 
 export default function JobAlertPage() {
+    const navigate = useNavigate();
     const {
-        jobAlerts,
+        recentJobs,
         loading,
         error,
         totalCount,
         currentPage,
-        selectedJobId,
-        setSelectedJobId,
         totalPages,
         handlePageChange,
     } = useJobAlerts();
+
+    const handleViewDetail = (id: string) => {
+        navigate(`/jobseeker/find-job/${id}`);
+    };
 
     if (loading) {
         return (
@@ -31,46 +36,44 @@ export default function JobAlertPage() {
 
     return (
         <div className='space-y-8 pb-8 text-left animate-fade-in'>
+            {/* Header */}
             <div className='border-b border-gray-50 pb-2'>
-                <div className='flex items-end gap-3'>
-                    <h1 className='text-xl font-bold text-gray-900'>Job Alerts</h1>
-                    <span className='mb-0.5 text-sm font-medium text-gray-400'>
-                        ({totalCount} alerts)
-                    </span>
+                <div className='flex items-center gap-3'>
+                    <div className='rounded-full bg-blue-50 p-2 text-primary-500'>
+                        <Bell size={18} />
+                    </div>
+                    <div>
+                        <h1 className='text-xl font-bold text-gray-900'>Job Alerts</h1>
+                        <p className='mt-0.5 text-sm text-gray-500'>
+                            {totalCount > 0
+                                ? `${totalCount} new jobs posted in the last 7 days`
+                                : 'No new jobs in the last 7 days'}
+                        </p>
+                    </div>
                 </div>
-                <p className='mt-2 text-sm text-gray-500'>
-                    These are your saved seeker alert rules from the backend.
-                </p>
             </div>
 
-            <div className='flex flex-col gap-5'>
-                {jobAlerts.length === 0 ? (
-                    <div className='rounded-xl border border-gray-100 bg-white py-10 text-center'>
-                        <p className='text-[15px] text-gray-400'>
-                            No job alerts found.
+            {/* Job List */}
+            <div className='flex flex-col gap-4'>
+                {recentJobs.length === 0 ? (
+                    <div className='rounded-xl border border-gray-100 bg-white py-16 text-center'>
+                        <Bell size={36} className='mx-auto mb-3 text-gray-200' />
+                        <p className='text-[15px] font-medium text-gray-400'>
+                            No new jobs this week. Check back soon!
                         </p>
                     </div>
                 ) : (
-                    jobAlerts.map((jobAlert) => (
+                    recentJobs.map((job) => (
                         <JobAlertItem
-                            key={jobAlert.id}
-                            id={jobAlert.id}
-                            keyword={jobAlert.keyword}
-                            location={jobAlert.location}
-                            category={jobAlert.category}
-                            createdAt={jobAlert.createdAt}
-                            isSelected={selectedJobId === jobAlert.id}
-                            onSelect={() =>
-                                setSelectedJobId(
-                                    jobAlert.id === selectedJobId ? null : jobAlert.id
-                                )
-                            }
+                            key={job.id}
+                            job={job}
+                            onViewDetail={handleViewDetail}
                         />
                     ))
                 )}
             </div>
 
-            {jobAlerts.length > 0 && (
+            {recentJobs.length > 0 && (
                 <DashboardPagination
                     currentPage={currentPage}
                     totalPages={totalPages}

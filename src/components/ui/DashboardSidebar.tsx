@@ -34,7 +34,6 @@ export default function DashboardSidebar() {
             path: '/jobseeker/DashBoard/jobalerts',
             label: 'Job Alert',
             icon: <Bell size={22} />,
-            badge: '09',
         },
         {
             path: '/jobseeker/DashBoard/settings',
@@ -74,17 +73,6 @@ export default function DashboardSidebar() {
                                     </span>
                                     {item.label}
                                 </div>
-                                {item.badge && (
-                                    <span
-                                        className={`text-xs font-semibold px-2 py-0.5 rounded ${
-                                            isActive
-                                                ? 'bg-white text-primary-500'
-                                                : 'bg-gray-100 text-gray-700'
-                                        }`}
-                                    >
-                                        {item.badge}
-                                    </span>
-                                )}
                             </Link>
                         );
                     })}
