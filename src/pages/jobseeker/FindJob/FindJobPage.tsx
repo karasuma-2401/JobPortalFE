@@ -58,6 +58,7 @@ export default function FindJobPage() {
     const handleProtectedListApplyClick = (jobId: string) => {
         if (!user) {
             toast.info('Please sign in before applying.');
+            return; 
         }
         navigate(buildJobApplyPath(jobId));
     };
@@ -86,7 +87,6 @@ export default function FindJobPage() {
             />
 
             <div className='mx-auto mt-8 max-w-7xl px-8'>
-                {/* Truyền thêm sortBy và onSortChange vào FilterSortBar */}
                 <FilterSortBar 
                     viewMode={viewMode} 
                     setViewMode={setViewMode} 
@@ -98,7 +98,7 @@ export default function FindJobPage() {
                     <div className='mt-8 flex flex-col gap-4'>
                         {[1, 2, 3].map((i) => (
                             <div
-                                key={i}
+                                key={`job-skeleton-${i}`} // Đã sửa: Key rõ ràng tránh conflict render
                                 className='flex items-center gap-6 p-6 border border-gray-100 rounded-xl bg-white'
                             >
                                 {/* Logo skeleton */}

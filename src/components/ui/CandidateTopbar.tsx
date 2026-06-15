@@ -1,3 +1,4 @@
+import { useJobseekerProfile } from '../../hooks/useJobseeker';
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, Settings, LogOut } from 'lucide-react';
@@ -6,7 +7,7 @@ import { toast } from 'sonner';
 import Logo from '../Logo';
 import NotificationBell from './NotificationBell'; 
 import useAuth from '../../contexts/auth/useAuth';
-import { useJobseekerProfile } from '../../hooks/useJobseeker';
+
 
 const topNavItems = [
     { label: 'Home', path: '/jobseeker/home' },
@@ -24,6 +25,8 @@ export default function CandidateTopBar() {
     const { user, logout } = useAuth();
     const { data: profile } = useJobseekerProfile();
 
+    const [navKeyword, setNavKeyword] = useState('');
+
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (
@@ -37,6 +40,14 @@ export default function CandidateTopBar() {
         return () =>
             document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    const handleNavSearchSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (navKeyword.trim()) {
+            navigate(`/jobseeker/find-job?keyword=${encodeURIComponent(navKeyword.trim())}`);
+            setNavKeyword(''); 
+        }
+    };
 
     const handleLogout = () => {
         logout();
@@ -80,8 +91,10 @@ export default function CandidateTopBar() {
 
             <div className='w-full bg-white h-20 px-8 flex items-center justify-between border-b border-b-gray-100'>
                 <Logo className='flex items-center gap-2 text-2xl font-bold text-gray-900' />
-
-                <div className='flex items-center border border-gray-200 rounded-lg p-1.5 w-[650px] focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500 transition-all bg-white shadow-sm'>
+                <form 
+                    onSubmit={handleNavSearchSubmit} 
+                    className='flex items-center border border-gray-200 rounded-lg p-1.5 w-[650px] focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500 transition-all bg-white shadow-sm'
+                >
                     <div className='flex items-center gap-3 flex-1 px-2'>
                         <Search
                             size={20}
@@ -89,11 +102,14 @@ export default function CandidateTopBar() {
                         />
                         <input
                             type='text'
-                            placeholder='Job title, keyword, company'
+                            placeholder='Job title, keyword'
+                            value={navKeyword} 
+                            onChange={(e) => setNavKeyword(e.target.value)} 
                             className='w-full outline-none text-[15px] text-gray-700 placeholder:text-gray-400 bg-transparent'
                         />
                     </div>
-                </div>
+                    <button type="submit" className="hidden">Search</button>
+                </form>
 
                 <div className='flex items-center gap-5'>
                     <NotificationBell />
