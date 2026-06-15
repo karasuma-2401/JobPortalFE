@@ -1,4 +1,11 @@
-import { MapPin, Clock, Briefcase, Building2 } from 'lucide-react';
+import {
+    MapPin,
+    Clock,
+    Briefcase,
+    Building2,
+    DollarSign,
+    ArrowRight,
+} from 'lucide-react';
 import type { Job } from '../../../../types/jobseeker';
 
 interface JobAlertItemProps {
@@ -9,60 +16,91 @@ interface JobAlertItemProps {
 export default function JobAlertItem({ job, onViewDetail }: JobAlertItemProps) {
     return (
         <div
-            className='flex cursor-pointer items-start justify-between rounded-xl border border-gray-100 bg-white p-5 transition-all hover:border-primary-200 hover:shadow-sm'
             onClick={() => onViewDetail?.(job.id)}
+            className='group flex cursor-pointer flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-gray-100 bg-bg-white p-6 transition-all hover:border-primary-200 hover:shadow-sm'
         >
-            {/* Logo + Info */}
-            <div className='flex items-start gap-4'>
-                <img
-                    src={job.logo || '/company-placeholder.png'}
-                    alt={job.companyName}
-                    className='h-12 w-12 rounded-lg border border-gray-100 object-contain p-1'
-                    onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/company-placeholder.png';
-                    }}
-                />
-                <div className='space-y-1.5'>
-                    <h3 className='text-base font-bold text-gray-900 leading-tight'>
-                        {job.title}
-                    </h3>
-                    <div className='flex items-center gap-1.5 text-sm text-gray-500'>
-                        <Building2 size={13} className='text-gray-400' />
+            <div className='flex items-center gap-5 flex-1'>
+                <div className='p-1.5 bg-bg-white border border-gray-100 rounded-xl shadow-sm shrink-0'>
+                    <img
+                        src={job.logo || '/company-placeholder.png'}
+                        alt={job.companyName}
+                        className='h-12 w-12 rounded-lg object-contain'
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                                '/company-placeholder.png';
+                        }}
+                    />
+                </div>
+                <div className='space-y-1.5 text-left flex-1'>
+                    <div className='flex items-center gap-3'>
+                        <h3 className='text-base font-bold text-gray-900 group-hover:text-primary-500 transition-colors line-clamp-1'>
+                            {job.title}
+                        </h3>
+                        {job.isFeatured && (
+                            <span className='rounded-md bg-warning-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-warning-600'>
+                                Featured
+                            </span>
+                        )}
+                    </div>
+
+                    <div className='flex items-center gap-1.5 text-sm text-gray-700 font-medium'>
+                        <Building2 size={14} className='text-gray-400' />
                         <span>{job.companyName}</span>
                     </div>
-                    <div className='flex flex-wrap items-center gap-3 text-xs text-gray-500'>
+
+                    <div className='flex flex-wrap items-center gap-5 text-[13px] text-gray-600 font-medium'>
                         {job.location && (
-                            <span className='flex items-center gap-1'>
-                                <MapPin size={12} className='text-gray-400' />
-                                {job.location}
-                            </span>
+                            <div className='flex items-center gap-1.5'>
+                                <MapPin size={14} className='text-gray-400' />
+                                <span className='truncate max-w-[150px]'>
+                                    {job.location}
+                                </span>
+                            </div>
                         )}
                         {job.type && (
-                            <span className='flex items-center gap-1'>
-                                <Briefcase size={12} className='text-gray-400' />
-                                {job.type}
-                            </span>
+                            <div className='flex items-center gap-1.5'>
+                                <Briefcase
+                                    size={14}
+                                    className='text-gray-400'
+                                />
+                                <span>{job.type}</span>
+                            </div>
                         )}
                         {job.salary && (
-                            <span className='font-medium text-primary-600'>
-                                {job.salary}
-                            </span>
+                            <div className='flex items-center gap-1.5'>
+                                <DollarSign
+                                    size={14}
+                                    className='text-gray-400'
+                                />
+                                <span className='text-primary-600 font-bold'>
+                                    {job.salary}
+                                </span>
+                            </div>
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* Right side: badge + days remaining */}
-            <div className='ml-4 flex shrink-0 flex-col items-end gap-2'>
-                {job.isFeatured && (
-                    <span className='rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-600'>
-                        Featured
+            <div className='flex items-center gap-5 shrink-0 justify-end w-full sm:w-auto'>
+                <div className='hidden sm:flex flex-col items-end gap-1.5'>
+                    <span className='flex items-center gap-1.5 text-xs text-primary-600 font-semibold bg-primary-50 px-3 py-1.5 rounded-md'>
+                        <Clock size={14} className='text-primary-400' />
+                        {job.daysRemaining || 'New'}
                     </span>
-                )}
-                <span className='flex items-center gap-1 text-xs text-gray-400'>
-                    <Clock size={12} />
-                    {job.daysRemaining || 'New'}
-                </span>
+                </div>
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onViewDetail?.(job.id);
+                    }}
+                    className='px-6 py-2.5 flex items-center justify-center gap-2 text-[14px] font-bold rounded-lg bg-blue-50 text-primary-500 group-hover:bg-primary-500 group-hover:text-bg-white transition-all w-full sm:w-auto'
+                >
+                    View Job
+                    <ArrowRight
+                        size={16}
+                        className='group-hover:translate-x-1 transition-transform'
+                    />
+                </button>
             </div>
         </div>
     );

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import DashboardPagination from '../../../components/ui/DashboardPagination';
+import { Skeleton } from '../../../components/ui/Skeleton';
 import JobSearchBar from './components/JobSearchBar';
 import FilterSortBar from './components/FilterSortBar';
 import JobList from './components/JobList';
@@ -94,12 +95,48 @@ export default function FindJobPage() {
                 />
 
                 {loading ? (
-                    <div className='flex items-center justify-center py-20'>
-                        <div className='h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500' />
+                    <div className='mt-8 flex flex-col gap-4'>
+                        {[1, 2, 3].map((i) => (
+                            <div
+                                key={i}
+                                className='flex items-center gap-6 p-6 border border-gray-100 rounded-xl bg-white'
+                            >
+                                {/* Logo skeleton */}
+                                <Skeleton className='h-14 w-14 rounded-lg shrink-0' />
+
+                                {/* Content skeleton */}
+                                <div className='flex-1 space-y-3'>
+                                    <Skeleton className='h-5 w-1/3' />
+                                    <div className='flex gap-4'>
+                                        <Skeleton className='h-4 w-24' />
+                                        <Skeleton className='h-4 w-24' />
+                                        <Skeleton className='h-4 w-24' />
+                                    </div>
+                                </div>
+
+                                {/* Action skeleton */}
+                                <div className='flex items-center gap-5'>
+                                    <Skeleton className='h-10 w-10 rounded-lg' />
+                                    <Skeleton className='h-12 w-32 rounded-lg' />
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : error ? (
-                    <div className='py-20 text-center font-semibold text-red-500'>
+                    <div className='py-20 text-center font-semibold text-danger-500'>
                         {error}
+                    </div>
+                ) : jobs.length === 0 ? (
+                    <div className='flex flex-col items-center justify-center py-20 text-center'>
+                        <p className='text-gray-500'>
+                            No jobs found matching your criteria.
+                        </p>
+                        <button
+                            onClick={handleResetFilters}
+                            className='mt-4 font-bold text-primary-500 hover:text-primary-600 transition-colors'
+                        >
+                            Reset Filters
+                        </button>
                     </div>
                 ) : (
                     <JobList
@@ -112,11 +149,13 @@ export default function FindJobPage() {
                     />
                 )}
 
-                <DashboardPagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                />
+                {!loading && jobs.length > 0 && (
+                    <DashboardPagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                    />
+                )}
             </div>
         </div>
     );
