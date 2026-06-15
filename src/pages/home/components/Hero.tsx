@@ -1,9 +1,25 @@
+import { useState } from 'react'; // 1. Thêm useState
+import { useNavigate } from 'react-router-dom'; // 2. Thêm useNavigate
 import { Search, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Button from '../../../components/ui/Button';
 import IllustrationImage from '../../../assets/IllustrationImage.svg';
 
 export default function Hero() {
+    // 3. Khai báo State và Hook điều hướng
+    const navigate = useNavigate();
+    const [keyword, setKeyword] = useState('');
+    const [locationInput, setLocationInput] = useState('');
+
+    const handleSearchSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const params = new URLSearchParams();
+        if (keyword.trim()) params.append('keyword', keyword.trim());
+        if (locationInput.trim()) params.append('location', locationInput.trim());
+
+        navigate(`/jobseeker/find-job?${params.toString()}`);
+    };
+
     return (
         <section className='w-full bg-gray-50 py-16 lg:py-24 px-8'>
             <div className='max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12'>
@@ -21,12 +37,18 @@ export default function Hero() {
                         A place where your dreams and passions are transformed
                         into a meaningful and fulfilling career
                     </p>
-                    <div className='w-full max-w-3xl mt-4 bg-bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center gap-3'>
+
+                    <form 
+                        onSubmit={handleSearchSubmit} 
+                        className='w-full max-w-3xl mt-4 bg-bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center gap-3'
+                    >
                         <div className='flex-1 flex items-center gap-3 px-3 w-full border-b sm:border-b-0 sm:border-r border-gray-100 pb-3 sm:pb-0'>
                             <Search className='text-primary-500' size={24} />
                             <input
                                 type='text'
                                 placeholder='Job title, Keyword...'
+                                value={keyword}
+                                onChange={(e) => setKeyword(e.target.value)} 
                                 className='w-full bg-transparent border-none outline-none text-gray-900 placeholder:text-gray-400'
                             />
                         </div>
@@ -35,17 +57,21 @@ export default function Hero() {
                             <input
                                 type='text'
                                 placeholder='Your Location'
+                                value={locationInput} 
+                                onChange={(e) => setLocationInput(e.target.value)}
                                 className='w-full bg-transparent border-none outline-none text-gray-900 placeholder:text-gray-400'
                             />
                         </div>
 
                         <Button
+                            type='submit'
                             variant='primary'
                             className='w-full sm:w-auto px-8 py-3 text-lg rounded-lg'
                         >
                             Find Job
                         </Button>
-                    </div>
+                    </form>
+                    
                     <div className='text-sm mt-2'>
                         <span className='text-gray-500'>Suggestion: </span>
                         <span className='text-gray-900 font-medium'>

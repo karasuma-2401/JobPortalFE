@@ -1,8 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { JobseekerService } from '../../../../services/jobseekerService';
 import type { Job } from '../../../../types/jobseeker';
 
 export function useFindJobs() {
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const initialKeyword = searchParams.get('keyword') || '';
+    const initialLocation = searchParams.get('location') || '';
+
     const [jobs, setJobs] = useState<Job[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -13,17 +19,18 @@ export function useFindJobs() {
     
     const [sortBy, setSortBy] = useState<string>('LATEST');
 
-    const [searchKeyword, setSearchKeyword] = useState('');
-    const [locationKeyword, setLocationKeyword] = useState('');
+    const [searchKeyword, setSearchKeyword] = useState(initialKeyword);
+    const [locationKeyword, setLocationKeyword] = useState(initialLocation);
     const [category, setCategory] = useState('');
     const [experience, setExperience] = useState('');
     const [salaryRange, setSalaryRange] = useState('');
     const [jobTypes, setJobTypes] = useState<string[]>([]);
     const [education, setEducation] = useState<string[]>([]);
     const [jobLevel, setJobLevel] = useState('');
+    
     const [filterParams, setFilterParams] = useState({
-        keyword: '',
-        location: '',
+        keyword: initialKeyword,
+        location: initialLocation,
         category: '',
         experience: '',
         salaryRange: '',
@@ -31,6 +38,7 @@ export function useFindJobs() {
         education: [] as string[],
         jobLevel: '',
     });
+    
     const [savedJobIds, setSavedJobIds] = useState<string[]>([]);
 
     const fetchJobs = useCallback(async () => {
@@ -85,6 +93,7 @@ export function useFindJobs() {
         (event: React.FormEvent) => {
             event.preventDefault();
             setCurrentPage(1);
+            
             setFilterParams({
                 keyword: searchKeyword,
                 location: locationKeyword,
@@ -95,6 +104,15 @@ export function useFindJobs() {
                 education,
                 jobLevel,
             });
+
+            const params = new URLSearchParams(searchParams);
+            if (searchKeyword.trim()) params.set('keyword', searchKeyword.trim());
+            else params.delete('keyword');
+            
+            if (locationKeyword.trim()) params.set('location', locationKeyword.trim());
+            else params.delete('location');
+
+            setSearchParams(params, { replace: true });
         },
         [
             category,
@@ -105,6 +123,8 @@ export function useFindJobs() {
             locationKeyword,
             salaryRange,
             searchKeyword,
+            searchParams,
+            setSearchParams
         ]
     );
 
@@ -119,7 +139,7 @@ export function useFindJobs() {
         setJobLevel('');
         setCurrentPage(1);
         
-        setSortBy('latest'); 
+        setSortBy('LATEST'); 
 
         setFilterParams({
             keyword: '',
@@ -131,7 +151,10 @@ export function useFindJobs() {
             education: [],
             jobLevel: '',
         });
-    }, []);
+
+        // 5. Xóa URL params khi reset
+        setSearchParams(new URLSearchParams(), { replace: true });
+    }, [setSearchParams]);
 
     const handlePageChange = useCallback((page: number) => {
         setCurrentPage(page);
@@ -175,7 +198,6 @@ export function useFindJobs() {
         handleSearch,
         handlePageChange,
         handleToggleSave,
-
         sortBy,
         setSortBy,
     };
