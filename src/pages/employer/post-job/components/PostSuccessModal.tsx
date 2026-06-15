@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom';
 interface PostSuccessModalProps {
     isOpen: boolean;
     onClose: () => void;
+    jobTitle: string;
 }
 
 export default function PostSuccessModal({
     isOpen,
     onClose,
+    jobTitle,
 }: PostSuccessModalProps) {
     const navigate = useNavigate();
 
@@ -34,6 +36,13 @@ export default function PostSuccessModal({
                     <p className='text-sm text-gray-500 mb-8'>
                         Your job's visibility (Highlights & Featured) has been
                         automatically applied based on your active plan.
+                    </p>
+                    <p className='text-gray-600 mb-6'>
+                        Your job{' '}
+                        <span className='font-semibold text-gray-900'>
+                            "{jobTitle}"
+                        </span>{' '}
+                        has been published successfully.
                     </p>
                     <button
                         onClick={() => navigate('/employer/my-jobs')}

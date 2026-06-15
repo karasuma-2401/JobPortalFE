@@ -9,23 +9,16 @@ export const useApplicationCount = (jobId: string | undefined) => {
         queryKey: ['applicationCount', jobId],
         queryFn: () => ApplicationService.getApplicationCount(Number(jobId)),
         enabled: !!jobId,
-        staleTime: 30 * 1000, // refresh mỗi 30s
+        staleTime: 30 * 1000,
     });
 };
 
 export const useApplications = (jobId: string | null) => {
     return useQuery({
         queryKey: ['jobApplications', jobId],
-        queryFn: async () => {
+        queryFn: async (): Promise<JobApplication[]> => {
             const numericJobId = jobId ? Number(jobId) : undefined;
-            const response =
-                await ApplicationService.getApplications(numericJobId);
-            const safeResponse = response as unknown as Record<string, unknown>;
-            return (
-                (safeResponse.data as JobApplication[]) ||
-                (response as unknown as JobApplication[]) ||
-                []
-            );
+            return await ApplicationService.getApplications(numericJobId);
         },
     });
 };

@@ -23,6 +23,10 @@ export interface JobApplication {
     status: ApplicationStatus;
     appliedAt?: string;
     jobSeekerProfile: JobSeekerProfileBrief;
+    resume?: {
+        id: number;
+        fileUrl: string;
+    };
 }
 
 export interface JobApplicationResponse {
