@@ -118,6 +118,7 @@ export interface JobFilterParams {
     jobLevel?: string;
     page: number;
     limit: number;
+    sortBy?: string;
 }
 
 export interface EmployerFilterParams {
