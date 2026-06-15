@@ -17,7 +17,7 @@ export default function JobAlertPage() {
     } = useJobAlerts();
 
     const handleViewDetail = (id: string) => {
-        navigate(`/jobseeker/find-job/${id}`);
+        navigate(`/jobseeker/job/${id}`);
     };
 
     if (loading) {

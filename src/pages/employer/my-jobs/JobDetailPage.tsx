@@ -133,7 +133,6 @@ export default function JobDetailPage() {
                             job.description || 'No description available.'
                         }
                         requirements={requirementsArray}
-                        benefits={[]}
                     />
                 </div>
 
