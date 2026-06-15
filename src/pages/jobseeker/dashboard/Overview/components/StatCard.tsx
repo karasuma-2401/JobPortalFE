@@ -5,6 +5,7 @@ interface StatCardProps {
     label: string;
     icon: React.ReactNode;
     variant: 'blue' | 'orange' | 'green';
+    onClick?: () => void;
 }
 
 const variants = {
@@ -18,9 +19,11 @@ export default function StatCard({
     label,
     icon,
     variant,
+    onClick,
 }: StatCardProps) {
     return (
         <div
+            onClick={onClick}
             className={`flex items-center justify-between p-6 rounded-xl border transition-transform hover:-translate-y-1 ${variants[variant]}`}
         >
             <div className='text-left'>

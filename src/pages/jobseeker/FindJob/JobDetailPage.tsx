@@ -156,18 +156,27 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
             <div className='mx-auto max-w-7xl'>
                 <div className='mb-8 flex flex-col justify-between gap-6 border-b border-gray-100 pb-8 lg:flex-row lg:items-center'>
                     <div className='flex items-start gap-5 sm:items-center'>
-                        <img
-                            src={jobData.logo}
-                            alt={jobData.companyName}
-                            className='h-16 w-16 shrink-0 rounded-full border border-gray-100 bg-white p-1 object-cover shadow-sm'
-                        />
+                        <div className='flex flex-col items-center gap-1.5 shrink-0'>
+                            <img
+                                src={jobData.logo}
+                                alt={jobData.companyName}
+                                className='h-16 w-16 rounded-full border border-gray-100 bg-white p-1 object-cover shadow-sm'
+                            />
+                            <div className='text-[11px] font-medium text-gray-500 whitespace-nowrap'>
+                                Expire:{' '}
+                                <span className='text-danger-500 font-bold'>
+                                    {jobData.expireDate}
+                                </span>
+                            </div>
+                        </div>
+
                         <div className='flex flex-col gap-1.5'>
                             <div className='flex flex-wrap items-center gap-2.5'>
                                 <h1 className='text-[22px] font-bold leading-tight text-gray-900 sm:text-[24px]'>
                                     {jobData.title}
                                 </h1>
                                 {jobData.isFeatured && (
-                                    <span className='rounded bg-[#FFEEEC] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#FF4F4F]'>
+                                    <span className='rounded bg-[#FFEEEC] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-warning-500'>
                                         Featured
                                     </span>
                                 )}
@@ -183,20 +192,25 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
                                     rel='noreferrer'
                                     className='flex items-center gap-1.5 transition-colors hover:text-primary-500'
                                 >
-                                    <LinkIcon size={15} />
-                                    <span>{jobData.website}</span>
+                                    <LinkIcon
+                                        className='text-primary-500'
+                                        size={15}
+                                    />
+                                    <span className='text-primary-500'>
+                                        {jobData.website}
+                                    </span>
                                 </a>
                                 <span className='hidden text-gray-300 sm:inline'>
                                     |
                                 </span>
-                                <span className='flex items-center gap-1.5'>
+                                <span className='text-success-500 flex items-center gap-1.5'>
                                     <Phone size={15} />
                                     <span>{jobData.phone}</span>
                                 </span>
                                 <span className='hidden text-gray-300 sm:inline'>
                                     |
                                 </span>
-                                <span className='flex items-center gap-1.5'>
+                                <span className='text-danger-500 flex items-center gap-1.5'>
                                     <Mail size={15} />
                                     <span>{jobData.email}</span>
                                 </span>
@@ -244,12 +258,12 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
                                 <ArrowRight size={18} />
                             </button>
                         </div>
-                        <span className='w-full text-[13px] text-gray-400 sm:w-auto sm:text-right'>
+                        {/* <span className='w-full text-[13px] text-gray-400 sm:w-auto sm:text-right'>
                             Job expire in:{' '}
                             <span className='font-medium text-red-500'>
                                 {jobData.expireDate}
                             </span>
-                        </span>
+                        </span> */}
                     </div>
                 </div>
 
