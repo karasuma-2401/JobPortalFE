@@ -17,6 +17,17 @@ export const ApplicationService = {
         return response.data;
     },
 
+    getApplicationCount: async (jobPostId: number): Promise<number> => {
+        const response = await privateApi.get('/job-application', {
+            params: { jobPostId, limit: 1, offset: 0 },
+        });
+        // BE trả về ApiResponse<PageResponse<...>> → data.data.totalElements
+        const outer = response as unknown as Record<string, unknown>;
+        const inner = (outer?.data ?? outer) as Record<string, unknown>;
+        const page = (inner?.data ?? inner) as Record<string, unknown>;
+        return (page?.totalElements as number) ?? 0;
+    },
+
     getApplicationById: async (id: number): Promise<JobApplicationDetail> => {
         const response = await privateApi.get(`/job-application/${id}`);
         return (

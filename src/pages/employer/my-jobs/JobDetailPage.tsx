@@ -7,12 +7,14 @@ import JobMainContent from './components/JobContent';
 import JobSidebar from './components/JobSidebar';
 import PromoteJobModal from './components/PromoteJobModal';
 import { useJobForEdit } from '../../../hooks/useJobForEdit';
+import { useApplicationCount } from '../../../hooks/useApplications';
 import JobDetailSkeleton from './components/JobDetailSkeleton';
 
 export default function JobDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { data: job, isLoading, isError } = useJobForEdit(id);
+    const { data: applicationCount = 0 } = useApplicationCount(id);
 
     const [promoteModalData, setPromoteModalData] = useState({
         isOpen: false,
@@ -137,8 +139,7 @@ export default function JobDetailPage() {
                 </div>
 
                 <JobSidebar
-                    applications={job.applicationCount || 0}
-                    views={job.views || 0}
+                    applications={applicationCount}
                     skills={skillsArray}
                     onViewApplications={handleViewApplications}
                     onPromote={handlePromote}

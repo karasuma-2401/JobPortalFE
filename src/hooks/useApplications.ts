@@ -4,6 +4,15 @@ import { type ApiError } from '../api/api';
 import { ApplicationService } from '../services/applicationService';
 import type { ApplicationStatus, JobApplication } from '../types/application';
 
+export const useApplicationCount = (jobId: string | undefined) => {
+    return useQuery({
+        queryKey: ['applicationCount', jobId],
+        queryFn: () => ApplicationService.getApplicationCount(Number(jobId)),
+        enabled: !!jobId,
+        staleTime: 30 * 1000, // refresh mỗi 30s
+    });
+};
+
 export const useApplications = (jobId: string | null) => {
     return useQuery({
         queryKey: ['jobApplications', jobId],

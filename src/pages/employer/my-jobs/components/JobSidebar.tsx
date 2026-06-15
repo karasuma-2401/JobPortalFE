@@ -1,8 +1,7 @@
-import { Users, Eye, TrendingUp } from 'lucide-react';
+import { Users, TrendingUp } from 'lucide-react';
 
 interface JobSidebarProps {
     applications: number;
-    views: number;
     skills: string[];
     onViewApplications: () => void;
     onPromote: () => void;
@@ -10,7 +9,6 @@ interface JobSidebarProps {
 
 export default function JobSidebar({
     applications,
-    views,
     skills,
     onViewApplications,
     onPromote,
@@ -32,15 +30,6 @@ export default function JobSidebar({
                         <span className='font-bold text-gray-900'>
                             {applications}
                         </span>
-                    </div>
-                    <div className='flex items-center justify-between'>
-                        <div className='flex items-center gap-3 text-gray-500'>
-                            <div className='w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center'>
-                                <Eye size={18} />
-                            </div>
-                            <span className='font-medium'>Job Views</span>
-                        </div>
-                        <span className='font-bold text-gray-900'>{views}</span>
                     </div>
                 </div>
 
