@@ -1,13 +1,18 @@
-import { useState } from 'react';
+// import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import JobDetailHeader from './components/JobDetailHeader';
 import JobQuickStats from './components/JobQuickStats';
 import JobMainContent from './components/JobContent';
 import JobSidebar from './components/JobSidebar';
+<<<<<<< HEAD
 import PromoteJobModal from './components/PromoteJobModal';
 import { useJobForEdit } from '../../../hooks/useJobForEdit';
 import { useApplicationCount } from '../../../hooks/useApplications';
+=======
+// import PromoteJobModal from './components/PromoteJobModal';
+import { useJobDetail } from '../../../hooks/useJobDetail';
+>>>>>>> 2b40f7ee0efb7bb1452c559ef226fafc4a3b7498
 import JobDetailSkeleton from './components/JobDetailSkeleton';
 
 export default function JobDetailPage() {
@@ -16,11 +21,11 @@ export default function JobDetailPage() {
     const { data: job, isLoading, isError } = useJobForEdit(id);
     const { data: applicationCount = 0 } = useApplicationCount(id);
 
-    const [promoteModalData, setPromoteModalData] = useState({
-        isOpen: false,
-        jobId: '',
-        jobTitle: '',
-    });
+    // const [promoteModalData, setPromoteModalData] = useState({
+    //     isOpen: false,
+    //     jobId: '',
+    //     jobTitle: '',
+    // });
 
     const handleBack = () => navigate('/employer/my-jobs');
 
@@ -37,19 +42,19 @@ export default function JobDetailPage() {
         if (job?.id) navigate(`/employer/applications?jobId=${job.id}`);
     };
 
-    const handlePromote = () => {
-        if (job)
-            setPromoteModalData({
-                isOpen: true,
-                jobId: String(job.id),
-                jobTitle: job.title || '',
-            });
-    };
+    // const handlePromote = () => {
+    //     if (job)
+    //         setPromoteModalData({
+    //             isOpen: true,
+    //             jobId: String(job.id),
+    //             jobTitle: job.title || '',
+    //         });
+    // };
 
-    const handleConfirmPromote = (plan: string) => {
-        toast.success(`Successfully promoted job as ${plan.toUpperCase()}`);
-        setPromoteModalData({ isOpen: false, jobId: '', jobTitle: '' });
-    };
+    // const handleConfirmPromote = (plan: string) => {
+    //     toast.success(`Successfully promoted job as ${plan.toUpperCase()}`);
+    //     setPromoteModalData({ isOpen: false, jobId: '', jobTitle: '' });
+    // };
 
     if (isLoading) {
         return <JobDetailSkeleton />;
@@ -142,18 +147,18 @@ export default function JobDetailPage() {
                     applications={applicationCount}
                     skills={skillsArray}
                     onViewApplications={handleViewApplications}
-                    onPromote={handlePromote}
+                    // onPromote={handlePromote}
                 />
             </div>
 
-            <PromoteJobModal
+            {/* <PromoteJobModal
                 isOpen={promoteModalData.isOpen}
                 jobTitle={promoteModalData.jobTitle}
                 onClose={() =>
                     setPromoteModalData((prev) => ({ ...prev, isOpen: false }))
                 }
                 onConfirm={handleConfirmPromote}
-            />
+            /> */}
         </div>
     );
 }

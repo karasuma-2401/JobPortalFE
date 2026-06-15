@@ -1,4 +1,4 @@
-import { useState } from 'react';
+// import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Briefcase, BookmarkCheck, Users } from 'lucide-react';
 import StatCard from './components/StatCard';
@@ -6,22 +6,22 @@ import RecentJobsTable from './components/RecentJobsTable';
 
 import { useEmployerDashboard } from '../../../hooks/useDashboard';
 import { useJobActions } from '../../../hooks/useJobActions';
-import PromoteJobModal from '../my-jobs/components/PromoteJobModal';
+// import PromoteJobModal from '../my-jobs/components/PromoteJobModal';
 
 import { DashboardSkeleton } from './components/DashboardSkeleton';
 export default function Overview() {
     const navigate = useNavigate();
     const { data, isLoading } = useEmployerDashboard();
-    const { promoteJob, expireJob } = useJobActions();
-    const [promoteModalData, setPromoteModalData] = useState<{
-        isOpen: boolean;
-        jobId: number | string;
-        jobTitle: string;
-    }>({
-        isOpen: false,
-        jobId: '',
-        jobTitle: '',
-    });
+    const { expireJob } = useJobActions();
+    // const [promoteModalData, setPromoteModalData] = useState<{
+    //     isOpen: boolean;
+    //     jobId: number | string;
+    //     jobTitle: string;
+    // }>({
+    //     isOpen: false,
+    //     jobId: '',
+    //     jobTitle: '',
+    // });
 
     const handleViewApplications = (jobId: number) => {
         navigate(`/employer/applications?jobId=${jobId}`);
@@ -31,24 +31,24 @@ export default function Overview() {
         navigate(`/employer/my-jobs/${jobId}`);
     };
 
-    const handlePromote = (jobId: number) => {
-        const job = data?.jobs?.find((j) => j.id === jobId);
-        if (job) {
-            setPromoteModalData({
-                isOpen: true,
-                jobId: job.id,
-                jobTitle: job.title,
-            });
-        }
-    };
+    // const handlePromote = (jobId: number) => {
+    //     const job = data?.jobs?.find((j) => j.id === jobId);
+    //     if (job) {
+    //         setPromoteModalData({
+    //             isOpen: true,
+    //             jobId: job.id,
+    //             jobTitle: job.title,
+    //         });
+    //     }
+    // };
 
-    const handleConfirmPromote = (plan: string) => {
-        promoteJob({
-            id: String(promoteModalData.jobId),
-            plan: plan as 'featured' | 'highlight',
-        });
-        setPromoteModalData((prev) => ({ ...prev, isOpen: false }));
-    };
+    // const handleConfirmPromote = (plan: string) => {
+    //     promoteJob({
+    //         id: String(promoteModalData.jobId),
+    //         plan: plan as 'featured' | 'highlight',
+    //     });
+    //     setPromoteModalData((prev) => ({ ...prev, isOpen: false }));
+    // };
 
     const handleMarkExpired = (jobId: number) => {
         const confirm = window.confirm(
@@ -101,19 +101,19 @@ export default function Overview() {
             <RecentJobsTable
                 jobs={data?.jobs || []}
                 onViewApplications={handleViewApplications}
-                onPromote={handlePromote}
+                // onPromote={handlePromote}
                 onViewDetail={handleViewDetail}
                 onMarkExpired={handleMarkExpired}
             />
 
-            <PromoteJobModal
+            {/* <PromoteJobModal
                 isOpen={promoteModalData.isOpen}
                 jobTitle={promoteModalData.jobTitle}
                 onClose={() =>
                     setPromoteModalData((prev) => ({ ...prev, isOpen: false }))
                 }
                 onConfirm={handleConfirmPromote}
-            />
+            /> */}
         </div>
     );
 }

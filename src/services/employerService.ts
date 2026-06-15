@@ -1,70 +1,76 @@
 import { privateApi } from '../api/api';
-import type { JobPostResponse, PagedJobResponse } from '../types/jobpost';
+import type { PagedJobResponse } from '../types/jobpost';
 
 export interface InviteCandidatePayload {
     jobSeekerId: number;
     jobPostId: number;
 }
+interface ApiResponse<T> {
+    success: boolean;
+    message?: string;
+    data: T;
+}
 
 export const EmployerService = {
     setupProfile: async (formData: FormData) => {
-        const response = await privateApi.post('/employer', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+        return await privateApi.post('/employer', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
         });
-        return response;
     },
 
     getProfile: async () => {
-        const response = await privateApi.get('/employer');
-        return response;
+        return await privateApi.get('/employer');
     },
+
     updateProfile: async (formData: FormData) => {
-        const response = await privateApi.patch('/employer', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+        return await privateApi.patch('/employer', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
         });
-        return response;
     },
-
-    getRecentJobs: async (params?: Record<string, unknown>) => {
-        const response = await privateApi.get('/employer/job-posts/recent', {
+    getRecentJobs: async <T = unknown>(
+        params?: Record<string, unknown>
+    ): Promise<T> => {
+        const response = (await privateApi.get('/employer/job-posts/recent', {
             params,
-        });
-        return response;
-    },
-    getStatistics: async () => {
-        const response = await privateApi.get('/employer/statistics');
+        })) as ApiResponse<T>;
         return response.data;
     },
 
-    getSavedCandidates: async () => {
-        const response = await privateApi.get('/saved-candidates');
+    getStatistics: async <T = unknown>(): Promise<T> => {
+        const response = (await privateApi.get(
+            '/employer/statistics'
+        )) as ApiResponse<T>;
         return response.data;
     },
+
+    getSavedCandidates: async <T = unknown>(): Promise<T> => {
+        const response = (await privateApi.get(
+            '/saved-candidates'
+        )) as ApiResponse<T>;
+        return response.data;
+    },
+
     discoverCandidates: async (params: Record<string, unknown>) => {
-        const response = await privateApi.get('/job-seeker/discover', {
-            params,
-        });
-        return response;
+        return await privateApi.get('/job-seeker/discover', { params });
     },
+
     getEmployerJobPosts: async (
         params: Record<string, unknown> = {}
     ): Promise<PagedJobResponse> => {
-        const response = await privateApi.get('/employer/job-posts', {
+        const response = (await privateApi.get('/employer/job-posts', {
             params,
-        });
-        const dataNode = ((response as unknown as Record<string, unknown>)
-            ?.data ?? response) as Record<string, unknown>;
+        })) as ApiResponse<PagedJobResponse>;
 
         return {
-            items: (dataNode?.items as JobPostResponse[]) || [],
-            totalItems: (dataNode?.totalItems as number) || 0,
+            items: response.data?.items || [],
+            totalItems: response.data?.totalItems || 0,
         };
     },
+
     inviteCandidate: async (payload: InviteCandidatePayload) => {
-        return await privateApi.post('/employer/candidate-invitations', payload);
+        return await privateApi.post(
+            '/employer/candidate-invitations',
+            payload
+        );
     },
 };

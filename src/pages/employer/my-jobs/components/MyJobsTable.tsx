@@ -1,9 +1,9 @@
+// src/pages/employer/my-jobs/components/MyJobsTable.tsx
 import { useState, useRef, useEffect } from 'react';
 import {
     MoreVertical,
     CheckCircle2,
     XCircle,
-    ArrowUpCircle,
     Eye,
     XSquare,
     Users,
@@ -16,14 +16,13 @@ export interface JobItem {
     dateInfo: string;
     status: 'Active' | 'Expire';
     applications: number;
-    isFeatured?: boolean;
+    isFeatured?: boolean; // Đã mở comment
     isHighlighted?: boolean;
 }
 
 interface MyJobsTableProps {
     jobs: JobItem[];
     onViewApplications: (id: string) => void;
-    onPromote: (id: string) => void;
     onViewDetail: (id: string) => void;
     onMarkExpired: (id: string) => void;
 }
@@ -31,7 +30,6 @@ interface MyJobsTableProps {
 export default function MyJobsTable({
     jobs,
     onViewApplications,
-    onPromote,
     onViewDetail,
     onMarkExpired,
 }: MyJobsTableProps) {
@@ -142,21 +140,6 @@ export default function MyJobsTable({
 
                                             {openDropdownId === job.id && (
                                                 <div className='absolute right-0 top-12 z-50 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 animate-in fade-in zoom-in-95'>
-                                                    <button
-                                                        onClick={() => {
-                                                            onPromote(job.id);
-                                                            setOpenDropdownId(
-                                                                null
-                                                            );
-                                                        }}
-                                                        className='w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors'
-                                                    >
-                                                        <ArrowUpCircle
-                                                            size={16}
-                                                            className='text-blue-500'
-                                                        />
-                                                        Promote Job
-                                                    </button>
                                                     <button
                                                         onClick={() => {
                                                             onViewDetail(
