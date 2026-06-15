@@ -7,25 +7,6 @@ import { useDashboardOverview } from './hooks/useDashboardOverview';
 import { useNavigate } from 'react-router-dom';
 
 export default function OverviewPage() {
-<<<<<<< HEAD
-  const {
-    loading,
-    error,
-    stats,
-    recentApplied,
-    isProfileCompleted,
-    selectedJobId,
-    setSelectedJobId,
-  } = useDashboardOverview();
-  console.log("=== KIỂM TRA DỮ LIỆU RECENT APPLIED ===", recentApplied);
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-=======
     const navigate = useNavigate();
     const {
         loading,
@@ -44,7 +25,6 @@ export default function OverviewPage() {
             </div>
         );
     }
->>>>>>> 18728b87f5c8e74e1cef5234679709b868294fdc
 
     if (error) {
         return (
@@ -63,62 +43,6 @@ export default function OverviewPage() {
                 </p>
             </div>
 
-<<<<<<< HEAD
-      <div className="grid grid-cols-3 gap-6">
-        <StatCard 
-          count={String(stats.appliedCount)} 
-          label="Applied jobs" 
-          variant="blue"
-          icon={<Briefcase size={26} strokeWidth={2.5} />} 
-        />
-        <StatCard 
-          count={String(stats.favoriteCount)} 
-          label="Favorite jobs" 
-          variant="orange"
-          icon={<Bookmark size={26} strokeWidth={2.5} />} 
-        />
-        <StatCard 
-          count={String(stats.alertCount)} 
-          label="Job Alerts" 
-          variant="green"
-          icon={<Bell size={26} strokeWidth={2.5} />} 
-        />
-      </div>
-
-      {!isProfileCompleted && <ProfileAlert />}
-
-      <div className="space-y-5">
-        <div className="flex items-center justify-between">
-          <h2 className="text-[18px] font-bold text-gray-900">Recently Applied</h2>
-          <button className="flex items-center gap-2 text-[15px] font-medium text-gray-500 hover:text-gray-900 transition-colors group">
-            View all <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
-
-        {recentApplied.length === 0 ? (
-          <div className="text-center py-10 bg-white border border-gray-100 rounded-xl">
-            <p className="text-[15px] text-gray-400">You haven't applied to any jobs yet.</p>
-          </div>
-        ) : (
-          <>
-            <JobTableHeader />
-            
-            <div className="flex flex-col gap-3">
-              {recentApplied.map((job) => (
-                <AppliedJobItem
-                  key={job.id}
-                  id={job.id}
-                  logo={job.logo}
-                  role={job.role}
-                  type={job.type}
-                  jobPostId={job.id}
-                  location={job.location}
-                  salary={job.salary}
-                  dateApplied={job.appliedAt}
-                  status={job.status}
-                  isSelected={selectedJobId === job.id}
-                  onSelect={() => setSelectedJobId(job.id)}
-=======
             <div className='grid grid-cols-3 gap-6'>
                 <StatCard
                     onClick={() => navigate('/jobseeker/DashBoard/applied')}
@@ -140,7 +64,6 @@ export default function OverviewPage() {
                     label='Job Alerts'
                     variant='green'
                     icon={<Bell size={26} strokeWidth={2.5} />}
->>>>>>> 18728b87f5c8e74e1cef5234679709b868294fdc
                 />
             </div>
 
