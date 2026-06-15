@@ -5,14 +5,8 @@ import JobDetailHeader from './components/JobDetailHeader';
 import JobQuickStats from './components/JobQuickStats';
 import JobMainContent from './components/JobContent';
 import JobSidebar from './components/JobSidebar';
-<<<<<<< HEAD
-import PromoteJobModal from './components/PromoteJobModal';
 import { useJobForEdit } from '../../../hooks/useJobForEdit';
 import { useApplicationCount } from '../../../hooks/useApplications';
-=======
-// import PromoteJobModal from './components/PromoteJobModal';
-import { useJobDetail } from '../../../hooks/useJobDetail';
->>>>>>> 2b40f7ee0efb7bb1452c559ef226fafc4a3b7498
 import JobDetailSkeleton from './components/JobDetailSkeleton';
 
 export default function JobDetailPage() {

@@ -21,11 +21,11 @@ export const ApplicationService = {
         const response = await privateApi.get('/job-application', {
             params: { jobPostId, limit: 1, offset: 0 },
         });
-        // BE trả về ApiResponse<PageResponse<...>> → data.data.totalElements
-        const outer = response as unknown as Record<string, unknown>;
-        const inner = (outer?.data ?? outer) as Record<string, unknown>;
-        const page = (inner?.data ?? inner) as Record<string, unknown>;
-        return (page?.totalElements as number) ?? 0;
+        // privateApi interceptor đã unwrap axios response → response = ApiResponse<PageResponse<...>>
+        // Cấu trúc: { status, message, data: { content: [...], totalElements: N, ... } }
+        const apiResponse = response as unknown as Record<string, unknown>;
+        const pageData = (apiResponse?.data ?? apiResponse) as Record<string, unknown>;
+        return (pageData?.totalElements as number) ?? 0;
     },
 
     getApplicationById: async (id: number): Promise<JobApplicationDetail> => {

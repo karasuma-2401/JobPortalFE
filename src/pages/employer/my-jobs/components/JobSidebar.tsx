@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { Users, TrendingUp } from 'lucide-react';
-=======
-import { Users, Eye } from 'lucide-react';
->>>>>>> 2b40f7ee0efb7bb1452c559ef226fafc4a3b7498
+import { Users} from 'lucide-react';
 
 interface JobSidebarProps {
     applications: number;
