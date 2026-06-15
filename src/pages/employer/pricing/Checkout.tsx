@@ -55,7 +55,6 @@ export default function CheckoutPage() {
                         const message =
                             'Failed to initialize payment gateway. Payment identifier is missing.';
                         setCheckoutError(message);
-                        toast.error(message);
                         return;
                     }
 
@@ -76,7 +75,6 @@ export default function CheckoutPage() {
                             ? error.message
                             : 'Failed to initialize payment gateway.';
                     setCheckoutError(message);
-                    toast.error(message);
                 },
             });
         }
