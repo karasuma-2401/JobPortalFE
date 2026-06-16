@@ -27,7 +27,7 @@ export function useDashboardOverview() {
         alertCount: data.alertCount,
       });
       setRecentApplied(data.recentApplied);
-      setIsProfileCompleted(data.isProfileCompleted);
+      setIsProfileCompleted(data.ProfileCompleted);
       
       // Chọn mặc định công việc đầu tiên nếu có
       if (data.recentApplied.length > 0) {

@@ -74,16 +74,15 @@ export interface IndustryResponse {
     createdAt: string;
 }
 
-export interface AuditLogResponse {
-    id: number;
-    actionType: 'CREATE' | 'UPDATE' | 'DELETE';
-    entityName: string;
-    recordId: number;
-    userId: number;
-    userName: string;
-    data: string; // JSON data
-    ipAddress?: string;
-    createdAt: string;
+export interface AuditLogResponse {  
+    id: number;  
+    actionType: 'CREATE' | 'UPDATE' | 'DELETE';  
+    entityName: string;  
+    recordId: number;  
+    actorUserId: number;    
+    actorEmail: string;    
+    data: string;  
+    eventTime: string;      
 }
 
 // 6. Payment Interfaces

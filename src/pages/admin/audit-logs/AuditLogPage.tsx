@@ -31,24 +31,15 @@ const toAdminAuditActionType = (
             return 'All';
     }
 };
-
-type AuditLogResponse = {
-    id: number | string;
-    createdAt: string;
-    actionType: 'CREATE' | 'UPDATE' | 'DELETE';
-    userId: number | string;
-    userName?: string;
-    data: string;
-    // Flexible backend fields
-    entityName?: string;
-    recordId?: number | string;
-};
-
+import type {AuditLogResponse} from '../../../types/admin';
 type AuditLogItemLike = AuditLogResponse & {
     email?: string;
     entityType?: string;
     entityId?: number | string;
     ipAddress?: string;
+    eventTime?: string;
+    actorUserId?: number;
+    actorEmail?: string;
 };
 
 export default function AuditLogPage() {
@@ -90,9 +81,9 @@ export default function AuditLogPage() {
 
             return {
                 id: String(log.id),
-                createdAt: log.createdAt,
-                userId: String(log.userId),
-                email: log.userName ?? log.email ?? 'N/A',
+                createdAt: log.eventTime ?? '',          
+                userId: String(log.actorUserId ?? ''),   
+                email: log.actorEmail ?? 'N/A',
                 action,
                 entityType,
                 entityId,
