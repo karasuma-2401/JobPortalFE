@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import type { Candidate } from '../../../types/candidate';
 
-// Giữ nguyên 2 file tách biệt như cấu trúc folder của bạn
 import { useCandidateProfile } from '../../../hooks/useCandidateProfile';
 import { useSeekerProfileById } from '../../../hooks/useSeekerProfileById';
 
@@ -31,11 +30,12 @@ export default function CandidateProfileModal({
 
     const { data: appProfile, isLoading: isAppLoading } = useCandidateProfile(
         isOpen && candidate && !isGeneralSeeker ? Number(candidate.id) : null
-    );  
-      
-    const { data: seekerProfile, isLoading: isSeekerLoading } = useSeekerProfileById(  
-        isOpen && candidate && isGeneralSeeker ? Number(candidate.id) : null  
     );
+
+    const { data: seekerProfile, isLoading: isSeekerLoading } =
+        useSeekerProfileById(
+            isOpen && candidate && isGeneralSeeker ? Number(candidate.id) : null
+        );
 
     const isLoading = isAppLoading || isSeekerLoading;
 
@@ -49,27 +49,46 @@ export default function CandidateProfileModal({
 
     if (!isOpen || !candidate) return null;
 
-    const seeker = isGeneralSeeker ? seekerProfile : appProfile?.jobSeekerProfile;
+    const seeker = isGeneralSeeker
+        ? seekerProfile
+        : appProfile?.jobSeekerProfile;
 
     const displayData = {
         name: seeker?.fullName || candidate.name,
         role: seeker?.professionalTitle || candidate.role || 'Candidate',
-        biography: seeker?.biography || candidate.biography || 'No biography provided.',
-        coverLetter: appProfile?.coverLetter || candidate.coverLetter || 'No cover letter provided.',
+        biography:
+            seeker?.biography ||
+            candidate.biography ||
+            'No biography provided.',
+        coverLetter:
+            appProfile?.coverLetter ||
+            candidate.coverLetter ||
+            'No cover letter provided.',
         dateOfBirth: seeker?.dateOfBirth
             ? new Date(seeker.dateOfBirth).toLocaleDateString()
             : candidate.dateOfBirth,
-        nationality: seeker?.nationality || candidate.nationality || 'Not specified',
-        maritalStatus: seeker?.maritalStatus || candidate.maritalStatus || 'Not specified',
+        nationality:
+            seeker?.nationality || candidate.nationality || 'Not specified',
+        maritalStatus:
+            seeker?.maritalStatus || candidate.maritalStatus || 'Not specified',
         gender: seeker?.gender || candidate.gender || 'Not specified',
-        experience: seeker?.experienceSummary || candidate.experience || 'Not specified',
-        education: seeker?.educationSummary || candidate.education || 'Not specified',
+        experience:
+            seeker?.experienceSummary ||
+            candidate.experience ||
+            'Not specified',
+        education:
+            seeker?.educationSummary || candidate.education || 'Not specified',
         website: seeker?.website || candidate.website,
         location: seeker?.address || candidate.location || 'Not specified',
         phone: seeker?.phone || candidate.phone || 'Not specified',
-        secondaryPhone: seeker?.secondaryPhone || candidate.secondaryPhone || 'Not specified',
+        secondaryPhone:
+            seeker?.secondaryPhone ||
+            candidate.secondaryPhone ||
+            'Not specified',
         email: seeker?.email || candidate.email,
-        avatar: seeker?.avatar || candidate.avatar || 
+        avatar:
+            seeker?.avatar ||
+            candidate.avatar ||
             `https://ui-avatars.com/api/?name=${encodeURIComponent(seeker?.fullName || candidate.name)}&background=f3f4f6&color=4b5563`,
         social: {
             facebook: seeker?.facebookUrl || candidate.social?.facebook,
@@ -80,7 +99,11 @@ export default function CandidateProfileModal({
 
     const handleToggleSave = () => {
         setIsSaved(!isSaved);
-        toast.info(isSaved ? `${displayData.name} removed.` : `${displayData.name} bookmarked!`);
+        toast.info(
+            isSaved
+                ? `${displayData.name} removed.`
+                : `${displayData.name} bookmarked!`
+        );
     };
 
     const handleSendMail = () => {
@@ -88,8 +111,12 @@ export default function CandidateProfileModal({
             onInviteCandidate(candidate);
             return;
         }
-        const subject = encodeURIComponent(`Interview Invitation: ${displayData.role}`);
-        const body = encodeURIComponent(`Hi ${displayData.name},\n\nWe would like to invite you...`);
+        const subject = encodeURIComponent(
+            `Interview Invitation: ${displayData.role}`
+        );
+        const body = encodeURIComponent(
+            `Hi ${displayData.name},\n\nWe would like to invite you...`
+        );
         window.location.href = `mailto:${displayData.email}?subject=${subject}&body=${body}`;
         toast.success(`Opening email composer...`);
     };
@@ -105,7 +132,10 @@ export default function CandidateProfileModal({
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `${displayData.name.replace(/\s+/g, '_')}_Resume.pdf`);
+        link.setAttribute(
+            'download',
+            `${displayData.name.replace(/\s+/g, '_')}_Resume.pdf`
+        );
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -122,7 +152,7 @@ export default function CandidateProfileModal({
                 >
                     <X size={20} />
                 </button>
-                
+
                 <ModalHeader
                     avatar={displayData.avatar}
                     name={displayData.name}

@@ -149,9 +149,12 @@ export function PersonalStatsCard({
                 <p className='text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1'>
                     Experience
                 </p>
-                <p className='text-sm font-semibold text-gray-900'>
-                    {experience}
-                </p>
+                <p
+                    dangerouslySetInnerHTML={{
+                        __html: experience || 'No experience provided',
+                    }}
+                    className='text-sm font-semibold text-gray-900'
+                ></p>
             </div>
             <div>
                 <div className='text-blue-600 mb-2'>
@@ -160,9 +163,12 @@ export function PersonalStatsCard({
                 <p className='text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1'>
                     Education
                 </p>
-                <p className='text-sm font-semibold text-gray-900'>
-                    {education}
-                </p>
+                <p
+                    dangerouslySetInnerHTML={{
+                        __html: education || 'No education provided',
+                    }}
+                    className='text-sm font-semibold text-gray-900'
+                ></p>
             </div>
         </div>
     );

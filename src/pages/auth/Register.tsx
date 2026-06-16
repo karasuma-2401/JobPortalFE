@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import ComboBox, { type OptionType } from '../../components/ui/ComboBox';
-import GoogleLogo from '../../assets/GoogleLogo.svg';
 import type { RegisterRequest } from '../../types/auth';
 import { useRegister } from '../../hooks/useAuth';
 import TermsModal from '../../components/TermsModal';
@@ -143,19 +142,6 @@ export default function Register() {
                     )}
                 </Button>
             </form>
-
-            <div className='flex items-center gap-4 my-6 '>
-                <div className='flex-1 h-px bg-gray-100'></div>
-                <span className='text-gray-400 text-sm'>or</span>
-                <div className='flex-1 h-px bg-gray-100'></div>
-            </div>
-
-            <div className='flex gap-4'>
-                <Button variant='social' fullWidth>
-                    <img src={GoogleLogo} alt='Google logo' />
-                    Sign in with Google
-                </Button>
-            </div>
 
             <TermsModal
                 isOpen={isModalOpen}

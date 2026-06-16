@@ -1,4 +1,3 @@
-// src/pages/employer/my-jobs/MyJobsPage.tsx
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MyJobsTable, { type JobItem } from './components/MyJobsTable';
@@ -10,21 +9,21 @@ import { useJobActions } from '../../../hooks/useJobActions';
 import type { JobPostResponse } from '../../../types/jobpost';
 
 import MyJobsTableSkeleton from './components/MyJobsTableSkeleton';
+
 const ITEMS_PER_PAGE = 6;
 
 const filterOptions = [
-    { label: 'All Jobs', value: 'All Jobs' },
-    { label: 'Active', value: 'Active' },
-    { label: 'Expire', value: 'Expire' },
+    { label: 'All Jobs', value: 'ALL' },
+    { label: 'Active', value: 'ACTIVE' },
+    { label: 'Expire', value: 'EXPIRED' },
 ];
 
 export default function MyJobsPage() {
     const navigate = useNavigate();
-    const [filter, setFilter] = useState<string>('All Jobs');
+    const [filter, setFilter] = useState<string>('ALL');
     const [currentPage, setCurrentPage] = useState(1);
-
     const { data: jobData, isLoading } = useEmployerJobs(
-        filter,
+        '',
         currentPage,
         ITEMS_PER_PAGE
     );
@@ -32,7 +31,8 @@ export default function MyJobsPage() {
 
     const mappedJobs: JobItem[] = useMemo(() => {
         if (!jobData?.items) return [];
-        return jobData.items.map((job: JobPostResponse) => {
+
+        const allJobs = jobData.items.map((job: JobPostResponse) => {
             let dateInfo = job.daysRemaining || 'N/A';
             if (!job.daysRemaining && job.expiresAt) {
                 const diffTime =
@@ -40,6 +40,10 @@ export default function MyJobsPage() {
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 dateInfo =
                     diffDays > 0 ? `${diffDays} days remaining` : 'Expired';
+            }
+            let displayStatus: 'Active' | 'Expire' = 'Active';
+            if (job.status === 'EXPIRED' || job.status === 'CLOSED') {
+                displayStatus = 'Expire';
             }
 
             return {
@@ -49,19 +53,27 @@ export default function MyJobsPage() {
                     ? job.employmentType.replace('_', ' ')
                     : 'N/A',
                 dateInfo,
-                status: job.status === 'EXPIRED' ? 'Expire' : 'Active',
+                status: displayStatus,
                 applications: job.applicationCount || 0,
                 isFeatured: job.isFeatured,
                 isHighlighted: job.isHighlighted,
             };
         });
-    }, [jobData]);
+
+        if (filter === 'ACTIVE') {
+            return allJobs.filter((job) => job.status === 'Active');
+        }
+        if (filter === 'EXPIRED') {
+            return allJobs.filter((job) => job.status === 'Expire');
+        }
+
+        return allJobs;
+    }, [jobData, filter]);
 
     const totalPages = Math.ceil((jobData?.totalItems || 0) / ITEMS_PER_PAGE);
 
     const handleFilterChange = (val: string) => {
         setFilter(val);
-        setCurrentPage(1);
     };
 
     const handleViewApplications = (id: string) => {
