@@ -116,6 +116,11 @@ export default function IndustryManagementPage() {
         setIsModalOpen(true);
     };
 
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEditingIndustry(null); // Reset dữ liệu sửa đổi khi đóng modal
+    };
+
     const handleSubmitForm = (name: string) => {
         saveIndustryMutation.mutate(name);
     };
@@ -192,12 +197,17 @@ export default function IndustryManagementPage() {
                     }}
                 />
             </div>
-            <IndustryModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSubmit={handleSubmitForm}
-                initialData={editingIndustry}
-            />
+
+            {/* SỬA ĐỔI CHÍNH Ở ĐÂY: Chỉ render khi mở và truyền key động để ép buộc làm mới State bên trong */}
+            {isModalOpen && (
+                <IndustryModal
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                    onSubmit={handleSubmitForm}
+                    initialData={editingIndustry}
+                    key={editingIndustry?.id || 'new-industry'}
+                />
+            )}
 
             <ConfirmModal
                 isOpen={!!deletingIndustry}

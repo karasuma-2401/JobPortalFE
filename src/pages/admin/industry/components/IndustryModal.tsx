@@ -34,6 +34,7 @@ export default function IndustryModal({
                 className='absolute inset-0 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200'
                 onClick={onClose}
             ></div>
+            
             <div className='relative w-full max-w-md bg-white rounded-xl shadow-2xl p-6 animate-in zoom-in-95 duration-200'>
                 <div className='flex items-center justify-between mb-6'>
                     <div className='flex items-center gap-3'>
