@@ -1,5 +1,5 @@
 import { X, Download, Loader2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
 import type { Candidate } from '../../../types/candidate';
 
@@ -26,8 +26,6 @@ export default function CandidateProfileModal({
     isGeneralSeeker,
     onInviteCandidate,
 }: CandidateProfileModalProps) {
-    const [isSaved, setIsSaved] = useState(true);
-
     const { data: appProfile, isLoading: isAppLoading } = useCandidateProfile(
         isOpen && candidate && !isGeneralSeeker ? Number(candidate.id) : null
     );
@@ -97,15 +95,6 @@ export default function CandidateProfileModal({
         },
     };
 
-    const handleToggleSave = () => {
-        setIsSaved(!isSaved);
-        toast.info(
-            isSaved
-                ? `${displayData.name} removed.`
-                : `${displayData.name} bookmarked!`
-        );
-    };
-
     const handleSendMail = () => {
         if (onInviteCandidate) {
             onInviteCandidate(candidate);
@@ -157,8 +146,6 @@ export default function CandidateProfileModal({
                     avatar={displayData.avatar}
                     name={displayData.name}
                     role={displayData.role}
-                    isSaved={isSaved}
-                    onToggleSave={handleToggleSave}
                     onSendMail={handleSendMail}
                 />
 
