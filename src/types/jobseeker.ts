@@ -171,7 +171,7 @@ export interface DashboardOverviewType {
     favoriteCount: number;
     alertCount: number;
     recentApplied: AppliedJobType[];
-    isProfileCompleted: boolean;
+    ProfileCompleted: boolean;
 }
 
 export interface Resume {
