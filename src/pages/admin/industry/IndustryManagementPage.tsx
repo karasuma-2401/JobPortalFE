@@ -118,7 +118,7 @@ export default function IndustryManagementPage() {
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
-        setEditingIndustry(null); // Reset dữ liệu sửa đổi khi đóng modal
+        setEditingIndustry(null); 
     };
 
     const handleSubmitForm = (name: string) => {
@@ -198,7 +198,6 @@ export default function IndustryManagementPage() {
                 />
             </div>
 
-            {/* SỬA ĐỔI CHÍNH Ở ĐÂY: Chỉ render khi mở và truyền key động để ép buộc làm mới State bên trong */}
             {isModalOpen && (
                 <IndustryModal
                     isOpen={isModalOpen}
