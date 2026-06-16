@@ -116,6 +116,7 @@ function JobFormInner({
     }));
 
     const handleChange = (field: string, value: string | string[]) => {
+        console.log(value) 
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
@@ -130,6 +131,7 @@ function JobFormInner({
             !formData.tags.length ||
             !formData.industry
         ) {
+            console.log(formData.title , formData.location , formData.expirationDate , formData.description , formData.tags.length, formData.industry)
             toast.error('Please fill in all required fields...');
             return;
         }

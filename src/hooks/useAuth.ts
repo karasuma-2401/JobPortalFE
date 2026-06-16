@@ -29,6 +29,7 @@ export const useLogin = () => {
             let tokens;
             try {
                 const deviceToken = await registerDeviceToken();
+                console.log(deviceToken) 
                 tokens = await AuthService.login({
                     ...payload,
                     ...(deviceToken ? { fcmToken: deviceToken } : {}),
