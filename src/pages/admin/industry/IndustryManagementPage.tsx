@@ -116,6 +116,11 @@ export default function IndustryManagementPage() {
         setIsModalOpen(true);
     };
 
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEditingIndustry(null); 
+    };
+
     const handleSubmitForm = (name: string) => {
         saveIndustryMutation.mutate(name);
     };
@@ -192,12 +197,16 @@ export default function IndustryManagementPage() {
                     }}
                 />
             </div>
-            <IndustryModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSubmit={handleSubmitForm}
-                initialData={editingIndustry}
-            />
+
+            {isModalOpen && (
+                <IndustryModal
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                    onSubmit={handleSubmitForm}
+                    initialData={editingIndustry}
+                    key={editingIndustry?.id || 'new-industry'}
+                />
+            )}
 
             <ConfirmModal
                 isOpen={!!deletingIndustry}
