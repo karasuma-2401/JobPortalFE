@@ -138,6 +138,15 @@ export default function CandidateTopBar() {
                                 <button
                                     onClick={() => {
                                         setIsProfileOpen(false);
+                                        navigate('/jobseeker/DashBoard/overview'); 
+                                    }}
+                                    className='w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors'
+                                >
+                                    <Settings size={16} /> Overview
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setIsProfileOpen(false);
                                         navigate('/jobseeker/DashBoard/settings'); 
                                     }}
                                     className='w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors'

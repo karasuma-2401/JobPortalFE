@@ -143,7 +143,7 @@ export interface AppliedJobType {
     type: string;
     location: string;
     salary: string;
-    appliedAt: string;
+    dateApplied: string;
     status: string;
 }
 
