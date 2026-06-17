@@ -95,7 +95,7 @@ export default function AppliedJobsPage() {
                                     type={job.type}
                                     location={job.location}
                                     salary={job.salary}
-                                    dateApplied={job.appliedAt}
+                                    dateApplied={job.dateApplied}
                                     status={job.status}
                                     isSelected={selectedJobId === job.id}
                                     onSelect={() => setSelectedJobId(job.id)}
