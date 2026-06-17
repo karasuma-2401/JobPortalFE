@@ -62,7 +62,10 @@ export const InterviewService = {
         payload: CreateInterviewSessionPayload
     ): Promise<InterviewSession> => {
         return unwrap<InterviewSession>(
-            await privateApi.post(`/interview-sessions/${id}/reschedule`, payload)
+            await privateApi.post(
+                `/interview-sessions/${id}/reschedule`,
+                payload
+            )
         );
     },
 

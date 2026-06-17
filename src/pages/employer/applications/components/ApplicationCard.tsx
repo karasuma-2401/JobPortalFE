@@ -1,10 +1,9 @@
-import { Download, MoreVertical, Trash2, Eye } from 'lucide-react';
+import { MoreVertical, Trash2, Eye } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import { toast } from 'sonner';
 import type { Candidate } from '../../../../types/candidate';
 
 interface ApplicationCardProps {
-    applicant: Candidate & { resumeUrl?: string };
+    applicant: Candidate;
     onDragStart: (e: React.DragEvent, id: string) => void;
     onDeleteApplicant: (id: string) => void;
     onViewProfile: (id: string) => void;
@@ -37,30 +36,6 @@ export default function ApplicationCard({
             document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleDownloadCV = () => {
-        let fileUrl = applicant.resumeUrl;
-
-        if (fileUrl) {
-            const httpMatches = fileUrl.match(/http/g);
-            if (httpMatches && httpMatches.length > 1) {
-                const lastHttpIndex = fileUrl.lastIndexOf('http');
-                fileUrl = fileUrl.substring(lastHttpIndex);
-            }
-
-            toast.success(`Opening CV of ${applicant.name}...`);
-
-            const link = document.createElement('a');
-            link.href = fileUrl;
-            link.target = '_blank';
-            link.download = `CV_${applicant.name.replace(/\s+/g, '_')}`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } else {
-            toast.error('No CV attached to this application.');
-        }
-    };
-
     return (
         <div
             draggable
@@ -78,9 +53,14 @@ export default function ApplicationCard({
                         <h4 className='font-bold text-gray-900 text-sm'>
                             {applicant.name}
                         </h4>
-                        <p className='text-[11px] text-gray-400 uppercase font-semibold tracking-wider'>
-                            {applicant.experience}
-                        </p>
+                        <p
+                            dangerouslySetInnerHTML={{
+                                __html:
+                                    applicant.experience ||
+                                    'No experience provided',
+                            }}
+                            className='text-[11px] text-gray-400 uppercase font-semibold tracking-wider'
+                        ></p>
                     </div>
                 </div>
                 <div className='relative' ref={menuRef}>
@@ -116,14 +96,18 @@ export default function ApplicationCard({
                 </div>
             </div>
 
-            <div className='space-y-2 mb-5'>
+            <div className='space-y-2 mb-2'>
                 <div className='flex items-start gap-2 text-xs text-gray-600'>
                     <span className='text-gray-400 font-medium'>
                         Education:
                     </span>
-                    <span className='flex-1 leading-relaxed'>
-                        {applicant.education}
-                    </span>
+                    <span
+                        dangerouslySetInnerHTML={{
+                            __html:
+                                applicant.education || 'No experience provided',
+                        }}
+                        className='flex-1 leading-relaxed'
+                    ></span>
                 </div>
                 <div className='flex items-start gap-2 text-xs text-gray-600'>
                     <span className='text-gray-400 font-medium'>Applied:</span>
@@ -132,14 +116,6 @@ export default function ApplicationCard({
                     </span>
                 </div>
             </div>
-
-            <button
-                onClick={handleDownloadCV}
-                className='w-full flex items-center justify-center gap-2 py-2.5 bg-blue-50 text-blue-600 rounded-md text-xs font-bold hover:bg-blue-600 hover:text-white transition-all'
-            >
-                <Download size={14} />
-                Download CV
-            </button>
         </div>
     );
 }

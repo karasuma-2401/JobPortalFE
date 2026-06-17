@@ -63,9 +63,7 @@ export const useSelectInterviewSlot = () => {
     });
 };
 
-export const useInterviewAction = (
-    action: 'cancel' | 'complete'
-) => {
+export const useInterviewAction = (action: 'cancel' | 'complete') => {
     const queryClient = useQueryClient();
 
     return useMutation({

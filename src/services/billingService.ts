@@ -41,7 +41,10 @@ export const BillingService = {
     ): Promise<TransactionDetails> => {
         const response = (await privateApi.get(
             `/payments/transaction/${transactionRef}`
-        )) as unknown as ApiResponse<TransactionDetails>;
-        return response.data;
+        )) as unknown as ApiResponse<TransactionDetails> | TransactionDetails;
+        if ('data' in response) {
+            return response.data;
+        }
+        return response;
     },
 };

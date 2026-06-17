@@ -26,6 +26,14 @@ const FIXED_COLUMNS: ColumnData[] = [
     { id: 'REJECTED', title: 'Rejected' },
 ];
 
+type ExtendedJobApplication = JobApplication & {
+    cvUrl?: string;
+    resume?: { fileUrl?: string } | string;
+    jobSeekerProfile?: JobApplication['jobSeekerProfile'] & {
+        resume?: { fileUrl?: string } | string;
+    };
+};
+
 export default function ApplicationsPage() {
     const queryClient = useQueryClient();
     const [searchParams] = useSearchParams();
@@ -61,8 +69,26 @@ export default function ApplicationsPage() {
     const candidates: Candidate[] = useMemo(() => {
         if (!apiApplications || !Array.isArray(apiApplications)) return [];
 
-        return apiApplications.map((app: JobApplication) => {
+
+        return apiApplications.map((app: ExtendedJobApplication) => {
             const seeker = app.jobSeekerProfile;
+
+            let extractedFileUrl: string | undefined = app.cvUrl;
+
+            if (!extractedFileUrl && app.resume) {
+                extractedFileUrl =
+                    typeof app.resume === 'string'
+                        ? app.resume
+                        : app.resume.fileUrl;
+            }
+
+            if (!extractedFileUrl && seeker?.resume) {
+                extractedFileUrl =
+                    typeof seeker.resume === 'string'
+                        ? seeker.resume
+                        : seeker.resume.fileUrl;
+            }
+
             return {
                 id: String(app.id),
                 columnId: app.status,
@@ -84,7 +110,7 @@ export default function ApplicationsPage() {
                 secondaryPhone: '',
                 email: seeker?.email || 'Unknown Email',
                 social: {},
-                resumeUrl: app.resume?.fileUrl || '',
+                resumeUrl: extractedFileUrl || '',
             };
         });
     }, [apiApplications]);
