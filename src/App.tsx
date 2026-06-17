@@ -54,7 +54,9 @@ import JobAlertPage from './pages/jobseeker/dashboard/JobAlert/JobAlert';
 import FindJobPage from './pages/jobseeker/FindJob/FindJobPage';
 import FavoriteJobsPage from './pages/jobseeker/dashboard/FavoriteJob/FavoriteJobs';
 import AppliedJobsPage from './pages/jobseeker/dashboard/AppliedJob/AppliedJobs';
+import InterviewsPage from './pages/jobseeker/dashboard/Interviews/InterviewsPage';
 import OverviewPage from './pages/jobseeker/dashboard/Overview/Overview';
+import InterviewDetailPage from './pages/jobseeker/interviews/InterviewDetailPage';
 
 import JobDetailPage from './pages/employer/my-jobs/JobDetailPage';
 import EditJobPage from './pages/employer/my-jobs/components/EditJobPage';
@@ -225,6 +227,7 @@ const router = createBrowserRouter([
             { path: 'jobalerts', element: <JobAlertPage /> },
             { path: 'favorites', element: <FavoriteJobsPage /> },
             { path: 'applied', element: <AppliedJobsPage /> },
+            { path: 'interviews', element: <InterviewsPage /> },
             { path: 'overview', element: <OverviewPage /> },
             {
                 index: true,
@@ -233,6 +236,15 @@ const router = createBrowserRouter([
                 ),
             },
         ],
+    },
+    {
+        path: '/job-seeker/interviews/:id',
+        element: (
+            <ProtectedRoute allowedRoles={['SEEKER']}>
+                <CandidateFullLayout />
+            </ProtectedRoute>
+        ),
+        children: [{ index: true, element: <InterviewDetailPage /> }],
     },
 ]);
 
