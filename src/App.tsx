@@ -66,6 +66,8 @@ import JobSeekerSetupPage from './pages/jobseeker/setup/JobSeekerSetupPage';
 import JobSeekerJobDetailPage from './pages/jobseeker/FindJob/JobDetailPage';
 import DynamicJobDetailRoute from './routes/DynamicJobDetailRoute';
 import EmployerDetailPage from './pages/jobseeker/FindEmployer/EmployerDetailPage';
+import InterviewSchedulePage from './pages/jobseeker/dashboard/interview/InterviewSchedulePage'
+import InterviewConfirmPage from './pages/jobseeker/dashboard/interview/InterviewConfirmPage';
 const router = createBrowserRouter([
     {
         element: <MainLayout />,
@@ -232,7 +234,20 @@ const router = createBrowserRouter([
                     <Navigate to='/jobseeker/DashBoard/overview' replace />
                 ),
             },
+            { path: 'interviews', element: <InterviewSchedulePage /> },
+            
+            {
+                index: true,
+                element: <Navigate to='/jobseeker/DashBoard/overview' replace />,
+            },
         ],
+    },
+    {
+        path: '/candidate/interviews/:applicationId/confirm',
+        element: <CandidateFullLayout />, 
+        children: [
+            { index: true, element: <InterviewConfirmPage /> }
+        ]
     },
 ]);
 

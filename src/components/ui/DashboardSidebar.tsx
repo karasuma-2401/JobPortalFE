@@ -6,6 +6,7 @@ import {
     Bell,
     Settings,
     LogOut,
+    CalendarDays, // 1. Import icon mới
 } from 'lucide-react';
 import useAuth from '../../contexts/auth/useAuth';
 
@@ -19,6 +20,12 @@ export default function DashboardSidebar() {
             path: '/jobseeker/DashBoard/overview',
             label: 'Overview',
             icon: <LayoutDashboard size={22} />,
+        },
+        // 2. Thêm mục Interviews vào danh sách
+        {
+            path: '/jobseeker/DashBoard/interviews',
+            label: 'Interviews',
+            icon: <CalendarDays size={22} />,
         },
         {
             path: '/jobseeker/DashBoard/applied',
@@ -50,6 +57,7 @@ export default function DashboardSidebar() {
                 </span>
                 <nav className='flex flex-col w-full'>
                     {menuItems.map((item) => {
+                        // Logic kiểm tra active path
                         const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
                         return (
                             <Link
@@ -63,11 +71,7 @@ export default function DashboardSidebar() {
                             >
                                 <div className='flex items-center gap-3'>
                                     <span
-                                        className={
-                                            isActive
-                                                ? 'text-primary-500'
-                                                : 'text-gray-400'
-                                        }
+                                        className={isActive ? 'text-primary-500' : 'text-gray-400'}
                                     >
                                         {item.icon}
                                     </span>
