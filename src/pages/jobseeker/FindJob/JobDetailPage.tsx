@@ -17,6 +17,7 @@ import { FaFacebook, FaTwitter } from 'react-icons/fa';
 import JobOverviewSidebar from './components/JobOverviewSidebar';
 import JobGridSection from '../../../components/ui/JobGridSection';
 import ApplyJobModal from './components/ApplyJobModal';
+import JobReviewsSection from './components/JobReviewsSection';
 import { useJobDetail } from './hooks/useJobDetail';
 import useAuth from '../../../contexts/auth/useAuth';
 import {
@@ -75,6 +76,12 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
         () => searchParams.get('apply') === 'true',
         [searchParams]
     );
+    const shouldScrollToReviews = useMemo(
+        () =>
+            searchParams.get('review') === 'true' ||
+            window.location.hash === '#reviews',
+        [searchParams]
+    );
 
     const openApplyFlow = () => {
         const applyPath = buildJobApplyPath(resolvedJobId);
@@ -130,6 +137,18 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
         shouldAutoOpenApply,
         user,
     ]);
+
+    useEffect(() => {
+        if (!jobData || !shouldScrollToReviews) {
+            return;
+        }
+
+        window.requestAnimationFrame(() => {
+            document
+                .getElementById('reviews')
+                ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }, [jobData, shouldScrollToReviews]);
 
     if (!resolvedJobId) {
         return <Navigate to='/find-job' replace />;
@@ -332,6 +351,17 @@ export default function JobDetailPage({ jobId }: JobDetailPageProps) {
                             website={jobData.website}
                         />
                     </div>
+                </div>
+
+                <div
+                    id='reviews'
+                    className='scroll-mt-24 border-t border-gray-100 pt-8'
+                >
+                    <JobReviewsSection
+                        jobPostId={resolvedJobId}
+                        averageRating={jobData.averageRating}
+                        reviewCount={jobData.reviewCount}
+                    />
                 </div>
 
                 <div className='border-t border-gray-100 pt-8'>

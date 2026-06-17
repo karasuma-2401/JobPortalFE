@@ -33,18 +33,4 @@ export interface JobDetail extends JobPostResponse {
     requirements?: string;
     benefits?: string[];
     industryIds?: number[];
-    reviews?: JobReview[];
-    userApplication?: UserApplication;
-}
-export interface JobReview {
-    id: string | number;
-    userName: string;
-    rating: number;
-    comment: string;
-    createdAt: string;
-}
-
-export interface UserApplication {
-    status: string; 
-    hasInterview: boolean; 
 }

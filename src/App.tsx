@@ -54,7 +54,9 @@ import JobAlertPage from './pages/jobseeker/dashboard/JobAlert/JobAlert';
 import FindJobPage from './pages/jobseeker/FindJob/FindJobPage';
 import FavoriteJobsPage from './pages/jobseeker/dashboard/FavoriteJob/FavoriteJobs';
 import AppliedJobsPage from './pages/jobseeker/dashboard/AppliedJob/AppliedJobs';
+import InterviewsPage from './pages/jobseeker/dashboard/Interviews/InterviewsPage';
 import OverviewPage from './pages/jobseeker/dashboard/Overview/Overview';
+import InterviewDetailPage from './pages/jobseeker/interviews/InterviewDetailPage';
 
 import JobDetailPage from './pages/employer/my-jobs/JobDetailPage';
 import EditJobPage from './pages/employer/my-jobs/components/EditJobPage';
@@ -66,8 +68,6 @@ import JobSeekerSetupPage from './pages/jobseeker/setup/JobSeekerSetupPage';
 import JobSeekerJobDetailPage from './pages/jobseeker/FindJob/JobDetailPage';
 import DynamicJobDetailRoute from './routes/DynamicJobDetailRoute';
 import EmployerDetailPage from './pages/jobseeker/FindEmployer/EmployerDetailPage';
-import InterviewSchedulePage from './pages/jobseeker/dashboard/interview/InterviewSchedulePage'
-import InterviewConfirmPage from './pages/jobseeker/dashboard/interview/InterviewConfirmPage';
 const router = createBrowserRouter([
     {
         element: <MainLayout />,
@@ -227,6 +227,7 @@ const router = createBrowserRouter([
             { path: 'jobalerts', element: <JobAlertPage /> },
             { path: 'favorites', element: <FavoriteJobsPage /> },
             { path: 'applied', element: <AppliedJobsPage /> },
+            { path: 'interviews', element: <InterviewsPage /> },
             { path: 'overview', element: <OverviewPage /> },
             {
                 index: true,
@@ -234,20 +235,16 @@ const router = createBrowserRouter([
                     <Navigate to='/jobseeker/DashBoard/overview' replace />
                 ),
             },
-            { path: 'interviews', element: <InterviewSchedulePage /> },
-            
-            {
-                index: true,
-                element: <Navigate to='/jobseeker/DashBoard/overview' replace />,
-            },
         ],
     },
     {
-        path: '/candidate/interviews/:applicationId/confirm',
-        element: <CandidateFullLayout />, 
-        children: [
-            { index: true, element: <InterviewConfirmPage /> }
-        ]
+        path: '/job-seeker/interviews/:id',
+        element: (
+            <ProtectedRoute allowedRoles={['SEEKER']}>
+                <CandidateFullLayout />
+            </ProtectedRoute>
+        ),
+        children: [{ index: true, element: <InterviewDetailPage /> }],
     },
 ]);
 

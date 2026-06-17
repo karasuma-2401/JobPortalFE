@@ -66,6 +66,8 @@ export interface JobDetailType {
     description: string | string[];
     responsibilities: string[];
     requirements?: string;
+    averageRating?: number;
+    reviewCount?: number;
     overview: JobOverview;
     companyProfile: CompanyProfile;
 }
@@ -143,7 +145,7 @@ export interface AppliedJobType {
     type: string;
     location: string;
     salary: string;
-    dateApplied: string;
+    appliedAt: string;
     status: string;
 }
 
@@ -245,4 +247,3 @@ export interface SpringPageResponse<T> {
     size: number;
     number: number;
 }
-

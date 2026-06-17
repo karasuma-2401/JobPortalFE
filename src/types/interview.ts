@@ -1,30 +1,55 @@
+import type { ApplicationStatus } from './application';
 
-export type InterviewStatus = 
-    | 'PENDING_CONFIRMATION' 
-    | 'SCHEDULED' 
-    | 'COMPLETED' 
-    | 'CANCELLED';
+export type InterviewSessionStatus =
+    | 'PENDING_SELECTION'
+    | 'CONFIRMED'
+    | 'EXPIRED'
+    | 'CANCELLED'
+    | 'COMPLETED';
 
-export const InterviewStatusList = {
-    PENDING_CONFIRMATION: 'PENDING_CONFIRMATION',
-    SCHEDULED: 'SCHEDULED',
-    COMPLETED: 'COMPLETED',
-    CANCELLED: 'CANCELLED',
-} as const;
-
-export interface InterviewSession {
-    id: string;
-    applicationId: string;
-    jobTitle: string;
-    companyName: string;
-    scheduledAt: string; 
-    status: InterviewStatus; 
-    location?: string;
-    notes?: string;
+export interface InterviewSlot {
+    id: number;
+    startsAt: string;
+    displayNote?: string;
+    selected?: boolean;
 }
 
-export interface InterviewConfirmationPayload {
-    applicationId: string;
-    selectedDateTime: string;
-    candidateNotes?: string;
+export interface InterviewSession {
+    id: number;
+    applicationId: number;
+    jobPostId: number;
+    jobPostTitle: string;
+    jobSeekerId: number;
+    jobSeekerName: string;
+    employerId: number;
+    employerName: string;
+    applicationStatus: ApplicationStatus;
+    status: InterviewSessionStatus;
+    message?: string;
+    meetingLocation?: string;
+    meetingUrl?: string;
+    expiresAt: string;
+    createdAt: string;
+    completedAt?: string;
+    cancelledAt?: string;
+    selectedSlot?: InterviewSlot;
+    slots: InterviewSlot[];
+}
+
+export interface CreateInterviewSessionPayload {
+    applicationId: number;
+    message?: string;
+    meetingLocation?: string;
+    meetingUrl?: string;
+    slots: Array<{
+        startsAt: string;
+        displayNote?: string;
+    }>;
+}
+
+export interface PagedInterviewSessions {
+    items: InterviewSession[];
+    totalItems: number;
+    page: number;
+    size: number;
 }
