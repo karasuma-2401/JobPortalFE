@@ -108,9 +108,14 @@ export default function EmployerDetailPage() {
                                 <h2 className='text-[18px] font-bold text-gray-900'>
                                     Company Vision
                                 </h2>
-                                <p className='text-[14px] text-gray-500 leading-relaxed'>
-                                    {employerData.vision}
-                                </p>
+                                <p
+                                    dangerouslySetInnerHTML={{
+                                        __html:
+                                            employerData.vision ||
+                                            'No vision provided',
+                                    }}
+                                    className='text-[14px] text-gray-500 leading-relaxed'
+                                ></p>
                             </div>
                         )}
                     </div>
